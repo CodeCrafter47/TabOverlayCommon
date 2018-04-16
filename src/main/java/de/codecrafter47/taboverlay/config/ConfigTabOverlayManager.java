@@ -89,7 +89,7 @@ public class ConfigTabOverlayManager {
         this.expressionEngine = constructExpressionEngine(options);
         this.tabEventQueue = tabEventQueue;
         this.iconManager = iconManager;
-        this.globalPlayerSetFactory = new GlobalPlayerSetFactory(playerProvider, tabEventQueue, logger);
+        this.globalPlayerSetFactory = new GlobalPlayerSetFactory(playerProvider, tabEventQueue, logger, options.playerInvisibleDataKey, options.playerCanSeeInvisibleDataKey);
         this.playerIconDataKey = options.playerIconDataKey;
         this.playerPingDataKey = options.playerPingDataKey;
 
@@ -320,5 +320,8 @@ public class ConfigTabOverlayManager {
         DataKey<Icon> playerIconDataKey;
 
         DataKey<Integer> playerPingDataKey;
+
+        DataKey<Boolean> playerInvisibleDataKey;
+        DataKey<Boolean> playerCanSeeInvisibleDataKey;
     }
 }

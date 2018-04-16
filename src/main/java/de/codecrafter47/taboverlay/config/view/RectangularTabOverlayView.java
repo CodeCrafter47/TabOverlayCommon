@@ -97,7 +97,9 @@ public class RectangularTabOverlayView<TabView extends de.codecrafter47.taboverl
 
         @Override
         protected void requestLayoutUpdate(ComponentView source) {
-            updateTabListSize();
+            if (!updateTabListSize()) {
+                contentView.updateArea(contentView.getArea());
+            }
         }
 
         @Override

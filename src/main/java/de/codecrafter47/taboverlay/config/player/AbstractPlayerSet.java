@@ -25,11 +25,11 @@ public abstract class AbstractPlayerSet implements PlayerSet {
 
     private boolean isNotifyingListeners = false;
 
-    AbstractPlayerSet(ScheduledExecutorService eventQueue, PlayerProvider playerProvider, Logger logger, PlayerSetTemplate template, Context context) {
+    AbstractPlayerSet(ScheduledExecutorService eventQueue, PlayerProvider playerProvider, Logger logger, ExpressionTemplate predicate, Context context) {
         this.logger = logger;
         this.context = context;
         this.playerProvider = playerProvider;
-        this.predicate = template.getPredicate(); // todo visibility
+        this.predicate = predicate;
     }
 
     private void activate() {

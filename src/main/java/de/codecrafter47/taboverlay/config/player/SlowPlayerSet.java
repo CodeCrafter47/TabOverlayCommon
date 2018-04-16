@@ -2,13 +2,12 @@ package de.codecrafter47.taboverlay.config.player;
 
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
-import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 
 import java.util.logging.Logger;
 
 public class SlowPlayerSet extends AbstractPlayerSet implements PlayerSet {
 
-    public SlowPlayerSet(PlayerProvider playerProvider, PlayerSetTemplate template, Context context, Logger logger) {
+    public SlowPlayerSet(PlayerProvider playerProvider, ExpressionTemplate template, Context context, Logger logger) {
         super(context.getTabEventQueue(), playerProvider, logger, template, context);
     }
 

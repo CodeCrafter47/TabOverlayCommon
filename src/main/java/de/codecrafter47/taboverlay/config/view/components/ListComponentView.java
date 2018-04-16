@@ -65,7 +65,7 @@ public final class ListComponentView extends ComponentView implements TextViewUp
 
     @Override
     protected void requestLayoutUpdate(ComponentView source) {
-        if (updateFuture == null) {
+        if (updateFuture == null || updateFuture.isDone()) {
             updateFuture = getContext().getTabEventQueue().submit(this::update);
         }
     }

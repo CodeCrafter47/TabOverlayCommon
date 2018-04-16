@@ -25,6 +25,6 @@ public class PlayerSetTemplate {
     public PlayerSetTemplate(@Nonnull PlayerSetConfiguration.Visibility hiddenPlayersVisibility, @Nonnull ExpressionTemplate predicate) {
         this.hiddenPlayersVisibility = hiddenPlayersVisibility;
         this.predicate = predicate;
-        this.requiresViewerContext = predicate.requiresViewerContext();
+        this.requiresViewerContext = predicate.requiresViewerContext() || hiddenPlayersVisibility == PlayerSetConfiguration.Visibility.VISIBLE_TO_ADMINS;
     }
 }

@@ -5,7 +5,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
-import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 import lombok.SneakyThrows;
 
 import javax.annotation.Nonnull;
@@ -24,7 +23,7 @@ public class SharedPlayerSet extends AbstractPlayerSet {
         }
     });
 
-    public SharedPlayerSet(PlayerProvider playerProvider, PlayerSetTemplate template, ScheduledExecutorService eventQueue, Logger logger) {
+    public SharedPlayerSet(PlayerProvider playerProvider, ExpressionTemplate template, ScheduledExecutorService eventQueue, Logger logger) {
         super(eventQueue, playerProvider, logger, template, Context.from(null, eventQueue));
     }
 

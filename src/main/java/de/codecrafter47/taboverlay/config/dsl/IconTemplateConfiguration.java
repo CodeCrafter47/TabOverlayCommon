@@ -6,6 +6,7 @@ import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.template.icon.PlayerIconTemplate;
+import org.yaml.snakeyaml.error.Mark;
 
 public class IconTemplateConfiguration extends MarkedPropertyBase {
 
@@ -18,10 +19,10 @@ public class IconTemplateConfiguration extends MarkedPropertyBase {
     }
 
     public IconTemplateConfiguration(String value) {
-        this.templateConstructor = tcc -> parse(value, tcc);
+        this.templateConstructor = tcc -> parse(value, getStartMark(), tcc);
     }
 
-    private IconTemplate parse(String value, TemplateCreationContext tcc) {
+    private IconTemplate parse(String value, Mark mark, TemplateCreationContext tcc) {
         if (value.equals("${player skin}")) {
             if (!tcc.isPlayerAvailable()) {
                 tcc.getErrorHandler().addWarning("${player skin} cannot be used here", getStartMark());
@@ -35,7 +36,7 @@ public class IconTemplateConfiguration extends MarkedPropertyBase {
             }
             return new PlayerIconTemplate(PlayerPlaceholder.BindPoint.VIEWER, tcc.getPlayerIconDataKey());
         } else {
-            return tcc.getIconManager().createIconTemplate(value, tcc);
+            return tcc.getIconManager().createIconTemplate(value, mark, tcc);
         }
     }
 

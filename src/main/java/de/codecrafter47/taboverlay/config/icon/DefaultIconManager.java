@@ -13,15 +13,13 @@ import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.icon.IconView;
 import de.codecrafter47.taboverlay.config.view.icon.IconViewConstant;
 import de.codecrafter47.taboverlay.config.view.icon.IconViewUpdateListener;
+import org.yaml.snakeyaml.error.Mark;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -86,9 +84,10 @@ public class DefaultIconManager implements IconManager {
     }
 
     @Override
-    public synchronized IconTemplate createIconTemplate(String s, TemplateCreationContext tcc) {
+    public synchronized IconTemplate createIconTemplate(String s, Mark mark, TemplateCreationContext tcc) {
         if (s.contains("\\$\\{")) {
             // todo contains a placeholder
+            tcc.getErrorHandler().addWarning("Icon definition contains placeholder. This is not supported yet.", mark);
         } else {
             IconEntry entry = cache.getIfPresent(s);
 
@@ -106,7 +105,7 @@ public class DefaultIconManager implements IconManager {
                 CompletableFuture<Icon> future = fetchIconFromImage(iconFolder.resolve(s));
                 entry = new IconEntry(future);
             } else {
-                // todo
+                tcc.getErrorHandler().addWarning("Icon needs to be either\n1. A username,\n2. A UUID or\n3. A png image file.", mark);
             }
 
             if (entry != null) {
@@ -309,7 +308,8 @@ public class DefaultIconManager implements IconManager {
         private List<Runnable> listeners = new ArrayList<>();
 
         public IconEntry(CompletableFuture<Icon> iconProvider) {
-            factory = IconViewDelegate::new;
+            IconViewDelegate delegate = new IconViewDelegate();
+            factory = () -> delegate;
             iconProvider.exceptionally(th -> Icon.DEFAULT_ALEX /* todo error icon */)
                     .thenAcceptAsync(icon -> {
                         IconViewConstant iconView = new IconViewConstant(icon);

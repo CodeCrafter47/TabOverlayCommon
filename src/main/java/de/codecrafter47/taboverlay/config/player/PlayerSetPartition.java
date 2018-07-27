@@ -1,10 +1,14 @@
 package de.codecrafter47.taboverlay.config.player;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.ExpressionUpdateListener;
 import de.codecrafter47.taboverlay.config.expression.ToStringExpression;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.view.ActiveElement;
+import lombok.SneakyThrows;
 
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
@@ -94,7 +98,7 @@ public final class PlayerSetPartition {
 
         void addToPartition(String p) {
             if (!partitions.containsKey(p)) {
-                PlayerSetSubset subset = new PlayerSetSubset(logger);
+                PlayerSetSubset subset = new PlayerSetSubset(context, logger);
                 subset.add(player);
                 partitions.put(p, subset);
                 isNotifyingListeners = true;
@@ -172,13 +176,16 @@ public final class PlayerSetPartition {
 
     private static class PlayerSetSubset implements PlayerSet {
 
+        private final Context context;
         private final Logger logger;
         private final HashSet<Listener> listeners = new HashSet<>();
         private final Set<Player> containedPlayers = new HashSet<>();
+        private final Cache<PlayerOrderTemplate, OrderedPlayerSet> cacheOrdered = CacheBuilder.newBuilder().weakValues().build();
 
         private boolean isNotifyingListeners = false;
 
-        private PlayerSetSubset(Logger logger) {
+        private PlayerSetSubset(Context context, Logger logger) {
+            this.context = context;
             this.logger = logger;
         }
 
@@ -243,6 +250,17 @@ public final class PlayerSetPartition {
         @Override
         public PlayerSetPartition getPartition(ExpressionTemplate idFunction) {
             throw new UnsupportedOperationException("Partition inside partition is not supported");
+        }
+
+        @Override
+        @SneakyThrows
+        public OrderedPlayerSet getOrderedPlayerSet(Context context, PlayerOrderTemplate playerOrderTemplate) {
+            if (playerOrderTemplate.requiresViewerContext())
+                return new OrderedPlayerSetImpl(this, logger, context, playerOrderTemplate);
+            else
+                return cacheOrdered.get(playerOrderTemplate, () -> {
+                    return new OrderedPlayerSetImpl(this, logger, PlayerSetSubset.this.context, playerOrderTemplate);
+                });
         }
     }
 

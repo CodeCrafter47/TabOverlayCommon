@@ -2,10 +2,10 @@ package de.codecrafter47.taboverlay.config.view.components;
 
 import de.codecrafter47.taboverlay.config.area.Area;
 import de.codecrafter47.taboverlay.config.context.Context;
-import de.codecrafter47.taboverlay.config.context.ContextKey;
 import de.codecrafter47.taboverlay.config.context.ContextKeys;
+import de.codecrafter47.taboverlay.config.player.OrderedPlayerSet;
 import de.codecrafter47.taboverlay.config.player.Player;
-import de.codecrafter47.taboverlay.config.player.PlayerSet;
+import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
 import de.codecrafter47.taboverlay.config.view.icon.IconView;
@@ -15,7 +15,7 @@ import de.codecrafter47.taboverlay.config.view.text.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class PlayersComponentView extends ComponentView implements PlayerSet.Listener, DefaultSlotHandler.Listener {
+public final class PlayersComponentView extends ComponentView implements OrderedPlayerSet.Listener, DefaultSlotHandler.Listener {
 
     private final PlayerSetTemplate playerSetTemplate;
     private final ComponentTemplate playerComponentTemplate;
@@ -23,20 +23,20 @@ public final class PlayersComponentView extends ComponentView implements PlayerS
     private final ComponentTemplate morePlayerComponentTemplate;
     private final int morePlayerComponentSize;
     private final DefaultSlotHandler defaultSlotHandler;
+    private final PlayerOrderTemplate playerOrderTemplate;
 
-    private PlayerSet playerSet;
-    private List<Player> players = null;
+    private OrderedPlayerSet playerSet;
     private List<ComponentView> activePlayerComponents = new ArrayList<>();
     private ComponentView morePlayersComponent;
     private int firstDefaultSlot;
-    // todo sort the players
 
-    public PlayersComponentView(PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, IconView defaultIconView, TextView defaultTextView, PingView defaultPingView) {
+    public PlayersComponentView(PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, IconView defaultIconView, TextView defaultTextView, PingView defaultPingView, PlayerOrderTemplate playerOrderTemplate) {
         this.playerSetTemplate = playerSetTemplate;
         this.playerComponentTemplate = playerComponentTemplate;
         this.playerComponentSize = playerComponentSize;
         this.morePlayerComponentTemplate = morePlayerComponentTemplate;
         this.morePlayerComponentSize = morePlayerComponentSize;
+        this.playerOrderTemplate = playerOrderTemplate;
         this.defaultSlotHandler = new DefaultSlotHandler(defaultTextView, defaultPingView, defaultIconView);
     }
 
@@ -44,10 +44,9 @@ public final class PlayersComponentView extends ComponentView implements PlayerS
     protected void onActivation() {
         super.onActivation();
 
-        playerSet = getContext().getPlayerSetFactory().getInstance(playerSetTemplate);
+        playerSet = getContext().getPlayerSetFactory().getInstance(playerSetTemplate).getOrderedPlayerSet(getContext(), playerOrderTemplate);
         playerSet.addListener(this);
 
-        players = new ArrayList<>(playerSet.getPlayers());
         morePlayersComponent = morePlayerComponentTemplate.instantiate();
 
         defaultSlotHandler.activate(getContext(), this);
@@ -57,15 +56,15 @@ public final class PlayersComponentView extends ComponentView implements PlayerS
     protected void onAreaUpdated() {
         Area area = getArea();
         if (area != null) {
-            boolean allFit = area.getSize() >= players.size() * playerComponentSize;
+            boolean allFit = area.getSize() >= playerSet.getCount() * playerComponentSize;
             int indexP = 0;
             int pos = 0;
-            while (indexP < players.size() && (allFit || pos + playerComponentSize + morePlayerComponentSize <= area.getSize())) {
+            while (indexP < playerSet.getCount() && (allFit || pos + playerComponentSize + morePlayerComponentSize <= area.getSize())) {
                 if (indexP < activePlayerComponents.size()) {
                     activePlayerComponents.get(indexP).updateArea(area.createChild(pos, playerComponentSize));
                 } else {
                     Context child = getContext().clone();
-                    child.setPlayer(players.get(indexP));
+                    child.setPlayer(playerSet.getPlayer(indexP));
                     ComponentView playerComponent = playerComponentTemplate.instantiate();
                     playerComponent.activate(child, this);
                     playerComponent.updateArea(area.createChild(pos, playerComponentSize));
@@ -108,20 +107,24 @@ public final class PlayersComponentView extends ComponentView implements PlayerS
     }
 
     @Override
-    public void onPlayerAdded(Player player) {
-        players.add(player);
-        /*
+    public void onPlayerRemoved(Player player) {
+        int indexP;
+        for (indexP = 0; indexP < activePlayerComponents.size(); indexP++) {
+            if (player == activePlayerComponents.get(indexP).getContext().getPlayer()) {
+                ComponentView playerComponent = activePlayerComponents.remove(indexP);
+                playerComponent.deactivate();
+            }
+        }
         Area area = getArea();
         if (area != null) {
-            boolean allFit = area.getSize() >= players.size() * playerComponentSize;
-            int indexP = activePlayerComponents.size();
+            boolean allFit = area.getSize() >= playerSet.getCount() * playerComponentSize;
             int pos = indexP * playerComponentSize;
-            while (indexP < players.size() && (allFit || pos + playerComponentSize + morePlayerComponentSize <= area.getSize())) {
+            while (indexP < playerSet.getCount() && (allFit || pos + playerComponentSize + morePlayerComponentSize <= area.getSize())) {
                 if (indexP < activePlayerComponents.size()) {
                     activePlayerComponents.get(indexP).updateArea(area.createChild(pos, playerComponentSize));
                 } else {
                     Context child = getContext().clone();
-                    child.setPlayer(players.get(indexP));
+                    child.setPlayer(playerSet.getPlayer(indexP));
                     ComponentView playerComponent = playerComponentTemplate.instantiate();
                     playerComponent.activate(child, this);
                     playerComponent.updateArea(area.createChild(pos, playerComponentSize));
@@ -154,69 +157,34 @@ public final class PlayersComponentView extends ComponentView implements PlayerS
                 area.setSlot(pos, defaultSlotHandler.getIcon(), defaultSlotHandler.getText(), '&', defaultSlotHandler.getPing());
                 pos++;
             }
-        }*/
-        // todo
+        }
         getListener().requestLayoutUpdate(this);
     }
 
     @Override
-    public void onPlayerRemoved(Player player) {
-        int indexP = players.indexOf(player);
-        if (indexP < 0) {
-            // shouldn't happen
-            throw new AssertionError("Removed non-existent player " + player);
-        }
-        players.remove(indexP);
-        if (indexP < activePlayerComponents.size()) {
-            ComponentView playerComponent = activePlayerComponents.remove(indexP);
-            playerComponent.deactivate();
+    public void onUpdate(boolean newPlayers) {
+        if (newPlayers) {
+            // todo don't do this each time
+            getListener().requestLayoutUpdate(this);
         } else {
-            indexP = activePlayerComponents.size();
-        }
-        Area area = getArea();
-        if (area != null) {
-            boolean allFit = area.getSize() >= players.size() * playerComponentSize;
-            int pos = indexP * playerComponentSize;
-            while (indexP < players.size() && (allFit || pos + playerComponentSize + morePlayerComponentSize <= area.getSize())) {
-                if (indexP < activePlayerComponents.size()) {
-                    activePlayerComponents.get(indexP).updateArea(area.createChild(pos, playerComponentSize));
-                } else {
-                    Context child = getContext().clone();
-                    child.setPlayer(players.get(indexP));
-                    ComponentView playerComponent = playerComponentTemplate.instantiate();
-                    playerComponent.activate(child, this);
-                    playerComponent.updateArea(area.createChild(pos, playerComponentSize));
-                    activePlayerComponents.add(playerComponent);
+            Area area = getArea();
+            if (area != null) {
+                for (int i = 0; i < activePlayerComponents.size(); i++) {
+                    Player player = playerSet.getPlayer(i);
+                    if (player != activePlayerComponents.get(i).getContext().getPlayer()) {
+                        Area childArea = activePlayerComponents.get(i).getArea();
+                        activePlayerComponents.get(i).deactivate();
+
+                        Context child = getContext().clone();
+                        child.setPlayer(player);
+                        ComponentView playerComponent = playerComponentTemplate.instantiate();
+                        playerComponent.activate(child, this);
+                        playerComponent.updateArea(childArea);
+                        activePlayerComponents.set(i, playerComponent);
+                    }
                 }
-                indexP++;
-                pos += playerComponentSize;
-            }
-            for (int j = activePlayerComponents.size() - 1; j >= indexP; j--) {
-                ComponentView playerComponent = activePlayerComponents.get(j);
-                playerComponent.deactivate();
-                activePlayerComponents.remove(j);
-            }
-            if (!allFit) {
-                if (morePlayersComponent == null) {
-                    morePlayersComponent = morePlayerComponentTemplate.instantiate();
-                }
-                if (morePlayersComponent.isActive()) {
-                    morePlayersComponent.deactivate();
-                }
-                Context child = getContext().clone();
-                child.setCustomObject(ContextKeys.OTHER_COUNT, playerSet.getCount() - indexP);
-                morePlayersComponent.activate(child, this);
-                morePlayersComponent.updateArea(area.createChild(pos, morePlayerComponentSize));
-                pos += morePlayerComponentSize;
-            }
-            int upper = Integer.min(area.getSize(), firstDefaultSlot);
-            firstDefaultSlot = pos;
-            while (pos < upper) {
-                area.setSlot(pos, defaultSlotHandler.getIcon(), defaultSlotHandler.getText(), '&', defaultSlotHandler.getPing());
-                pos++;
             }
         }
-        getListener().requestLayoutUpdate(this);
     }
 
     @Override

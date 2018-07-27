@@ -1,7 +1,7 @@
 package de.codecrafter47.taboverlay.config.template.component;
 
 import de.codecrafter47.taboverlay.config.player.PlayerSetFactory;
-import de.codecrafter47.taboverlay.config.playerorder.PlayerOrderOptions;
+import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.template.ping.PingTemplate;
@@ -14,7 +14,6 @@ import lombok.NonNull;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @Value
 @Builder
@@ -23,7 +22,7 @@ public class PlayersComponentTemplate implements ComponentTemplate {
 
     private PlayerSetFactory playerSetFactory;
 
-    private PlayerOrderOptions playerOrder;
+    private PlayerOrderTemplate playerOrder;
 
     private ComponentTemplate playerComponent;
 
@@ -50,7 +49,7 @@ public class PlayersComponentTemplate implements ComponentTemplate {
 
     @Override
     public ComponentView instantiate() {
-        return new ContainerComponentView(new PlayersComponentView(playerSet, playerComponent, playerComponent.getLayoutInfo().getSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getSize(), defaultIcon.instantiate(), defaultText.instantiate(), defaultPing.instantiate()),
+        return new ContainerComponentView(new PlayersComponentView(playerSet, playerComponent, playerComponent.getLayoutInfo().getSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getSize(), defaultIcon.instantiate(), defaultText.instantiate(), defaultPing.instantiate(), playerOrder),
                 fillSlotsVertical, minSize, maxSize, columns);
     }
 }

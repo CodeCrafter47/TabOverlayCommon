@@ -15,6 +15,7 @@ import lombok.Value;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Stateless player based placeholder
@@ -76,6 +77,10 @@ public class PlayerPlaceholder<R, T> implements Placeholder {
 
     private T get(Context context) {
         Player player = getPlayer(context);
+        return get(player);
+    }
+
+    private T get(Player player) {
         T value = null;
         if (dataKey != null) {
             R original = player.get(dataKey);
@@ -89,6 +94,21 @@ public class PlayerPlaceholder<R, T> implements Placeholder {
             value = defaultValueFunction.apply(player);
         }
         return value;
+    }
+
+    public Function<Player, String> getToStringFunction() {
+        return player -> getString(player);
+    }
+
+    public String getString(Player player) {
+        return representationFunction.apply(get(player));
+    }
+
+    public ToDoubleFunction<Player> getToDoubleFunction() {
+        return player -> {
+            Number value = (Number) get(player);
+            return value == null ? 0 : value.doubleValue();
+        };
     }
 
     private Player getPlayer(Context context) {

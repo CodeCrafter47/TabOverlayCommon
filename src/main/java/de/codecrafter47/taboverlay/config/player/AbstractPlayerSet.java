@@ -4,6 +4,7 @@ import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.ExpressionUpdateListener;
 import de.codecrafter47.taboverlay.config.expression.ToBooleanExpression;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 import de.codecrafter47.taboverlay.config.view.ActiveElement;
 
@@ -82,6 +83,11 @@ public abstract class AbstractPlayerSet implements PlayerSet {
     @Override
     public Collection<? extends Player> getPlayers() {
         return containedPlayers;
+    }
+
+    @Override
+    public OrderedPlayerSet getOrderedPlayerSet(Context context, PlayerOrderTemplate playerOrderTemplate) {
+        return new OrderedPlayerSetImpl(this, logger, context, playerOrderTemplate);
     }
 
     private void addPlayerAndNotifyListeners(Player player) {

@@ -3,15 +3,13 @@ package de.codecrafter47.taboverlay.config.dsl.components;
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.PlayerOrderConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
-import de.codecrafter47.taboverlay.config.dsl.exception.MarkedConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.placeholder.OtherCountPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
-import de.codecrafter47.taboverlay.config.playerorder.PlayerOrderOptions;
+import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
 import de.codecrafter47.taboverlay.config.template.component.PlayersComponentTemplate;
@@ -43,9 +41,9 @@ public class PlayersComponentConfiguration extends MarkedPropertyBase implements
             }
         }
 
-        PlayerOrderOptions playerOrderOptions = null; // todo better dummy value
+        PlayerOrderTemplate playerOrderTemplate = null; // todo better dummy value
         if(ConfigValidationUtil.checkNotNull(tcc, "!players component", "playerOrder", playerOrder, getStartMark())) {
-            playerOrderOptions = this.playerOrder.toTemplate(tcc);
+            playerOrderTemplate = this.playerOrder.toTemplate(tcc);
 
         }
         if (minSize.getValue() < 0) {
@@ -73,7 +71,7 @@ public class PlayersComponentConfiguration extends MarkedPropertyBase implements
         // todo check more players component for fixed size and not block aligned
 
         return PlayersComponentTemplate.builder()
-                .playerOrder(playerOrderOptions)
+                .playerOrder(playerOrderTemplate)
                 .playerSet(tcc.getPlayerSets().get(playerSet.getValue()))
                 .playerComponent(playerComponentTemplate)
                 .morePlayersComponent(morePlayersComponent != null ? morePlayersComponent.toTemplate(childContextM) : null)

@@ -4,6 +4,7 @@ import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.ExpressionUpdateListener;
 import de.codecrafter47.taboverlay.config.expression.ToBooleanExpression;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 
 import javax.annotation.Nullable;
@@ -86,6 +87,12 @@ public class VisibleToAdminsPlayerSetWrapper implements PlayerSet {
             throw new IllegalStateException("Calling PlayerSet.getPlayers() before registering a listener");
         }
         return playerSet.getPlayers();
+    }
+
+    @Override
+    public OrderedPlayerSet getOrderedPlayerSet(Context context, PlayerOrderTemplate playerOrderTemplate) {
+        // todo make this be shared!
+        return new OrderedPlayerSetImpl(this, logger, context, playerOrderTemplate);
     }
 
     @Override

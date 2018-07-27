@@ -25,15 +25,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,6 +39,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class DefaultIconManager implements IconManager {
 
@@ -112,11 +109,47 @@ public class DefaultIconManager implements IconManager {
                 cache.put(s, entry);
                 return entry;
             } else {
-                // todo
+                // todo missing icon
             }
         }
         // todo log and return error
         return IconTemplate.STEVE;
+    }
+
+    public Map<String, Icon> getIconCache() {
+        try {
+            return Files.find(iconFolder, Integer.MAX_VALUE, (path, attrs) -> attrs.isRegularFile() && path.getFileName().toString().endsWith(".png"))
+                    .collect(Collectors.toMap(
+                            path -> {
+                                return iconFolder.relativize(path).toString();
+                            },
+                            path -> {
+                                BufferedImage head;
+                                try {
+                                    head = ImageIO.read(Files.newInputStream(path));
+                                } catch (IOException e) {
+                                    return new Icon(new ProfileProperty("error", "failed to read file", null));
+                                }
+                                if (head.getWidth() != 8 || head.getHeight() != 8) {
+                                    return new Icon(new ProfileProperty("error", "wrong image dimensions", null));
+                                }
+
+                                int[] rgb = head.getRGB(0, 0, 8, 8, null, 0, 8);
+                                ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
+                                byteBuffer.asIntBuffer().put(rgb);
+                                byte[] headArray = byteBuffer.array();
+
+                                IconImageData imageData = IconImageData.of(headArray);
+                                Icon icon = iconCache.get(imageData);
+                                if (icon == null) {
+                                    return new Icon(new ProfileProperty("error", "not resolved yet", null));
+                                }
+                                return icon;
+                            }
+                    ));
+        } catch (IOException e) {
+            return Collections.emptyMap();
+        }
     }
 
     private CompletableFuture<Icon> fetchIconFromImage(Path path) {
@@ -308,8 +341,7 @@ public class DefaultIconManager implements IconManager {
         private List<Runnable> listeners = new ArrayList<>();
 
         public IconEntry(CompletableFuture<Icon> iconProvider) {
-            IconViewDelegate delegate = new IconViewDelegate();
-            factory = () -> delegate;
+            factory = IconViewDelegate::new;
             iconProvider.exceptionally(th -> Icon.DEFAULT_ALEX /* todo error icon */)
                     .thenAcceptAsync(icon -> {
                         IconViewConstant iconView = new IconViewConstant(icon);

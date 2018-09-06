@@ -46,15 +46,15 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
 
     @Override
     public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
-        if (alignment != null && alignment != Alignment.LEFT) {
-            // todo implement alignment
-            tcc.getErrorHandler().addWarning("Option `alignment: " + alignment + "` is not supported yet.", getStartMark());
+        if (alignment != null && alignment != Alignment.LEFT && !tcc.getSlotWidth().isPresent()) {
+            tcc.getErrorHandler().addWarning("Option `alignment: " + alignment + "` is not supported in this configuration.", getStartMark());
         }
         return BasicComponentTemplate.builder()
                 .icon(icon != null ? icon.toTemplate(tcc) : tcc.getDefaultIcon())
                 .text(text != null ? text.toTemplate(tcc) : tcc.getDefaultText())
                 .ping(ping != null ? ping.toTemplate(tcc) : tcc.getDefaultPing())
                 .alignment(alignment != null ? alignment : Alignment.LEFT)
+                .slotWidth(tcc.getSlotWidth().orElse(80))
                 .build();
     }
 

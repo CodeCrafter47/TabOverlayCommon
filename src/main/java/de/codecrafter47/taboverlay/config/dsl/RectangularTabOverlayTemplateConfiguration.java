@@ -47,6 +47,20 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
             child.setColumns(columns != null ? columns.getValue() : (size.getValue() + 19) / 20);
             template.setSize(size != null ? size.getValue() : -1);
             template.setColumns(columns != null ? columns.getValue() : -1);
+            switch (child.getColumns().getAsInt()) {
+                case 1:
+                    child.setSlotWidth(360);
+                    break;
+                case 2:
+                    child.setSlotWidth(180);
+                    break;
+                case 3:
+                    child.setSlotWidth(110);
+                    break;
+                case 4:
+                    child.setSlotWidth(80);
+                    break;
+            }
         }
 
         if (size != null && size.getValue() > 80) {

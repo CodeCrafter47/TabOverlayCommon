@@ -16,6 +16,7 @@ public class BasicComponentTemplate implements ComponentTemplate {
     PingTemplate ping;
     IconTemplate icon;
     BasicComponentConfiguration.Alignment alignment;
+    int slotWidth;
 
     @Override
     public LayoutInfo getLayoutInfo() {
@@ -27,6 +28,6 @@ public class BasicComponentTemplate implements ComponentTemplate {
 
     @Override
     public ComponentView instantiate() {
-        return new BasicComponentView(text.instantiate(), ping.instantiate(), icon.instantiate(), alignment);
+        return new BasicComponentView(text.instantiate(), ping.instantiate(), icon.instantiate(), alignment, slotWidth);
     }
 }

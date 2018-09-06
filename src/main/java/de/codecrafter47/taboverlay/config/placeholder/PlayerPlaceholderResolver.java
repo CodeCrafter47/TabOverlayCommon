@@ -29,7 +29,7 @@ public class PlayerPlaceholderResolver implements PlaceholderResolver {
         if (bindPoint == PlayerPlaceholder.BindPoint.VIEWER && !tcc.isViewerAvailable()) {
             throw new PlaceholderException("viewer bound placeholders not available in the current context");
         } else if (bindPoint == PlayerPlaceholder.BindPoint.PLAYER && !tcc.isPlayerAvailable()) {
-            StringBuilder suggest = new StringBuilder(prefix);
+            StringBuilder suggest = new StringBuilder("viewer");
             for (int i = 1; i < tokens.length; i++) {
                 String token = tokens[i];
                 suggest.append(' ');

@@ -211,9 +211,17 @@ public final class ListComponentView extends ComponentView implements TextViewUp
                 int posNext = ((pos + columns - 1) / columns) * columns;
                 setSlotsToDefault(pos, posNext);
                 pos = posNext;
-                component.updateArea(area.createRectangularChild(0, pos / columns, area.getColumns(), sectionSize[i] / columns));
+                if (pos < area.getSize()) {
+                    component.updateArea(area.createRectangularChild(0, pos / columns, area.getColumns(), sectionSize[i] / columns));
+                } else {
+                    component.updateArea(null);
+                }
             } else {
-                component.updateArea(area.createChild(pos, sectionSize[i]));
+                if (pos < area.getSize()) {
+                    component.updateArea(area.createChild(pos, sectionSize[i]));
+                } else {
+                    component.updateArea(null);
+                }
             }
             pos += sectionSize[i];
         }

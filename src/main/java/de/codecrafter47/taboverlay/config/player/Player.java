@@ -21,6 +21,7 @@ package de.codecrafter47.taboverlay.config.player;
 
 import de.codecrafter47.data.api.DataHolder;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
@@ -32,6 +33,7 @@ public interface Player extends DataHolder {
      *
      * @return the username
      */
+    @Nonnull
     String getName();
 
     /**
@@ -39,5 +41,6 @@ public interface Player extends DataHolder {
      *
      * @return the uuid of the player
      */
+    @Nonnull
     UUID getUniqueID();
 }

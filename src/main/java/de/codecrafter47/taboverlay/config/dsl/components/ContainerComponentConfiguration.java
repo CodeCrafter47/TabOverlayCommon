@@ -60,10 +60,15 @@ public class ContainerComponentConfiguration extends MarkedPropertyBase implemen
             content = this.components.toTemplate(childContext);
         }
 
+        int contentMinSize = content.getLayoutInfo().getMinSize();
+        if (maxSize != null && contentMinSize < maxSize.getValue()) {
+            tcc.getErrorHandler().addWarning("maxSize of !container set to " + maxSize.getValue() + " but content will require at least " + contentMinSize + " slots.", maxSize.getStartMark());
+        }
+
         return ContainerComponentTemplate.builder()
                 .content(content)
                 .fillSlotsVertical(fillSlotsVertical)
-                .minSize(minSize != null ? minSize.getValue() : 0)
+                .minSize(this.minSize != null ? this.minSize.getValue() : 0)
                 .maxSize(maxSize != null ? maxSize.getValue() : -1)
                 .columns(tcc.getColumns().orElse(1))
                 .build();

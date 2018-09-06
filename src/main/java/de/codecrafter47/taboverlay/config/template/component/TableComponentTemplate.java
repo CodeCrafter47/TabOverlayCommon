@@ -27,7 +27,9 @@ public class TableComponentTemplate implements ComponentTemplate {
     public LayoutInfo getLayoutInfo() {
         return LayoutInfo.builder()
                 .constantSize(size != -1)
-                .size(size)
+                .minSize(size != -1
+                        ? size
+                        : columns.stream().mapToInt(Column::getMinSize).max().orElse(0))
                 .build();
     }
 
@@ -57,6 +59,10 @@ public class TableComponentTemplate implements ComponentTemplate {
 
         private TableComponentView.Column instantiate() {
             return new TableComponentView.Column(columnIndex, width, component.instantiate());
+        }
+
+        private int getMinSize() {
+            return component.getLayoutInfo().getMinSize();
         }
     }
 }

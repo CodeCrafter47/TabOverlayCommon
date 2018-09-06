@@ -44,13 +44,13 @@ public class AnimatedComponentConfiguration extends MarkedPropertyBase implement
             if (!componentTemplates.get(0).getLayoutInfo().isConstantSize()) {
                 throw new MarkedConfigurationException("Animated components can only contain components of constant size.", components.get(0).getStartMark());
             }
-            int size = componentTemplates.get(0).getLayoutInfo().getSize();
+            int size = componentTemplates.get(0).getLayoutInfo().getMinSize();
 
             for (int i = 1; i < componentTemplates.size(); i++) {
                 if (!componentTemplates.get(i).getLayoutInfo().isConstantSize()) {
                     throw new MarkedConfigurationException("Animated components can only contain components of constant size.", (components.get(i) != null ? components.get(i) : components).getStartMark());
                 }
-                if (componentTemplates.get(i).getLayoutInfo().getSize() != size) {
+                if (componentTemplates.get(i).getLayoutInfo().getMinSize() != size) {
                     throw new MarkedConfigurationException("Animated components can only contain components of the same size.", (components.get(i) != null ? components.get(i) : components).getStartMark());
                 }
             }

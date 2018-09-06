@@ -21,7 +21,7 @@ public class BasicComponentTemplate implements ComponentTemplate {
     public LayoutInfo getLayoutInfo() {
         return LayoutInfo.builder()
                 .constantSize(true)
-                .size(1)
+                .minSize(1)
                 .build();
     }
 

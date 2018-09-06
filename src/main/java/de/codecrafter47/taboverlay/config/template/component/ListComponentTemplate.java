@@ -28,9 +28,9 @@ public class ListComponentTemplate implements ComponentTemplate {
                 .constantSize(components.stream()
                         .map(ComponentTemplate::getLayoutInfo)
                         .allMatch(LayoutInfo::isConstantSize))
-                .size(components.stream()
+                .minSize(components.stream()
                         .map(ComponentTemplate::getLayoutInfo)
-                        .mapToInt(LayoutInfo::getSize)
+                        .mapToInt(LayoutInfo::getMinSize)
                         .sum())
                 .build();
     }

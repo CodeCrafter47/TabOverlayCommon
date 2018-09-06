@@ -16,6 +16,10 @@ public interface ComponentTemplate {
 
         boolean constantSize;
 
-        int size;
+        /**
+         * Minimum number of slots required for the component. Should be conservative, i.e. this should always be enough
+         * to render the component.
+         */
+        int minSize;
     }
 }

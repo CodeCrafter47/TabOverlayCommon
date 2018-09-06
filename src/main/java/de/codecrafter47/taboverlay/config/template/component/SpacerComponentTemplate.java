@@ -19,7 +19,7 @@ public class SpacerComponentTemplate implements ComponentTemplate {
     public LayoutInfo getLayoutInfo() {
         return LayoutInfo.builder()
                 .constantSize(false)
-                .size(0)
+                .minSize(0)
                 .build();
     }
 

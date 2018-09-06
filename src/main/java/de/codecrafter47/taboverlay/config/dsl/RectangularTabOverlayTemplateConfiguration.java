@@ -5,6 +5,7 @@ import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.template.RectangularTabOverlayTemplate;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
+import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,6 +35,8 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
 
         if (size == null && columns == null) {
             tcc.getErrorHandler().addError("Failed to configure RECTANGULAR tab list. Either the size or the columns property must be set.", null);
+        } else if (size != null && columns != null) {
+            tcc.getErrorHandler().addError("Failed to configure RECTANGULAR tab list. The size and columns options are mutually exclusive. Only set one of them.", null);
         } else if (size != null && size.getValue() < 0) {
             tcc.getErrorHandler().addError("Failed to configure RECTANGULAR tab list. Size is negative.", size.getStartMark());
         } else if (size != null && !ConfigValidationUtil.isRectangular(size.getValue())) {
@@ -46,6 +49,14 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
             template.setColumns(columns != null ? columns.getValue() : -1);
         }
 
+        if (size != null && size.getValue() > 80) {
+            tcc.getErrorHandler().addWarning("size must not be greater than 80.", size.getStartMark());
+        }
+
+        if (columns != null && columns.getValue() > 4) {
+            tcc.getErrorHandler().addWarning("columns must not be greater than 4.", columns.getStartMark());
+        }
+
         if (ConfigValidationUtil.checkNotNull(tcc, "RECTANGULAR tab overlay", "defaultIcon", defaultIcon, null)) {
             child.setDefaultIcon(defaultIcon.toTemplate(tcc));
         }
@@ -53,7 +64,15 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
             child.setDefaultPing(defaultPing.toTemplate(tcc));
         }
         if (ConfigValidationUtil.checkNotNull(tcc, "RECTANGULAR tab overlay", "components", components, null)) {
-            template.setContentRoot(components.toTemplate(child));
+            ComponentTemplate contentRoot = components.toTemplate(child);
+            template.setContentRoot(contentRoot);
+            int contentMinSize = contentRoot.getLayoutInfo().getMinSize();
+            if (size != null && size.getValue() < contentMinSize) {
+                tcc.getErrorHandler().addWarning("size set to " + size.getValue() + ", but to display everything at least " + contentMinSize + " slots would be required.", size.getStartMark());
+            }
+            if (columns != null && columns.getValue() * 20 < contentMinSize) {
+                tcc.getErrorHandler().addWarning("columns set to " + columns.getValue() + " which implies a maximum size of " + (columns.getValue() * 20) + ", but to display everything at least " + contentMinSize + " slots would be required.", columns.getStartMark());
+            }
         }
     }
 }

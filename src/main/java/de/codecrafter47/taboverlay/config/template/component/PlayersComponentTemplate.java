@@ -43,13 +43,13 @@ public class PlayersComponentTemplate implements ComponentTemplate {
     public LayoutInfo getLayoutInfo() {
         return LayoutInfo.builder()
                 .constantSize(false)
-                .size(0)
+                .minSize(0)
                 .build();
     }
 
     @Override
     public ComponentView instantiate() {
-        return new ContainerComponentView(new PlayersComponentView(playerSet, playerComponent, playerComponent.getLayoutInfo().getSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getSize(), defaultIcon.instantiate(), defaultText.instantiate(), defaultPing.instantiate(), playerOrder),
+        return new ContainerComponentView(new PlayersComponentView(playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), defaultIcon.instantiate(), defaultText.instantiate(), defaultPing.instantiate(), playerOrder),
                 fillSlotsVertical, minSize, maxSize, columns);
     }
 }

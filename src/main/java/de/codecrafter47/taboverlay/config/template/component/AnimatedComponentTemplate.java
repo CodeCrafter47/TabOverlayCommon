@@ -18,7 +18,7 @@ public class AnimatedComponentTemplate implements ComponentTemplate {
     public LayoutInfo getLayoutInfo() {
         return LayoutInfo.builder()
                 .constantSize(true)
-                .size(components.get(0).getLayoutInfo().getSize())
+                .minSize(components.get(0).getLayoutInfo().getMinSize())
                 .build();
     }
 
@@ -28,6 +28,6 @@ public class AnimatedComponentTemplate implements ComponentTemplate {
         for (ComponentTemplate component : components) {
             componentViews.add(component.instantiate());
         }
-        return new AnimatedComponentView(componentViews, interval, components.get(0).getLayoutInfo().getSize());
+        return new AnimatedComponentView(componentViews, interval, components.get(0).getLayoutInfo().getMinSize());
     }
 }

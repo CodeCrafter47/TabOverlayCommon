@@ -18,8 +18,8 @@ public class ConditionalComponentTemplate implements ComponentTemplate {
         LayoutInfo layout1 = trueReplacement.getLayoutInfo();
         LayoutInfo layout2 = falseReplacement.getLayoutInfo();
         return LayoutInfo.builder()
-                .constantSize(layout1.isConstantSize() && layout2.isConstantSize() && layout1.getSize() == layout2.getSize())
-                .size(layout1.getSize())
+                .constantSize(layout1.isConstantSize() && layout2.isConstantSize() && layout1.getMinSize() == layout2.getMinSize())
+                .minSize(Integer.max(layout1.getMinSize(), layout2.getMinSize()))
                 .build();
     }
 

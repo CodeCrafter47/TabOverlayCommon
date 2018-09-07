@@ -3,6 +3,7 @@ package de.codecrafter47.taboverlay.config.area;
 import com.google.common.base.Preconditions;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.handler.RectangularTabOverlay;
+import de.codecrafter47.taboverlay.handler.SimpleTabOverlay;
 
 import java.util.UUID;
 
@@ -145,6 +146,156 @@ public interface RectangularArea extends Area {
             @Override
             public int getSize() {
                 return size;
+            }
+        };
+    }
+
+    static Area of(SimpleTabOverlay tabOverlay) {
+        return new RectangularArea() {
+            @Override
+            public void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
+                tabOverlay.setSlot(index, uuid, icon, text, alternateColorChar, ping);
+            }
+
+            @Override
+            public void setSlot(int index, UUID uuid, Icon icon, String text, int ping) {
+                tabOverlay.setSlot(index, uuid, icon, text, ping);
+            }
+
+            @Override
+            public void setSlot(int index, Icon icon, String text, char alternateColorChar, int ping) {
+                tabOverlay.setSlot(index, icon, text, alternateColorChar, ping);
+            }
+
+            @Override
+            public void setSlot(int index, Icon icon, String text, int ping) {
+                tabOverlay.setSlot(index, icon, text, ping);
+            }
+
+            @Override
+            public void setUuid(int index, UUID uuid) {
+                tabOverlay.setUuid(index, uuid);
+            }
+
+            @Override
+            public void setIcon(int index, Icon icon) {
+                tabOverlay.setIcon(index, icon);
+            }
+
+            @Override
+            public void setText(int index, String text) {
+                tabOverlay.setText(index, text);
+            }
+
+            @Override
+            public void setText(int index, String text, char alternateColorChar) {
+                tabOverlay.setText(index, text, alternateColorChar);
+            }
+
+            @Override
+            public void setPing(int index, int ping) {
+                tabOverlay.setPing(index, ping);
+            }
+
+            @Override
+            public void setSlot(int column, int row, UUID uuid, Icon icon, String text, int ping) {
+                if (column == 0) {
+                    tabOverlay.setSlot(row, uuid, icon, text, ping);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setSlot(int column, int row, Icon icon, String text, int ping) {
+                if (column == 0) {
+                    tabOverlay.setSlot(row, icon, text, ping);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setSlot(int column, int row, Icon icon, String text, char alternateColorChar, int ping) {
+                if (column == 0) {
+                    tabOverlay.setSlot(row, icon, text, alternateColorChar, ping);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setSlot(int column, int row, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
+                if (column == 0) {
+                    tabOverlay.setSlot(row, uuid, icon, text, alternateColorChar, ping);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setUuid(int column, int row, UUID uuid) {
+                if (column == 0) {
+                    tabOverlay.setUuid(row, uuid);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setIcon(int column, int row, Icon icon) {
+                if (column == 0) {
+                    tabOverlay.setIcon(row, icon);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setText(int column, int row, String text) {
+                if (column == 0) {
+                    tabOverlay.setText(row, text);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setText(int column, int row, String text, char alternateColorChar) {
+                if (column == 0) {
+                    tabOverlay.setText(row, text, alternateColorChar);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public void setPing(int column, int row, int ping) {
+                if (column == 0) {
+                    tabOverlay.setPing(row, ping);
+                } else {
+                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
+                }
+            }
+
+            @Override
+            public int getRows() {
+                return tabOverlay.getSize();
+            }
+
+            @Override
+            public int getColumns() {
+                return 1;
+            }
+
+            @Override
+            public int getSize() {
+                return tabOverlay.getSize();
+            }
+
+            @Override
+            public RectangularArea asRectangularArea() {
+                return this;
             }
         };
     }

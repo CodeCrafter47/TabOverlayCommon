@@ -4,8 +4,11 @@ import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.exception.MarkedConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
+import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.template.DynamicSizeTabOverlayTemplate;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
+import de.codecrafter47.taboverlay.config.template.icon.PlayerIconTemplate;
+import de.codecrafter47.taboverlay.config.template.ping.PlayerPingTemplate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +35,7 @@ public class DynamicSizeTabOverlayTemplateConfiguration extends AbstractTabOverl
             if(!tcc.getPlayerSets().containsKey(playerSet.getValue())) {
                 tcc.getErrorHandler().addError("No player set definition available for player set \"" + playerSet.getValue() + "\"", playerSet.getStartMark());
             } else {
-                template.setPlayerSet(playerSet.getValue());
+                template.setPlayerSet(tcc.getPlayerSets().get(playerSet.getValue()));
             }
         }
 
@@ -41,8 +44,11 @@ public class DynamicSizeTabOverlayTemplateConfiguration extends AbstractTabOverl
         }
         if (ConfigValidationUtil.checkNotNull(tcc, "DYNAMIC_SIZE tab overlay", "playerComponent", playerComponent, null)) {
             TemplateCreationContext childContext = tcc.clone();
+            childContext.setDefaultIcon(new PlayerIconTemplate(PlayerPlaceholder.BindPoint.PLAYER, tcc.getPlayerIconDataKey()));
+            childContext.setDefaultPing(new PlayerPingTemplate(PlayerPlaceholder.BindPoint.PLAYER, tcc.getPlayerPingDataKey()));
             childContext.setPlayerAvailable(true);
             template.setPlayerComponent(playerComponent.toTemplate(childContext));
         }
+        template.setMorePlayersComponent(tcc.emptyComponent());
     }
 }

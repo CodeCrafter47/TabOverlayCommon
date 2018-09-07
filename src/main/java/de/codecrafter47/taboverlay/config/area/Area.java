@@ -2,6 +2,8 @@ package de.codecrafter47.taboverlay.config.area;
 
 import com.google.common.base.Preconditions;
 import de.codecrafter47.taboverlay.Icon;
+import de.codecrafter47.taboverlay.handler.SimpleTabOverlay;
+import de.codecrafter47.taboverlay.handler.SimpleTabOverlayWithHeaderAndFooter;
 
 import java.util.UUID;
 

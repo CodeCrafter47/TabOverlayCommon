@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedHashTreeMap;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
+import de.codecrafter47.taboverlay.config.ErrorHandler;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.icon.ConstantIconTemplate;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
@@ -85,10 +86,10 @@ public class DefaultIconManager implements IconManager {
     }
 
     @Override
-    public synchronized IconTemplate createIconTemplate(String s, Mark mark, TemplateCreationContext tcc) {
+    public synchronized IconTemplate createIconTemplate(String s, Mark mark, ErrorHandler errorHandler) {
         if (s.contains("\\$\\{")) {
             // todo contains a placeholder
-            tcc.getErrorHandler().addWarning("Icon definition contains placeholder. This is not supported yet.", mark);
+            errorHandler.addWarning("Icon definition contains placeholder. This is not supported yet.", mark);
         } else {
             IconTemplate entry = cache.getIfPresent(s);
 
@@ -106,7 +107,7 @@ public class DefaultIconManager implements IconManager {
                 CompletableFuture<Icon> future = fetchIconFromImage(iconFolder.resolve(s));
                 entry = new IconEntry(future);
             } else {
-                tcc.getErrorHandler().addWarning("Icon needs to be either\n1. A username,\n2. A UUID or\n3. A png image file.", mark);
+                errorHandler.addWarning("Icon needs to be either\n1. A username,\n2. A UUID or\n3. A png image file.", mark);
             }
 
             if (entry != null) {

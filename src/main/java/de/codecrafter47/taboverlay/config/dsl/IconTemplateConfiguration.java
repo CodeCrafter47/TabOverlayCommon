@@ -36,7 +36,7 @@ public class IconTemplateConfiguration extends MarkedPropertyBase {
             }
             return new PlayerIconTemplate(PlayerPlaceholder.BindPoint.VIEWER, tcc.getPlayerIconDataKey());
         } else {
-            return tcc.getIconManager().createIconTemplate(value, mark, tcc);
+            return tcc.getIconManager().createIconTemplate(value, mark, tcc.getErrorHandler());
         }
     }
 

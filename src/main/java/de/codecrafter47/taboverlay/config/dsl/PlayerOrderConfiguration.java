@@ -1,6 +1,9 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.placeholder.UnknownPlaceholderException;
@@ -8,14 +11,14 @@ import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class PlayerOrderConfiguration extends MarkedPropertyBase {
     public static final PlayerOrderConfiguration DEFAULT = new PlayerOrderConfiguration("name as text asc");
+
+    private static final Set<TypeToken<?>> NUMERIC_TYPES = ImmutableSet.of(TypeToken.INTEGER, TypeToken.FLOAT, TypeToken.DOUBLE);
+    private static final Set<TypeToken<?>> STRING_TYPES = ImmutableSet.of(TypeToken.STRING);
 
     private static final Map<String, PlayerOrderTemplate.Direction> DIRECTION_ID_MAP = ImmutableMap.<String, PlayerOrderTemplate.Direction>builder()
             .put("ascending", PlayerOrderTemplate.Direction.ASCENDING)
@@ -104,7 +107,13 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                 }
 
                 if (type == null) {
-                    // todo type = defaultType(placeholderId)
+                    TypeToken<?> placeholderType = placeholder.getType();
+                    if (STRING_TYPES.contains(placeholderType)) {
+                        type = PlayerOrderTemplate.Type.TEXT;
+                    }
+                    if (NUMERIC_TYPES.contains(placeholderType)) {
+                        type = PlayerOrderTemplate.Type.NUMBER;
+                    }
                 }
 
                 if (type == null) {

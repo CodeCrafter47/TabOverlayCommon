@@ -1,5 +1,6 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
+import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
@@ -15,6 +16,8 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
 
     private MarkedIntegerProperty size = null;
     private MarkedIntegerProperty columns = null;
+
+    private BasicComponentConfiguration.LongTextBehaviour longText = BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL;
 
     private IconTemplateConfiguration defaultIcon;
 
@@ -62,6 +65,8 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
                     break;
             }
         }
+
+        child.setDefaultLongTextBehaviour(longText);
 
         if (size != null && size.getValue() > 80) {
             tcc.getErrorHandler().addWarning("size must not be greater than 80.", size.getStartMark());

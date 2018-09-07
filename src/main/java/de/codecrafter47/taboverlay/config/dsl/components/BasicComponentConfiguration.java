@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.yaml.snakeyaml.error.Mark;
 
+import java.util.Optional;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,10 +26,9 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
     private IconTemplateConfiguration icon = IconTemplateConfiguration.DEFAULT;
     private PingTemplateConfiguration ping = PingTemplateConfiguration.DEFAULT;
     private Alignment alignment = Alignment.LEFT;
+    private LongTextBehaviour longText = null;
 
     private transient boolean needToFixMark = false;
-
-    // todo add option to limit content length
 
     public BasicComponentConfiguration(String text) {
         if (text != null) {
@@ -49,16 +50,24 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
         if (alignment != null && alignment != Alignment.LEFT && !tcc.getSlotWidth().isPresent()) {
             tcc.getErrorHandler().addWarning("Option `alignment: " + alignment + "` is not supported in this configuration.", getStartMark());
         }
+        if (longText != null && longText != LongTextBehaviour.DISPLAY_ALL && !tcc.getSlotWidth().isPresent()){
+            tcc.getErrorHandler().addWarning("Option `longText: " + longText + "` is not supported in this configuration.", getStartMark());
+        }
         return BasicComponentTemplate.builder()
                 .icon(icon != null ? icon.toTemplate(tcc) : tcc.getDefaultIcon())
                 .text(text != null ? text.toTemplate(tcc) : tcc.getDefaultText())
                 .ping(ping != null ? ping.toTemplate(tcc) : tcc.getDefaultPing())
                 .alignment(alignment != null ? alignment : Alignment.LEFT)
+                .longText(Optional.ofNullable(longText).orElse(tcc.getDefaultLongTextBehaviour().orElse(LongTextBehaviour.DISPLAY_ALL)))
                 .slotWidth(tcc.getSlotWidth().orElse(80))
                 .build();
     }
 
     public enum Alignment {
         LEFT, CENTER, RIGHT
+    }
+
+    public enum LongTextBehaviour {
+        DISPLAY_ALL, CROP, CROP_2DOTS, CROP_3DOTS;
     }
 }

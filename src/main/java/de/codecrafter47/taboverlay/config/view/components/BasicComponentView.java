@@ -21,17 +21,19 @@ public final class BasicComponentView extends ComponentView implements TextViewU
     private final PingView pingView;
     private final IconView iconView;
     private final BasicComponentConfiguration.Alignment alignment;
+    private final BasicComponentConfiguration.LongTextBehaviour longText;
     private final int slotWidth;
     @Nullable
     private UUID uuid;
     @Nullable
     private String textAfterAlignment;
 
-    public BasicComponentView(TextView textView, PingView pingView, IconView iconView, BasicComponentConfiguration.Alignment alignment, int slotWidth) {
+    public BasicComponentView(TextView textView, PingView pingView, IconView iconView, BasicComponentConfiguration.Alignment alignment, BasicComponentConfiguration.LongTextBehaviour longText, int slotWidth) {
         this.textView = textView;
         this.pingView = pingView;
         this.iconView = iconView;
         this.alignment = alignment;
+        this.longText = longText;
         this.slotWidth = slotWidth;
     }
 
@@ -55,21 +57,35 @@ public final class BasicComponentView extends ComponentView implements TextViewU
     private void updateText() {
 
         String text = textView.getText();
-        int textLength = ChatAlignment.legacyTextLength(text, '&');
 
-        // todo crop long text option?
+        if (alignment != BasicComponentConfiguration.Alignment.LEFT || longText != BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL) {
+            int textLength = ChatAlignment.legacyTextLength(text, '&');
 
-        int space = slotWidth - textLength;
-        if (alignment != BasicComponentConfiguration.Alignment.LEFT && space > 0) {
-            int spaces = (int) (space / ChatAlignment.getCharWidth(' ', false));
-            int spacesBefore = spaces;
-            int spacesBehind = 0;
-            if (alignment == BasicComponentConfiguration.Alignment.CENTER) {
-                spacesBefore = spaces / 2;
-                spacesBehind = spaces - spacesBefore;
+            if (longText != BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL && textLength > slotWidth) {
+                String suffix = "";
+                if (longText == BasicComponentConfiguration.LongTextBehaviour.CROP_2DOTS) {
+                    suffix = "..";
+                } else if (longText == BasicComponentConfiguration.LongTextBehaviour.CROP_3DOTS) {
+                    suffix = "...";
+                }
+                int suffixLength = ChatAlignment.legacyTextLength(suffix, '&');
+                text = ChatAlignment.cropLegacyText(text, '&', slotWidth - suffixLength) + suffix;
+                textLength = slotWidth;
             }
-            text = Strings.repeat(" ", spacesBefore) + text + "&r" + Strings.repeat(" ", spacesBehind);
+
+            int space = slotWidth - textLength;
+            if (alignment != BasicComponentConfiguration.Alignment.LEFT && space > 0) {
+                int spaces = (int) (space / ChatAlignment.getCharWidth(' ', false));
+                int spacesBefore = spaces;
+                int spacesBehind = 0;
+                if (alignment == BasicComponentConfiguration.Alignment.CENTER) {
+                    spacesBefore = spaces / 2;
+                    spacesBehind = spaces - spacesBefore;
+                }
+                text = Strings.repeat(" ", spacesBefore) + text + "&r" + Strings.repeat(" ", spacesBehind);
+            }
         }
+
         textAfterAlignment = text;
     }
 

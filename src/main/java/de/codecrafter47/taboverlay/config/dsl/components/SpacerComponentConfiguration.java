@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class SpacerComponentConfiguration extends MarkedPropertyBase implements ComponentConfiguration {
 
     public SpacerComponentConfiguration(String ignored) {
-        // todo check whether this fixes using just !spacer
+        // this allows to use just !spacer with nothing following it
     }
 
     @Override

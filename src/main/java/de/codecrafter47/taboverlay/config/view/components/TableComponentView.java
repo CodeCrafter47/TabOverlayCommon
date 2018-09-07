@@ -67,7 +67,7 @@ public final class TableComponentView extends ComponentView implements DefaultSl
 
     @Override
     protected void requestLayoutUpdate(ComponentView source) {
-        if (updateFuture != null) {
+        if (updateFuture == null || updateFuture.isDone()) {
             updateFuture = getContext().getTabEventQueue().submit(this::update);
         }
     }
@@ -126,7 +126,7 @@ public final class TableComponentView extends ComponentView implements DefaultSl
                 this.minSize = minSize;
                 this.preferredSize = preferredSize;
                 this.maxSize = maxSize;
-                if (hasListener()) {
+                if (notify && hasListener()) {
                     getListener().requestLayoutUpdate(this);
                 }
             }

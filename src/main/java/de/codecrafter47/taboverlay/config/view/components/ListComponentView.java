@@ -147,7 +147,7 @@ public final class ListComponentView extends ComponentView implements TextViewUp
             this.preferredSize = preferredSize;
             this.maxSize = maxSize;
             this.blockAligned = blockAligned;
-            if (hasListener()) {
+            if (notify && hasListener()) {
                 getListener().requestLayoutUpdate(this);
             }
         }

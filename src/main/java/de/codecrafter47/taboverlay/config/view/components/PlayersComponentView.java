@@ -60,14 +60,27 @@ public final class PlayersComponentView extends ComponentView implements Ordered
             int indexP = 0;
             int pos = 0;
             while (indexP < playerSet.getCount() && (allFit || pos + playerComponentSize + morePlayerComponentSize <= area.getSize())) {
+                Area childArea = area.createChild(pos, playerComponentSize);
                 if (indexP < activePlayerComponents.size()) {
-                    activePlayerComponents.get(indexP).updateArea(area.createChild(pos, playerComponentSize));
+                    Player player = playerSet.getPlayer(indexP);
+                    if (player != activePlayerComponents.get(indexP).getContext().getPlayer()) {
+                        activePlayerComponents.get(indexP).deactivate();
+
+                        Context child = getContext().clone();
+                        child.setPlayer(player);
+                        ComponentView playerComponent = playerComponentTemplate.instantiate();
+                        playerComponent.activate(child, this);
+                        playerComponent.updateArea(childArea);
+                        activePlayerComponents.set(indexP, playerComponent);
+                    } else {
+                        activePlayerComponents.get(indexP).updateArea(childArea);
+                    }
                 } else {
                     Context child = getContext().clone();
                     child.setPlayer(playerSet.getPlayer(indexP));
                     ComponentView playerComponent = playerComponentTemplate.instantiate();
                     playerComponent.activate(child, this);
-                    playerComponent.updateArea(area.createChild(pos, playerComponentSize));
+                    playerComponent.updateArea(childArea);
                     activePlayerComponents.add(playerComponent);
                 }
                 indexP++;

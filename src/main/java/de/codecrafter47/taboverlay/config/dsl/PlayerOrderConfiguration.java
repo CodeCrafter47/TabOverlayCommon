@@ -97,16 +97,8 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                     // todo other options
                 }
 
-                if (direction == null) {
-                    // todo direction = defaultDirection(placeholderId)
-                }
-
-                if (direction == null) {
-                    tcc.getErrorHandler().addWarning("In playerOrder: Missing direction for `" + placeholderId + "`. Try `" + placeholderId + " asc` or `" + placeholderId + " desc` instead.", getStartMark());
-                    continue;
-                }
-
                 if (type == null) {
+                    // defaults
                     TypeToken<?> placeholderType = placeholder.getType();
                     if (STRING_TYPES.contains(placeholderType)) {
                         type = PlayerOrderTemplate.Type.TEXT;
@@ -120,6 +112,19 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                     tcc.getErrorHandler().addWarning("In playerOrder: Missing type for `" + placeholderId + "`. Try `" + placeholderId + " as text` or `" + placeholderId + " as number` instead.", getStartMark());
                     continue;
                 }
+
+                if (direction == null) {
+                    // defaults
+                    if (type == PlayerOrderTemplate.Type.TEXT) {
+                        direction = PlayerOrderTemplate.Direction.ASCENDING;
+                    }
+                }
+
+                if (direction == null) {
+                    tcc.getErrorHandler().addWarning("In playerOrder: Missing direction for `" + placeholderId + "`. Try `" + placeholderId + " asc` or `" + placeholderId + " desc` instead.", getStartMark());
+                    continue;
+                }
+
                 chain.add(new PlayerOrderTemplate.Entry(placeholder, direction, type));
             }
         }

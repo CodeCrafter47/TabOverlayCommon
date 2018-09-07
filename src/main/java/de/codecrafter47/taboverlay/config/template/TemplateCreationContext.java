@@ -4,6 +4,7 @@ import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
 import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
+import de.codecrafter47.taboverlay.config.dsl.PlayerSetConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
 import de.codecrafter47.taboverlay.config.expression.ExpressionEngine;
 import de.codecrafter47.taboverlay.config.icon.IconManager;
@@ -22,11 +23,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.OptionalInt;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class TemplateCreationContext implements Cloneable {
@@ -54,6 +51,8 @@ public class TemplateCreationContext implements Cloneable {
     private PlaceholderResolverChain placeholderResolverChain;
 
     private AbstractPlayerPlaceholderResolver playerPlaceholderResolver;
+
+    private PlayerSetConfiguration.Visibility defaultHiddenPlayerVisibility = PlayerSetConfiguration.Visibility.VISIBLE_TO_ADMINS;
 
     private boolean viewerAvailable = false;
 

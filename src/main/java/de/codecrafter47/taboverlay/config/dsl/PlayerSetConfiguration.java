@@ -8,6 +8,9 @@ import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.yaml.snakeyaml.error.Mark;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -16,24 +19,32 @@ public class PlayerSetConfiguration extends MarkedPropertyBase {
 
     private MarkedStringProperty filter;
 
-    // todo default visibility option for all player sets in root config element?
-    private Visibility hiddenPlayers = Visibility.VISIBLE_TO_ADMINS;
+    private Visibility hiddenPlayers = null;
+
+    private transient boolean fixMark;
 
     public PlayerSetConfiguration(String expression) {
         this.filter = new MarkedStringProperty(expression);
-        this.filter.setStartMark(getStartMark()); // todo this doesn't work
+        this.fixMark = true;
+    }
+
+    @Override
+    public void setStartMark(Mark startMark) {
+        super.setStartMark(startMark);
+        if (fixMark) {
+            filter.setStartMark(startMark);
+        }
     }
 
     public PlayerSetTemplate toTemplate(TemplateCreationContext tcc) {
 
-        // todo handle exceptions
         TemplateCreationContext childContext = tcc.clone();
         childContext.setPlayerAvailable(true);
         ExpressionTemplate predicate = tcc.getExpressionEngine().compile(childContext, filter.getValue(), filter.getStartMark());
 
         return PlayerSetTemplate.builder()
                 .predicate(predicate)
-                .hiddenPlayersVisibility(hiddenPlayers)
+                .hiddenPlayersVisibility(Optional.ofNullable(hiddenPlayers).orElse(tcc.getDefaultHiddenPlayerVisibility()))
                 .build();
     }
 

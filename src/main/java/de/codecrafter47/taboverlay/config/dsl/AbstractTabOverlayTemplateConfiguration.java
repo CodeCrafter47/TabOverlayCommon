@@ -43,6 +43,8 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
 
     private MarkedFloatProperty footerAnimationUpdateInterval = new MarkedFloatProperty(1.0f);
 
+    private PlayerSetConfiguration.Visibility hiddenPlayers = PlayerSetConfiguration.Visibility.VISIBLE_TO_ADMINS;
+
     private Map<MarkedStringProperty, CustomPlaceholderConfiguration> customPlaceholders = new HashMap<>();
 
     private Map<MarkedStringProperty, PlayerSetConfiguration> playerSets = new HashMap<>();
@@ -56,6 +58,10 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
     protected abstract T createTemplate();
 
     protected void populateTemplate(T template, TemplateCreationContext tcc) throws ConfigurationException {
+
+        if (ConfigValidationUtil.checkNotNull(tcc, "tab overlay", "hiddenPlayers", hiddenPlayers, null)) {
+            tcc.setDefaultHiddenPlayerVisibility(hiddenPlayers);
+        }
 
         // playerSets
         Map<String, PlayerSetTemplate> playerSetTemplates = new HashMap<>();

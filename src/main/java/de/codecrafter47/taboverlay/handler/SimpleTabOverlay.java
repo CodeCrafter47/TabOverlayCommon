@@ -4,10 +4,9 @@ import de.codecrafter47.taboverlay.Icon;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.UUID;
 
-public interface SimpleTabOverlay extends TabOverlay, TabOverlay.BatchModifiable {
+public interface SimpleTabOverlay extends TabOverlayHandle.BatchModifiable, TabOverlayHandle {
 
     /**
      * Get the current size of the tab overlay.

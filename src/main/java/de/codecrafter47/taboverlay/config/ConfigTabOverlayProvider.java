@@ -25,7 +25,7 @@ public class ConfigTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
     private final AbstractTabOverlayTemplate template;
     private final ActivationHandler activationHandler;
     private final Context context;
-    private TabOverlayView<? extends AbstractTabOverlayTemplate, ?> tabView;
+    private TabOverlayView tabView;
 
     public ConfigTabOverlayProvider(@Nonnull @NonNull TabView tabView, @Nonnull @NonNull AbstractTabOverlayTemplate template, @Nonnull @NonNull Player viewer, @Nonnull @NonNull ScheduledExecutorService eventQueue, @Nonnull @NonNull PlayerProvider playerProvider, @Nonnull @NonNull GlobalPlayerSetFactory globalPlayerSetFactory) {
         super(tabView, template.getPath().toString(), template.getPriority());
@@ -44,7 +44,7 @@ public class ConfigTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
     @Override
     @SneakyThrows
     protected void onActivate(TabOverlayHandler handler) {
-        context.getTabEventQueue().submit(() -> tabView = template.instantiate(getTabView(), handler, context)).get();
+        context.getTabEventQueue().submit(() -> tabView = TabOverlayView.create(getTabView(), handler, context, template)).get();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ConfigTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
     @Override
     @SneakyThrows
     protected void onDetach() {
-        context.getTabEventQueue().submit(() -> activationHandler.deactivate()).get();
+        context.getTabEventQueue().submit(activationHandler::deactivate).get();
     }
 
     @Override

@@ -1,8 +1,6 @@
 package de.codecrafter47.taboverlay;
 
 import com.google.common.base.Preconditions;
-import de.codecrafter47.taboverlay.handler.OperationMode;
-import de.codecrafter47.taboverlay.handler.TabOverlay;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
 import lombok.NonNull;
 
@@ -87,7 +85,7 @@ public abstract class AbstractPlayerTabOverlayProvider extends TabOverlayProvide
      * Called to check whether this {@link AbstractPlayerTabOverlayProvider} should be activated.
      * <p>
      * Note that this method is <em>not</em> invoked periodically. The code implementing this interface is expected to
-     * call {@link TabOverlayProviderSet#update()} when its state is changed.
+     * call {@link TabOverlayProviderSet#scheduleUpdate()} when its state is changed.
      *
      * @return true if it should be activated, false otherwise
      */

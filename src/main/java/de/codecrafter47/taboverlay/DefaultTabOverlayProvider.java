@@ -1,9 +1,10 @@
 package de.codecrafter47.taboverlay;
 
-import de.codecrafter47.taboverlay.handler.OperationMode;
-import de.codecrafter47.taboverlay.handler.TabOverlay;
+import de.codecrafter47.taboverlay.handler.ContentOperationMode;
+import de.codecrafter47.taboverlay.handler.HeaderAndFooterOperationMode;
+import de.codecrafter47.taboverlay.handler.TabOverlayHandle;
 
-public final class DefaultTabOverlayProvider extends AbstractTabOverlayProvider<TabOverlay> {
+public final class DefaultTabOverlayProvider extends AbstractTabOverlayProvider<TabOverlayHandle, TabOverlayHandle> {
 
     private static final DefaultTabOverlayProvider INSTANCE = new DefaultTabOverlayProvider();
 
@@ -12,7 +13,7 @@ public final class DefaultTabOverlayProvider extends AbstractTabOverlayProvider<
     }
 
     private DefaultTabOverlayProvider() {
-        super("default", Integer.MIN_VALUE, OperationMode.PASS_TROUGH);
+        super("default", Integer.MIN_VALUE, ContentOperationMode.PASS_TROUGH, HeaderAndFooterOperationMode.PASS_TROUGH);
     }
 
     @Override
@@ -26,7 +27,7 @@ public final class DefaultTabOverlayProvider extends AbstractTabOverlayProvider<
     }
 
     @Override
-    protected void activate(TabView tabView, TabOverlay tabOverlay) {
+    protected void activate(TabView tabView, TabOverlayHandle contentHandle, TabOverlayHandle headerAndFooterHandle) {
         // nothing to do here
     }
 

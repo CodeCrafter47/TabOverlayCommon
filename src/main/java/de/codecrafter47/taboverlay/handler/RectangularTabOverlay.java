@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * A rectangular tab overlay.
  */
-public interface RectangularTabOverlay extends TabOverlay, TabOverlay.BatchModifiable {
+public interface RectangularTabOverlay extends TabOverlayHandle.BatchModifiable, TabOverlayHandle {
 
     /**
      * Get the current size of the tab overlay.

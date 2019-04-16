@@ -12,17 +12,17 @@ import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 import java.util.List;
 import java.util.concurrent.Future;
 
-public final class ListComponentView extends ComponentView implements TextViewUpdateListener, PingViewUpdateListener, IconViewUpdateListener {
+public class ListComponentView extends ComponentView implements TextViewUpdateListener, PingViewUpdateListener, IconViewUpdateListener {
 
-    private final List<ComponentView> components;
-    private final int columns;
+    protected final List<ComponentView> components;
+    protected final int columns;
     private final TextView defaultTextView;
     private final PingView defaultPingView;
     private final IconView defaultIconView;
     private int minSize, preferredSize, maxSize;
     private boolean blockAligned;
     private Future<?> updateFuture = null;
-    private final int[] sectionSize;
+    private int[] sectionSize;
 
     public ListComponentView(List<ComponentView> components, int columns, TextView defaultTextView, PingView defaultPingView, IconView defaultIconView) {
         this.components = components;
@@ -106,7 +106,7 @@ public final class ListComponentView extends ComponentView implements TextViewUp
         super.onDeactivation();
     }
 
-    private void updateLayoutRequirements(boolean notify) {
+    protected void updateLayoutRequirements(boolean notify) {
         int minSize = 0;
         for (int i = 0; i < components.size(); i++) {
             ComponentView component = components.get(i);
@@ -154,6 +154,7 @@ public final class ListComponentView extends ComponentView implements TextViewUp
     }
 
     private void updateLayout() {
+        this.sectionSize = new int[this.components.size()];
         for (int i = 0; i < components.size(); i++) {
             sectionSize[i] = components.get(i).getMinSize();
         }

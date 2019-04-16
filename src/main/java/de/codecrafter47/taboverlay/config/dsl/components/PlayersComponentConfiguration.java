@@ -74,7 +74,7 @@ public class PlayersComponentConfiguration extends MarkedPropertyBase implements
                 .playerOrder(playerOrderTemplate)
                 .playerSet(tcc.getPlayerSets().get(playerSet.getValue()))
                 .playerComponent(playerComponentTemplate)
-                .morePlayersComponent(morePlayersComponent != null ? morePlayersComponent.toTemplate(childContextM) : null)
+                .morePlayersComponent(morePlayersComponent != null ? morePlayersComponent.toTemplate(childContextM) : childContextM.emptyComponent())
                 .fillSlotsVertical(fillSlotsVertical)
                 .minSize(minSize.getValue())
                 .maxSize(maxSize.getValue())

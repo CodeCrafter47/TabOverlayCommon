@@ -27,6 +27,6 @@ public class ContainerComponentTemplate implements ComponentTemplate {
 
     @Override
     public ComponentView instantiate() {
-        return new ContainerComponentView(content.instantiate(), fillSlotsVertical, minSize, maxSize, columns);
+        return new ContainerComponentView(content.instantiate(), fillSlotsVertical, minSize, maxSize, columns, false);
     }
 }

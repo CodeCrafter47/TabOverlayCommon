@@ -36,11 +36,11 @@ public final class PlayerSetPartition {
         this.partitionFunction = partitionFunction;
     }
 
-    private void activate() {
+    private void activate(boolean notify) {
         playerSet.addListener(listener);
 
         for (Player player : playerSet.getPlayers()) {
-            playerEntryMap.put(player, new PlayerEntry(player));
+            playerEntryMap.put(player, new PlayerEntry(player, notify));
         }
 
         active = true;
@@ -67,7 +67,7 @@ public final class PlayerSetPartition {
         }
         listeners.add(listener);
         if (!active) {
-            activate();
+            activate(false);
         }
     }
 
@@ -86,32 +86,34 @@ public final class PlayerSetPartition {
         private final ToStringExpression function;
         private String partition;
 
-        private PlayerEntry(Player player) {
+        private PlayerEntry(Player player, boolean notify) {
             this.player = player;
             this.function = PlayerSetPartition.this.partitionFunction.instantiateWithStringResult();
             Context childContext = PlayerSetPartition.this.context.clone();
             childContext.setPlayer(player);
             function.activate(childContext, this);
             this.partition = function.evaluate();
-            addToPartition(partition);
+            addToPartition(partition, notify);
         }
 
-        void addToPartition(String p) {
+        void addToPartition(String p, boolean notify) {
             if (!partitions.containsKey(p)) {
                 PlayerSetSubset subset = new PlayerSetSubset(context, logger);
                 subset.add(player);
                 partitions.put(p, subset);
-                isNotifyingListeners = true;
-                try {
-                    for (Listener listener1 : listeners) {
-                        try {
-                            listener1.onPartitionAdded(p, subset);
-                        } catch (Throwable th) {
-                            logger.log(Level.SEVERE, "Unexpected exception while notifying listener", th);
+                if (notify) {
+                    isNotifyingListeners = true;
+                    try {
+                        for (Listener listener1 : listeners) {
+                            try {
+                                listener1.onPartitionAdded(p, subset);
+                            } catch (Throwable th) {
+                                logger.log(Level.SEVERE, "Unexpected exception while notifying listener", th);
+                            }
                         }
+                    } finally {
+                        isNotifyingListeners = false;
                     }
-                } finally {
-                    isNotifyingListeners = false;
                 }
             } else {
                 partitions.get(p).add(player);
@@ -145,7 +147,7 @@ public final class PlayerSetPartition {
             if (!Objects.equals(partition, this.partition)) {
                 removeFromPartition(this.partition);
                 this.partition = partition;
-                addToPartition(this.partition);
+                addToPartition(this.partition, true);
             }
         }
 
@@ -159,12 +161,12 @@ public final class PlayerSetPartition {
     private class MyListener implements PlayerSet.Listener {
         @Override
         public void onPlayerAdded(Player player) {
-            playerEntryMap.put(player, new PlayerSetPartition.PlayerEntry(player));
+            playerEntryMap.put(player, new PlayerSetPartition.PlayerEntry(player, true));
         }
 
         @Override
         public void onPlayerRemoved(Player player) {
-            PlayerSetPartition.PlayerEntry playerEntry = playerEntryMap.get(player);
+            PlayerSetPartition.PlayerEntry playerEntry = playerEntryMap.remove(player);
             if (playerEntry != null) {
                 playerEntry.deactivate();
             } else {
@@ -264,7 +266,7 @@ public final class PlayerSetPartition {
         }
     }
 
-    interface Listener {
+    public interface Listener {
 
         void onPartitionAdded(String id, PlayerSet playerSet);
 

@@ -5,6 +5,7 @@ import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.context.ContextKeys;
 import de.codecrafter47.taboverlay.config.player.OrderedPlayerSet;
 import de.codecrafter47.taboverlay.config.player.Player;
+import de.codecrafter47.taboverlay.config.player.PlayerSet;
 import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
@@ -40,11 +41,24 @@ public final class PlayersComponentView extends ComponentView implements Ordered
         this.defaultSlotHandler = new DefaultSlotHandler(defaultTextView, defaultPingView, defaultIconView);
     }
 
+    PlayersComponentView(OrderedPlayerSet playerSet, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, IconView defaultIconView, TextView defaultTextView, PingView defaultPingView) {
+        this.playerSetTemplate = null;
+        this.playerSet = playerSet;
+        this.playerComponentTemplate = playerComponentTemplate;
+        this.playerComponentSize = playerComponentSize;
+        this.morePlayerComponentTemplate = morePlayerComponentTemplate;
+        this.morePlayerComponentSize = morePlayerComponentSize;
+        this.playerOrderTemplate = null;
+        this.defaultSlotHandler = new DefaultSlotHandler(defaultTextView, defaultPingView, defaultIconView);
+    }
+
     @Override
     protected void onActivation() {
         super.onActivation();
 
-        playerSet = getContext().getPlayerSetFactory().getInstance(playerSetTemplate).getOrderedPlayerSet(getContext(), playerOrderTemplate);
+        if (playerSetTemplate != null) {
+            playerSet = getContext().getPlayerSetFactory().getInstance(playerSetTemplate).getOrderedPlayerSet(getContext(), playerOrderTemplate);
+        }
         playerSet.addListener(this);
 
         morePlayersComponent = morePlayerComponentTemplate.instantiate();

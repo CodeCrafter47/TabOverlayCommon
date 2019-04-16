@@ -50,6 +50,6 @@ public class PlayersComponentTemplate implements ComponentTemplate {
     @Override
     public ComponentView instantiate() {
         return new ContainerComponentView(new PlayersComponentView(playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), defaultIcon.instantiate(), defaultText.instantiate(), defaultPing.instantiate(), playerOrder),
-                fillSlotsVertical, minSize, maxSize, columns);
+                fillSlotsVertical, minSize, maxSize, columns, false);
     }
 }

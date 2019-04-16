@@ -13,13 +13,15 @@ public final class ContainerComponentView extends ComponentView {
     private final int minSize;
     private final int maxSize; // -1 denotes no limit
     private final int columns;
+    private final boolean forceBlock;
 
-    public ContainerComponentView(ComponentView content, boolean fillSlotsVertical, int minSize, int maxSize, int columns) {
+    public ContainerComponentView(ComponentView content, boolean fillSlotsVertical, int minSize, int maxSize, int columns, boolean forceBlock) {
         this.content = content;
         this.fillSlotsVertical = fillSlotsVertical;
         this.minSize = minSize;
         this.maxSize = maxSize;
         this.columns = columns;
+        this.forceBlock = forceBlock;
     }
 
     @Override
@@ -52,6 +54,9 @@ public final class ContainerComponentView extends ComponentView {
     @Override
     public int getMinSize() {
         int minSize = content.getMinSize();
+        if (forceBlock) {
+            minSize = ((minSize + columns - 1) / columns) * columns;
+        }
         if (this.minSize >= 0) {
             minSize = Integer.max(minSize, this.minSize);
         }
@@ -61,6 +66,9 @@ public final class ContainerComponentView extends ComponentView {
     @Override
     public int getPreferredSize() {
         int preferredSize = content.getPreferredSize();
+        if (forceBlock) {
+            preferredSize = ((preferredSize + columns - 1) / columns) * columns;
+        }
         if (fillSlotsVertical) {
             preferredSize *= columns;
         }
@@ -76,6 +84,9 @@ public final class ContainerComponentView extends ComponentView {
     @Override
     public int getMaxSize() {
         int maxSize = content.getMaxSize();
+        if (forceBlock) {
+            maxSize = ((maxSize + columns - 1) / columns) * columns;
+        }
         if (fillSlotsVertical) {
             maxSize *= columns;
         }
@@ -87,7 +98,7 @@ public final class ContainerComponentView extends ComponentView {
 
     @Override
     public boolean isBlockAligned() {
-        return fillSlotsVertical || content.isBlockAligned();
+        return forceBlock || fillSlotsVertical || content.isBlockAligned();
     }
 
     @Override

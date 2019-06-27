@@ -65,6 +65,13 @@ public class DefaultExpressionEngineTest {
     }
 
     @Test
+    public void testNegativeNumbers() {
+        ExpressionTemplate expression = expressionEngine.compile(tcc, "-1", null);
+        Assert.assertFalse(expression.instantiateWithBooleanResult().evaluate());
+        Assert.assertEquals(-1, expression.instantiateWithDoubleResult().evaluate(), 0.001);
+    }
+
+    @Test
     public void testBooleanExpressions() {
         assertTrue("1 == 1");
         assertTrue("\"test\" == \"test\"");

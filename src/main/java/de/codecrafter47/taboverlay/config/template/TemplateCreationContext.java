@@ -3,6 +3,7 @@ package de.codecrafter47.taboverlay.config.template;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
+import de.codecrafter47.taboverlay.config.SortingRulePreprocessor;
 import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.PlayerSetConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
@@ -37,6 +38,8 @@ public class TemplateCreationContext implements Cloneable {
     private final DataKey<Integer> playerPingDataKey;
 
     private final ErrorHandler errorHandler;
+
+    private final SortingRulePreprocessor sortingRulePreprocessor;
 
     private Map<String, CustomPlaceholderConfiguration> customPlaceholders;
 

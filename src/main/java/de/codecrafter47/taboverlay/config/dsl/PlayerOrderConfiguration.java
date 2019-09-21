@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.taboverlay.config.SortingRulePreprocessor;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.placeholder.UnknownPlaceholderException;
@@ -38,12 +39,17 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
     public PlayerOrderTemplate toTemplate(TemplateCreationContext tcc) {
 
+        SortingRulePreprocessor preprocessor = tcc.getSortingRulePreprocessor();
+
         List<PlayerOrderTemplate.Entry> chain = new ArrayList<>();
 
         if (order != null) {
             String[] elements = order.split(",");
             for (String element : elements) {
-                // todo transform aliases here
+
+                if (preprocessor != null) {
+                    element = preprocessor.process(element, tcc.getErrorHandler(), getStartMark());
+                }
 
                 String[] tokens = element.trim().split(" ");
 

@@ -44,6 +44,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,11 +52,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +61,7 @@ public class ConfigTabOverlayManager {
     private final Platform platform;
     private final PlayerProvider playerProvider;
     private final AbstractPlayerPlaceholderResolver playerPlaceholderResolver;
+    private final Collection<PlaceholderResolver> additionalGlobalPlaceholderResolvers;
     private final Yaml yaml;
     private final Logger logger;
     private final ScheduledExecutorService tabEventQueue;
@@ -78,12 +76,15 @@ public class ConfigTabOverlayManager {
     private final DataKey<Icon> playerIconDataKey;
     private final DataKey<Integer> playerPingDataKey;
 
+    private final SortingRulePreprocessor sortingRulePreprocessor;
+
     private final Map<TabView, Player> tabViews = new HashMap<>();
 
-    public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
+    public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Collection<PlaceholderResolver> additionalGlobalPlaceholderResolvers, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
         this.platform = platform;
         this.playerProvider = playerProvider;
         this.playerPlaceholderResolver = playerPlaceholderResolver;
+        this.additionalGlobalPlaceholderResolvers = additionalGlobalPlaceholderResolvers;
         this.yaml = constructYamlInstance(options);
         this.logger = logger;
         this.expressionEngine = constructExpressionEngine(options);
@@ -92,6 +93,7 @@ public class ConfigTabOverlayManager {
         this.globalPlayerSetFactory = new GlobalPlayerSetFactory(playerProvider, tabEventQueue, logger, options.playerInvisibleDataKey, options.playerCanSeeInvisibleDataKey);
         this.playerIconDataKey = options.playerIconDataKey;
         this.playerPingDataKey = options.playerPingDataKey;
+        this.sortingRulePreprocessor = options.sortingRulePreprocessor;
 
         this.platform.addEventListener(new Listener());
     }
@@ -159,7 +161,7 @@ public class ConfigTabOverlayManager {
         ErrorHandler errorHandler = configuration.getErrorHandler();
         AbstractTabOverlayTemplate template = null;
         try {
-            TemplateCreationContext tcc = new TemplateCreationContext(expressionEngine, iconManager, playerIconDataKey, playerPingDataKey, errorHandler);
+            TemplateCreationContext tcc = new TemplateCreationContext(expressionEngine, iconManager, playerIconDataKey, playerPingDataKey, errorHandler, sortingRulePreprocessor);
             tcc.setPlayerPlaceholderResolver(playerPlaceholderResolver);
             tcc.setCustomPlaceholders(new HashMap<>()); // TODO _copy_ of global custom placeholder map
             tcc.setPlayerSets(new HashMap<>()); // todo maybe set to null and throw on get?
@@ -172,6 +174,9 @@ public class ConfigTabOverlayManager {
             placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholder.BindPoint.PLAYER));
             placeholderResolverChain.addResolver(new TimePlaceholderResolver());
             placeholderResolverChain.addResolver(new PlayerSetPlaceholderResolver());
+            for (PlaceholderResolver placeholderResolver : additionalGlobalPlaceholderResolvers) {
+                placeholderResolverChain.addResolver(placeholderResolver);
+            }
             tcc.setPlaceholderResolverChain(placeholderResolverChain);
 
             template = configuration.toTemplate(tcc);
@@ -323,5 +328,8 @@ public class ConfigTabOverlayManager {
 
         DataKey<Boolean> playerInvisibleDataKey;
         DataKey<Boolean> playerCanSeeInvisibleDataKey;
+
+        @Nullable
+        SortingRulePreprocessor sortingRulePreprocessor;
     }
 }

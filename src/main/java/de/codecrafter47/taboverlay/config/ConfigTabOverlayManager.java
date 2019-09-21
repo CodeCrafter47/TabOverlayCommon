@@ -129,6 +129,7 @@ public class ConfigTabOverlayManager {
                 .put("!conditional", CustomPlaceholderConfiguration.Conditional.class)
                 .put("!switch", CustomPlaceholderConfiguration.Switch.class)
                 .put("!compute", CustomPlaceholderConfiguration.Compute.class)
+                .put("!animated", CustomPlaceholderConfiguration.Animated.class)
                 .build();
         inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, null));
 

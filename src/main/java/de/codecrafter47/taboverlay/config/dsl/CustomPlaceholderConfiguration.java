@@ -1,15 +1,10 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
-import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
-import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
-import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
+import de.codecrafter47.taboverlay.config.dsl.yaml.*;
 import de.codecrafter47.taboverlay.config.expression.template.ConstantExpressionTemplate;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
-import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderCompute;
-import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderConditional;
-import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderSwitch;
-import de.codecrafter47.taboverlay.config.placeholder.Placeholder;
+import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import lombok.Getter;
@@ -17,7 +12,9 @@ import lombok.Setter;
 import lombok.val;
 import org.yaml.snakeyaml.error.Mark;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -30,18 +27,18 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
     String replaceParameters(String template, String[] args) {
         for (int i = 0; i < parameters.getValue(); i++) {
-            String replacement;
+            StringBuilder replacement;
             if (i < args.length) {
-                replacement = args[i];
+                replacement = new StringBuilder(args[i]);
                 if (i == parameters.getValue() - 1) {
                     for (int j = i + 1; j < args.length; j++) {
-                        replacement += " " + args[j];
+                        replacement.append(" ").append(args[j]);
                     }
                 }
             } else {
-                replacement = "";
+                replacement = new StringBuilder();
             }
-            template = template.replace("%" + i, replacement);
+            template = template.replace("%" + i, replacement.toString());
         }
         return template;
     }
@@ -146,7 +143,8 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                             }
                         }
                         replacementMap.put(entry.getKey().getValue(), replacement);
-                    }}
+                    }
+                }
             }
             TextTemplate defaultReplacement = TextTemplate.EMPTY;
             if (this.defaultReplacement != null) {
@@ -162,7 +160,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         @Setter
         private MarkedStringProperty expression;
 
-        private transient boolean needToFixMark = false;
+        private transient boolean needToFixMark;
 
         public Compute(String text) {
             if (text != null) {
@@ -190,6 +188,36 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                 }
             }
             return new CustomPlaceholderCompute(compiledExpression);
+        }
+    }
+
+    public static class Animated extends CustomPlaceholderConfiguration {
+
+        @Getter
+        @Setter
+        private MarkedListProperty<MarkedStringProperty> elements;
+
+        @Getter
+        @Setter
+        private MarkedFloatProperty interval;
+
+        @Override
+        public Placeholder bindArgs(TemplateCreationContext tcc, String[] args) {
+            List<TextTemplate> elementTemplates = new ArrayList<>(elements.size());
+            if ((ConfigValidationUtil.checkNotNull(tcc, "!animated custom placeholder", "elements", elements, getStartMark())
+                    && ConfigValidationUtil.checkNotEmpty(tcc, "!animated custom placeholder", "elements", elements, elements.getStartMark()))
+                    & ConfigValidationUtil.checkNotNull(tcc, "!animated custom placeholder", "interval", interval, getStartMark())
+                    && ConfigValidationUtil.checkRange(tcc, "!animated custom placeholder", "interval", interval.getValue(), 0.05f, 9999f, interval.getStartMark())) {
+
+                for (MarkedStringProperty element : elements) {
+                    if (element == null) {
+                        elementTemplates.add(TextTemplate.EMPTY);
+                    } else {
+                        elementTemplates.add(TextTemplate.parse(replaceParameters(element.getValue(), args), element.getStartMark(), tcc));
+                    }
+                }
+            }
+            return new CustomPlaceholderAnimated(elementTemplates, interval.getValue());
         }
     }
 }

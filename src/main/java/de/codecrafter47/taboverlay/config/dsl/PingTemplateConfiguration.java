@@ -1,11 +1,12 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
 import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
-import de.codecrafter47.taboverlay.config.dsl.exception.MarkedConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
+import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.ping.ConstantPingTemplate;
+import de.codecrafter47.taboverlay.config.template.ping.ExpressionPingTemplate;
 import de.codecrafter47.taboverlay.config.template.ping.PingTemplate;
 import de.codecrafter47.taboverlay.config.template.ping.PlayerPingTemplate;
 
@@ -40,13 +41,15 @@ public class PingTemplateConfiguration extends MarkedPropertyBase {
             }
             return new PlayerPingTemplate(PlayerPlaceholder.BindPoint.VIEWER, tcc.getPlayerPingDataKey());
         } else {
-            Integer ping;
+            int ping;
             try {
-                ping = Integer.valueOf(value);
+                ping = Integer.parseInt(value);
+                return new ConstantPingTemplate(ping);
             } catch (NumberFormatException e) {
-                throw new MarkedConfigurationException("ping value not a number", getStartMark());
+                // try parse ping as an expression
+                ExpressionTemplate expression = tcc.getExpressionEngine().compile(tcc, value, getStartMark());
+                return new ExpressionPingTemplate(expression);
             }
-            return new ConstantPingTemplate(ping);
         }
     }
 

@@ -17,11 +17,16 @@ public class PlaceholderReader extends ValueReader {
         if (tokenList.get(0) instanceof PlaceholderToken) {
             PlaceholderToken token = (PlaceholderToken) tokenList.remove(0);
             try {
-                return tcc.getPlaceholderResolverChain().resolve(token.getValue().split(" "), tcc);
+                tcc.getErrorHandler().enterContext("in use of placeholder ${" + token.getValue() + "}", mark);
+                try {
+                    return tcc.getPlaceholderResolverChain().resolve(token.getValue().split(" "), tcc);
+                } finally {
+                    tcc.getErrorHandler().leaveContext();
+                }
             } catch (UnknownPlaceholderException e) {
                 tcc.getErrorHandler().addWarning("Unknown placeholder ${" + token.getValue() + "}", mark);
             } catch (PlaceholderException e) {
-                String message = "Error in placeholder " + token.getValue() + ":\n" + e.getMessage();
+                String message = "Error in placeholder ${\"" + token.getValue() + "}:\n" + e.getMessage();
                 if (e.getCause() != null) {
                     message = message + "\nCaused by: " + e.getCause().getMessage();
                 }

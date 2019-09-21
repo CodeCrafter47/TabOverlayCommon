@@ -216,6 +216,16 @@ public class ConfigTabOverlayManager {
                 if (position != null) {
                     message.append("\n").append(position.toString());
                 }
+                List<ErrorHandler.Context> context = error.getContext();
+                if (context != null) {
+                    for (ErrorHandler.Context contextElement : context) {
+                        message.append("\n ").append(contextElement.getMessage());
+                        position = contextElement.getPosition();
+                        if (position != null) {
+                            message.append("\n").append(position.toString());
+                        }
+                    }
+                }
             }
             if (success) {
                 logger.log(Level.WARNING, "There have been " + warnCnt + " warnings while loading " + configuration.getPath() + message + "\n");

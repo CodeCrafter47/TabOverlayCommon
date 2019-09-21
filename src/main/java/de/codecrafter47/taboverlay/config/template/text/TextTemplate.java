@@ -26,7 +26,12 @@ public interface TextTemplate {
             matcher.appendReplacement(sb, "");
             templates.add(new ConstantTextTemplate(sb.toString()));
             try {
-                templates.add(new PlaceholderTextTemplate(tcc.getPlaceholderResolverChain().resolve(matcher.group(1).split(" "), tcc)));
+                tcc.getErrorHandler().enterContext("in use of placeholder " + matcher.group(), mark);
+                try {
+                    templates.add(new PlaceholderTextTemplate(tcc.getPlaceholderResolverChain().resolve(matcher.group(1).split(" "), tcc)));
+                } finally {
+                    tcc.getErrorHandler().leaveContext();
+                }
             } catch (UnknownPlaceholderException e) {
                 tcc.getErrorHandler().addWarning("Unknown placeholder " + matcher.group(), mark);
             } catch (PlaceholderException e) {

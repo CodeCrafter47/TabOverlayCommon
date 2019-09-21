@@ -95,7 +95,7 @@ public class ExpressionTemplateParser {
         return parts.get(0);
     }
 
-    private ExpressionTemplate read(TemplateCreationContext tcc, List<Token> tokens, Mark mark) {
+    ExpressionTemplate read(TemplateCreationContext tcc, List<Token> tokens, Mark mark) {
         for (val valueReader : valueReaders) {
             ExpressionTemplate template = valueReader.read(tcc, this, tokens, mark);
             if (template != null) {

@@ -128,6 +128,7 @@ public class ConfigTabOverlayManager {
         val customPlaceholderMap = ImmutableMap.<String, Class<?>>builder()
                 .put("!conditional", CustomPlaceholderConfiguration.Conditional.class)
                 .put("!switch", CustomPlaceholderConfiguration.Switch.class)
+                .put("!compute", CustomPlaceholderConfiguration.Compute.class)
                 .build();
         inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, null));
 

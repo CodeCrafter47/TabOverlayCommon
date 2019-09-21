@@ -63,9 +63,14 @@ public class DefaultExpressionEngine implements ExpressionEngine {
                         .tokenReader(new PatternTokenReader(DefaultTokens.GREATER_THAN, ">"))
                         .tokenReader(new PatternTokenReader(DefaultTokens.LESSER_THAN, "<"))
                         .tokenReader(new PatternTokenReader(DefaultTokens.CONCAT_STRING, "."))
+                        .tokenReader(new PatternTokenReader(DefaultTokens.ADD, "+"))
+                        .tokenReader(new PatternTokenReader(DefaultTokens.SUB, "-"))
+                        .tokenReader(new PatternTokenReader(DefaultTokens.MULT, "*"))
+                        .tokenReader(new PatternTokenReader(DefaultTokens.DIV, "/"))
                         .tokenReader(new QuotedLiteralTokenReader(-10, '\"'))
                         .tokenReader(new QuotedLiteralTokenReader(-10, '\''))
                         .tokenReader(new PlaceholderTokenReader(-20))
+                        .tokenReader(new NumberTokenReader(-50))
                         .tokenReader(new NonQuotedLiteralTokenReader(-100));
             }
 
@@ -79,7 +84,11 @@ public class DefaultExpressionEngine implements ExpressionEngine {
                         .operator(DefaultTokens.GREATER_OR_EQUAL_THAN, Operator.of(25, ExpressionTemplates::greaterOrEqual))
                         .operator(DefaultTokens.LESSER_THAN, Operator.of(25, ExpressionTemplates::less))
                         .operator(DefaultTokens.LESSER_OR_EQUAL_THAN, Operator.of(25, ExpressionTemplates::lessOrEqual))
-                        .operator(DefaultTokens.CONCAT_STRING, ListOperator.of(0, ExpressionTemplates::concat));
+                        .operator(DefaultTokens.CONCAT_STRING, ListOperator.of(10, ExpressionTemplates::concat))
+                        .operator(DefaultTokens.ADD, ListOperator.of(4, ExpressionTemplates::sum))
+                        .operator(DefaultTokens.SUB, Operator.of(3, ExpressionTemplates::sub))
+                        .operator(DefaultTokens.MULT, ListOperator.of(2, ExpressionTemplates::product))
+                        .operator(DefaultTokens.DIV, Operator.of(1, ExpressionTemplates::div));
             }
 
             public OptionsBuilder withDefaultValueReaders() {
@@ -89,7 +98,8 @@ public class DefaultExpressionEngine implements ExpressionEngine {
                         .valueReader(new StringConstantReader())
                         .valueReader(new NegatedExpressionReader(DefaultTokens.NEGATION))
                         .valueReader(new ParenthesisedExpressionReader(DefaultTokens.OPENING_PARENTHESIS, DefaultTokens.CLOSING_PARENTHESIS))
-                        .valueReader(new PlaceholderReader());
+                        .valueReader(new PlaceholderReader())
+                        .valueReader(new NegatedNumberReader(DefaultTokens.SUB));
             }
         }
     }

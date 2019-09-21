@@ -34,7 +34,11 @@ public class ParenthesisedExpressionReader extends ValueReader {
                 }
             } while (cnt != 0);
 
-            return parser.parse(tcc, new ArrayList<>(tokenList.subList(1, index)), mark);
+            ExpressionTemplate result = parser.parse(tcc, new ArrayList<>(tokenList.subList(1, index)), mark);
+            for (int i = 0; i <= index; i++) {
+                tokenList.remove(0);
+            }
+            return result;
         }
         return null;
     }

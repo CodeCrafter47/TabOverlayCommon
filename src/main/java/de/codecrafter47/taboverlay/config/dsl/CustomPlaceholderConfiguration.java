@@ -6,6 +6,7 @@ import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.expression.template.ConstantExpressionTemplate;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderCompute;
 import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderConditional;
 import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderSwitch;
 import de.codecrafter47.taboverlay.config.placeholder.Placeholder;
@@ -14,6 +15,7 @@ import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.yaml.snakeyaml.error.Mark;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -151,6 +153,43 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                 defaultReplacement = TextTemplate.parse(replaceParameters(this.defaultReplacement.getValue(), args), this.defaultReplacement.getStartMark(), tcc);
             }
             return new CustomPlaceholderSwitch(compiledExpression, replacementMap, defaultReplacement);
+        }
+    }
+
+    public static class Compute extends CustomPlaceholderConfiguration {
+
+        @Getter
+        @Setter
+        private MarkedStringProperty expression;
+
+        private transient boolean needToFixMark = false;
+
+        public Compute(String text) {
+            if (text != null) {
+                this.expression = new MarkedStringProperty(text);
+            }
+            this.needToFixMark = true;
+        }
+
+        @Override
+        public void setStartMark(Mark startMark) {
+            super.setStartMark(startMark);
+            if (needToFixMark) {
+                this.expression.setStartMark(startMark);
+            }
+        }
+
+        @Override
+        public Placeholder bindArgs(TemplateCreationContext tcc, String[] args) {
+            ExpressionTemplate compiledExpression = ConstantExpressionTemplate.of(""); // dummy value, to continue processing in case of config errors, to find more errors
+            if (ConfigValidationUtil.checkNotNull(tcc, "custom placeholder !compute", "expression", expression, getStartMark())) {
+                try {
+                    compiledExpression = tcc.getExpressionEngine().compile(tcc, replaceParameters(expression.getValue(), args), expression.getStartMark());
+                } catch (Exception e) {
+                    tcc.getErrorHandler().addError("Failed to compile condition for custom placeholder. " + e.getMessage(), expression.getStartMark());
+                }
+            }
+            return new CustomPlaceholderCompute(compiledExpression);
         }
     }
 }

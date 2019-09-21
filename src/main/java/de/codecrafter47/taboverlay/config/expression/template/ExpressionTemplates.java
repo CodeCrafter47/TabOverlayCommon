@@ -2,6 +2,7 @@ package de.codecrafter47.taboverlay.config.expression.template;
 
 import de.codecrafter47.taboverlay.config.expression.Expressions;
 import de.codecrafter47.taboverlay.config.expression.ToBooleanExpression;
+import de.codecrafter47.taboverlay.config.expression.ToDoubleExpression;
 import de.codecrafter47.taboverlay.config.expression.ToStringExpression;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.UtilityClass;
@@ -50,6 +51,25 @@ public class ExpressionTemplates {
 
     public  ExpressionTemplate lessOrEqual(ExpressionTemplate a, ExpressionTemplate b) {
         return new LessOrEqual(a, b);
+    }
+
+    public ExpressionTemplate sum(Collection<ExpressionTemplate> operands) {
+        return new Sum(operands);
+    }
+
+    public ExpressionTemplate product(Collection<ExpressionTemplate> operands) {
+        return new Product(operands);
+    }
+    public  ExpressionTemplate sub(ExpressionTemplate a, ExpressionTemplate b) {
+        return new Sub(a, b);
+    }
+
+    public  ExpressionTemplate div(ExpressionTemplate a, ExpressionTemplate b) {
+        return new Div(a, b);
+    }
+
+    public  ExpressionTemplate negateNumber(ExpressionTemplate template) {
+        return new NegationNumber(template);
     }
 
     @EqualsAndHashCode(callSuper = false)
@@ -251,6 +271,105 @@ public class ExpressionTemplates {
         @Override
         public boolean requiresViewerContext() {
             return a.requiresViewerContext() || b.requiresViewerContext();
+        }
+    }
+
+    @EqualsAndHashCode(callSuper = false)
+    private static class Sum extends AbstractDoubleExpressionTemplate {
+        private final Collection<ExpressionTemplate> operands;
+
+        Sum(Collection<ExpressionTemplate> operands) {
+            this.operands = operands;
+        }
+
+        @Override
+        public ToDoubleExpression instantiateWithDoubleResult() {
+            return Expressions.sum(operands.stream().map(ExpressionTemplate::instantiateWithDoubleResult).collect(Collectors.toList()));
+        }
+
+        @Override
+        public boolean requiresViewerContext() {
+            return operands.stream().anyMatch(ExpressionTemplate::requiresViewerContext);
+        }
+    }
+
+    @EqualsAndHashCode(callSuper = false)
+    private static class Product extends AbstractDoubleExpressionTemplate {
+        private final Collection<ExpressionTemplate> operands;
+
+        Product(Collection<ExpressionTemplate> operands) {
+            this.operands = operands;
+        }
+
+        @Override
+        public ToDoubleExpression instantiateWithDoubleResult() {
+            return Expressions.product(operands.stream().map(ExpressionTemplate::instantiateWithDoubleResult).collect(Collectors.toList()));
+        }
+
+        @Override
+        public boolean requiresViewerContext() {
+            return operands.stream().anyMatch(ExpressionTemplate::requiresViewerContext);
+        }
+    }
+
+    @EqualsAndHashCode(callSuper = false)
+    private static class Sub extends AbstractDoubleExpressionTemplate {
+        private final ExpressionTemplate a;
+        private final ExpressionTemplate b;
+
+        Sub(ExpressionTemplate a, ExpressionTemplate b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        public ToDoubleExpression instantiateWithDoubleResult() {
+            return Expressions.sub(a.instantiateWithDoubleResult(), b.instantiateWithDoubleResult());
+        }
+
+        @Override
+        public boolean requiresViewerContext() {
+            return a.requiresViewerContext() || b.requiresViewerContext();
+        }
+    }
+
+    @EqualsAndHashCode(callSuper = false)
+    private static class Div extends AbstractDoubleExpressionTemplate {
+        private final ExpressionTemplate a;
+        private final ExpressionTemplate b;
+
+        Div(ExpressionTemplate a, ExpressionTemplate b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        public ToDoubleExpression instantiateWithDoubleResult() {
+            return Expressions.div(a.instantiateWithDoubleResult(), b.instantiateWithDoubleResult());
+        }
+
+        @Override
+        public boolean requiresViewerContext() {
+            return a.requiresViewerContext() || b.requiresViewerContext();
+        }
+    }
+
+    @EqualsAndHashCode(callSuper = false)
+    private static class NegationNumber extends AbstractDoubleExpressionTemplate {
+        private final ExpressionTemplate template;
+
+        NegationNumber(ExpressionTemplate template) {
+            this.template = template;
+        }
+
+        @Override
+        public ToDoubleExpression instantiateWithDoubleResult() {
+            return Expressions.negateNumber(template.instantiateWithDoubleResult());
+        }
+
+        @Override
+        public boolean requiresViewerContext() {
+            return template.requiresViewerContext();
         }
     }
 }

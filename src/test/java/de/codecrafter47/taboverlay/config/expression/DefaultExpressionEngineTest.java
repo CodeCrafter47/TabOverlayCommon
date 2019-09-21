@@ -17,7 +17,7 @@ public class DefaultExpressionEngineTest {
     @Before
     public void setup() {
         expressionEngine = new DefaultExpressionEngine(DefaultExpressionEngine.Options.builder().withDefaultOperators().withDefaultTokenReaders().withDefaultValueReaders().build());
-        tcc = new TemplateCreationContext(expressionEngine, null, null, null, null);
+        tcc = new TemplateCreationContext(expressionEngine, null, null, null, null, null);
     }
 
     private void assertTrue(String expr) {
@@ -31,12 +31,10 @@ public class DefaultExpressionEngineTest {
     @Test
     public void testExpressions() {
         ExpressionTemplate expression = expressionEngine.compile(tcc, "4", null);
-        Assert.assertFalse(expression.instantiateWithBooleanResult().evaluate());
         Assert.assertEquals(4, expression.instantiateWithDoubleResult().evaluate(), 0.001);
         Assert.assertEquals("4", expression.instantiateWithStringResult().evaluate());
 
         expression = expressionEngine.compile(tcc, "\"four\"", null);
-        Assert.assertFalse(expression.instantiateWithBooleanResult().evaluate());
         Assert.assertEquals(4, expression.instantiateWithDoubleResult().evaluate(), 0.001);
         Assert.assertEquals("four", expression.instantiateWithStringResult().evaluate());
 
@@ -67,7 +65,6 @@ public class DefaultExpressionEngineTest {
     @Test
     public void testNegativeNumbers() {
         ExpressionTemplate expression = expressionEngine.compile(tcc, "-1", null);
-        Assert.assertFalse(expression.instantiateWithBooleanResult().evaluate());
         Assert.assertEquals(-1, expression.instantiateWithDoubleResult().evaluate(), 0.001);
     }
 
@@ -95,5 +92,14 @@ public class DefaultExpressionEngineTest {
         assertFalse("true && false && true");
         assertTrue("true && true && true");
         assertTrue("true && true && false || true");
+    }
+
+    @Test
+    public void testArithmeticExpressions() {
+        assertTrue("1 + 1 == 2");
+        assertTrue("1 + 1 + 1 == 3");
+        assertTrue("1 + 1 - 1 == 1");
+        assertTrue("(4/2) == 2");
+        assertTrue("(2*2) == 4");
     }
 }

@@ -13,4 +13,8 @@ public class DefaultTokens {
     public static final Token GREATER_OR_EQUAL_THAN = new Token("GREATER_OR_EQUAL_THAN");
     public static final Token LESSER_OR_EQUAL_THAN = new Token("LESSER_OR_EQUAL_THAN");
     public static final Token CONCAT_STRING = new Token("CONCAT_STRING");
+    public static final Token ADD = new Token("ADD");
+    public static final Token SUB = new Token("SUB");
+    public static final Token MULT = new Token("MULT");
+    public static final Token DIV = new Token("DIV");
 }

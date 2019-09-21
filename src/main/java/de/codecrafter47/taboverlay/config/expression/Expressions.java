@@ -113,4 +113,59 @@ public class Expressions {
             }
         };
     }
+
+    public static ToDoubleExpression sum(Collection<ToDoubleExpression> operands) {
+        return new AbstractToDoubleExpression<ToDoubleExpression>(operands) {
+
+            @Override
+            public double evaluate() {
+                double result = 0;
+                for (val operand : operands) {
+                    result += operand.evaluate();
+                }
+                return result;
+            }
+        };
+    }
+
+    public static ToDoubleExpression product(Collection<ToDoubleExpression> operands) {
+        return new AbstractToDoubleExpression<ToDoubleExpression>(operands) {
+
+            @Override
+            public double evaluate() {
+                double result = 1;
+                for (val operand : operands) {
+                    result *= operand.evaluate();
+                }
+                return result;
+            }
+        };
+    }
+
+    public static ToDoubleExpression sub(ToDoubleExpression a, ToDoubleExpression b) {
+        return new AbstractBinaryToDoubleExpression<ToDoubleExpression>(a, b) {
+            @Override
+            public double evaluate() {
+                return a.evaluate() - b.evaluate();
+            }
+        };
+    }
+
+    public static ToDoubleExpression div(ToDoubleExpression a, ToDoubleExpression b) {
+        return new AbstractBinaryToDoubleExpression<ToDoubleExpression>(a, b) {
+            @Override
+            public double evaluate() {
+                return a.evaluate() / b.evaluate();
+            }
+        };
+    }
+
+    public ToDoubleExpression negateNumber(ToDoubleExpression a) {
+        return new AbstractUnaryToDoubleExpression<ToDoubleExpression>(a) {
+            @Override
+            public double evaluate() {
+                return -delegate.evaluate();
+            }
+        };
+    }
 }

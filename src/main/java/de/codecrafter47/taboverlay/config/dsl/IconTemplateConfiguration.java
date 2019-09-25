@@ -2,7 +2,7 @@ package de.codecrafter47.taboverlay.config.dsl;
 
 import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
+import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.template.icon.PlayerIconTemplate;
@@ -28,13 +28,13 @@ public class IconTemplateConfiguration extends MarkedPropertyBase {
                 tcc.getErrorHandler().addWarning("${player skin} cannot be used here", getStartMark());
                 return tcc.getDefaultIcon();
             }
-            return new PlayerIconTemplate(PlayerPlaceholder.BindPoint.PLAYER, tcc.getPlayerIconDataKey());
+            return new PlayerIconTemplate(PlayerPlaceholderResolver.BindPoint.PLAYER, tcc.getPlayerIconDataKey());
         } else if (value.equals("${viewer skin}")) {
             if (!tcc.isViewerAvailable()) {
                 tcc.getErrorHandler().addWarning("${viewer skin} cannot be used here", getStartMark());
                 return tcc.getDefaultIcon();
             }
-            return new PlayerIconTemplate(PlayerPlaceholder.BindPoint.VIEWER, tcc.getPlayerIconDataKey());
+            return new PlayerIconTemplate(PlayerPlaceholderResolver.BindPoint.VIEWER, tcc.getPlayerIconDataKey());
         } else {
             return tcc.getIconManager().createIconTemplate(value, mark, tcc.getErrorHandler());
         }

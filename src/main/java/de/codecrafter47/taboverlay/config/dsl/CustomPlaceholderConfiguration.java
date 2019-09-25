@@ -1,5 +1,7 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
+import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.*;
 import de.codecrafter47.taboverlay.config.expression.template.ConstantExpressionTemplate;
@@ -8,6 +10,7 @@ import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import org.yaml.snakeyaml.error.Mark;
@@ -23,16 +26,16 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
     private MarkedIntegerProperty parameters = new MarkedIntegerProperty(0);
 
-    public abstract Placeholder bindArgs(TemplateCreationContext tcc, String[] args);
+    public abstract PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc);
 
-    String replaceParameters(String template, String[] args) {
+    String replaceParameters(String template, List<PlaceholderArg> args) {
         for (int i = 0; i < parameters.getValue(); i++) {
             StringBuilder replacement;
-            if (i < args.length) {
-                replacement = new StringBuilder(args[i]);
+            if (i < args.size()) {
+                replacement = new StringBuilder(args.get(i).getText());
                 if (i == parameters.getValue() - 1) {
-                    for (int j = i + 1; j < args.length; j++) {
-                        replacement.append(" ").append(args[j]);
+                    for (int j = i + 1; j < args.size(); j++) {
+                        replacement.append(" ").append(args.get(j).getText());
                     }
                 }
             } else {
@@ -69,7 +72,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         }
 
         @Override
-        public Placeholder bindArgs(TemplateCreationContext tcc, String[] args) {
+        public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             ExpressionTemplate compiledCondition = ConstantExpressionTemplate.of(true); // dummy value, to continue processing in case of config errors, to find more errors
             if (ConfigValidationUtil.checkNotNull(tcc, "custom placeholder !conditional", "condition", condition, getStartMark())) {
                 try {
@@ -93,9 +96,12 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             } catch (Exception e) {
                 tcc.getErrorHandler().addError("Failed to parse false replacement for custom placeholder: " + e.getMessage(), this.falseReplacement.getStartMark());
             }
-            return new CustomPlaceholderConditional(compiledCondition,
-                    trueReplacement,
-                    falseReplacement);
+            ExpressionTemplate finalCompiledCondition = compiledCondition;
+            TextTemplate finalTrueReplacement = trueReplacement;
+            TextTemplate finalFalseReplacement = falseReplacement;
+            return builder.acquireData(() -> new CustomPlaceholderConditional(finalCompiledCondition,
+                    finalTrueReplacement,
+                    finalFalseReplacement), TypeToken.STRING, true); // todo check whether viewer is required
         }
     }
 
@@ -116,7 +122,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         }
 
         @Override
-        public Placeholder bindArgs(TemplateCreationContext tcc, String[] args) {
+        public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             ExpressionTemplate compiledExpression = ConstantExpressionTemplate.of(true); // dummy value, to continue processing in case of config errors, to find more errors
             if (ConfigValidationUtil.checkNotNull(tcc, "custom placeholder !switch", "expression", expression, getStartMark())) {
                 try {
@@ -150,10 +156,13 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             if (this.defaultReplacement != null) {
                 defaultReplacement = TextTemplate.parse(replaceParameters(this.defaultReplacement.getValue(), args), this.defaultReplacement.getStartMark(), tcc);
             }
-            return new CustomPlaceholderSwitch(compiledExpression, replacementMap, defaultReplacement);
+            ExpressionTemplate finalCompiledExpression = compiledExpression;
+            TextTemplate finalDefaultReplacement = defaultReplacement;
+            return builder.acquireData(() -> new CustomPlaceholderSwitch(finalCompiledExpression, replacementMap, finalDefaultReplacement), TypeToken.STRING, true); // todo check if viewer context is required
         }
     }
 
+    @NoArgsConstructor
     public static class Compute extends CustomPlaceholderConfiguration {
 
         @Getter
@@ -178,7 +187,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         }
 
         @Override
-        public Placeholder bindArgs(TemplateCreationContext tcc, String[] args) {
+        public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             ExpressionTemplate compiledExpression = ConstantExpressionTemplate.of(""); // dummy value, to continue processing in case of config errors, to find more errors
             if (ConfigValidationUtil.checkNotNull(tcc, "custom placeholder !compute", "expression", expression, getStartMark())) {
                 try {
@@ -187,7 +196,8 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                     tcc.getErrorHandler().addError("Failed to compile condition for custom placeholder. " + e.getMessage(), expression.getStartMark());
                 }
             }
-            return new CustomPlaceholderCompute(compiledExpression);
+            ExpressionTemplate finalCompiledExpression = compiledExpression;
+            return builder.acquireData(() -> new CustomPlaceholderCompute(finalCompiledExpression), TypeToken.DOUBLE, true); // todo check whether viewer is required
         }
     }
 
@@ -202,7 +212,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         private MarkedFloatProperty interval;
 
         @Override
-        public Placeholder bindArgs(TemplateCreationContext tcc, String[] args) {
+        public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             List<TextTemplate> elementTemplates = new ArrayList<>(elements.size());
             if ((ConfigValidationUtil.checkNotNull(tcc, "!animated custom placeholder", "elements", elements, getStartMark())
                     && ConfigValidationUtil.checkNotEmpty(tcc, "!animated custom placeholder", "elements", elements, elements.getStartMark()))
@@ -217,7 +227,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                     }
                 }
             }
-            return new CustomPlaceholderAnimated(elementTemplates, interval.getValue());
+            return builder.acquireData(() -> new CustomPlaceholderAnimated(elementTemplates, interval.getValue()), TypeToken.STRING, true); // todo check whether viewer is required
         }
     }
 }

@@ -19,6 +19,7 @@
 
 package de.codecrafter47.taboverlay.config.expression.token;
 
+import de.codecrafter47.taboverlay.config.placeholder.Placeholder;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -28,10 +29,10 @@ public class PlaceholderToken extends Token {
     @Nonnull
     @NonNull
     @Getter
-    private final String value;
+    private final Placeholder value;
 
-    public PlaceholderToken(@Nonnull @NonNull String value) {
-        super("PLACEHOLDER(" + value + ")");
+    public PlaceholderToken(@Nonnull @NonNull Placeholder value) {
+        super("PLACEHOLDER");
         this.value = value;
     }
 }

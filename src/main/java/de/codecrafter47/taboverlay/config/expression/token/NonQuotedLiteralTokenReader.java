@@ -1,5 +1,10 @@
 package de.codecrafter47.taboverlay.config.expression.token;
 
+import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
+import org.yaml.snakeyaml.error.Mark;
+
+import java.text.ParsePosition;
+
 public class NonQuotedLiteralTokenReader extends TokenReader {
 
     public NonQuotedLiteralTokenReader(int priority) {
@@ -7,12 +12,14 @@ public class NonQuotedLiteralTokenReader extends TokenReader {
     }
 
     @Override
-    public Token read(ExpressionTokenizer.State state) {
-        int startIndex = state.index;
+    public Token read(String text, ParsePosition position, Mark mark, TemplateCreationContext tcc) {
+        int startIndex = position.getIndex();
+        int index = position.getIndex();
 
-        while (++state.index < state.input.length() && !Character.isWhitespace(state.input.charAt(state.index)))
+        while (++index < text.length() && !Character.isWhitespace(text.charAt(index)))
             ;
+        position.setIndex(index);
 
-        return new StringToken(state.input.substring(startIndex, state.index++));
+        return new StringToken(text.substring(startIndex, position.getIndex()));
     }
 }

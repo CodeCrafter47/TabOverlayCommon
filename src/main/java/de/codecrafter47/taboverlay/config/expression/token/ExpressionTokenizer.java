@@ -23,6 +23,7 @@ import com.google.common.collect.Ordering;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import org.yaml.snakeyaml.error.Mark;
 
+import java.text.ParsePosition;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,44 +41,34 @@ public class ExpressionTokenizer {
         this.tokenReaders = TOKEN_READER_ORDERING.immutableSortedCopy(tokenReaders);
     }
 
-    public List<Token> parse(TemplateCreationContext tcc, String input, Mark mark) {
-        State state = new State(input);
+    public List<Token> parse(TemplateCreationContext tcc, String text, Mark mark) {
+        ParsePosition position = new ParsePosition(0);
 
         List<Token> tokens = new LinkedList<>();
 
         next_token:
         while (true) {
             // skip spaces
-            while (state.index < state.input.length() && Character.isWhitespace(state.input.charAt(state.index))) {
-                state.index += 1;
+            while (position.getIndex() < text.length() && Character.isWhitespace(text.charAt(position.getIndex()))) {
+                position.setIndex(position.getIndex() + 1);
             }
 
-            if (state.index >= state.input.length()) {
+            if (position.getIndex() >= text.length()) {
                 break;
             }
 
             for (TokenReader tokenReader : tokenReaders) {
                 Token token;
-                if (null != (token = tokenReader.read(state))) {
+                if (null != (token = tokenReader.read(text, position, mark, tcc))) {
                     tokens.add(token);
                     continue next_token;
                 }
             }
 
-            tcc.getErrorHandler().addError(format("Illegal token '%c' at index %d in \"%s\"", state.input.charAt(state.index), state.index, state.input), mark);
+            tcc.getErrorHandler().addError(format("Illegal token '%c' at index %d in \"%s\"", text.charAt(position.getIndex()), position.getIndex(), text), mark);
             break;
         }
 
         return tokens;
-    }
-
-    public class State {
-        public String input;
-        public int index;
-
-        public State(String input) {
-            this.input = input;
-            this.index = 0;
-        }
     }
 }

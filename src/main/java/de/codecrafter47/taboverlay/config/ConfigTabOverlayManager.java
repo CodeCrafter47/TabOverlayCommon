@@ -5,22 +5,10 @@ import com.google.common.collect.ImmutableMap;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.TabView;
-import de.codecrafter47.taboverlay.config.dsl.AbstractTabOverlayTemplateConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.DynamicSizeTabOverlayTemplateConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.RectangularTabOverlayTemplateConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.components.AnimatedComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.components.ConditionalComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.components.ContainerComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.components.PlayersComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.components.SpacerComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.components.TableComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.yaml.ComponentConfigurationInheritanceHandler;
-import de.codecrafter47.taboverlay.config.dsl.yaml.CustomYamlConstructor;
-import de.codecrafter47.taboverlay.config.dsl.yaml.InheritanceHandler;
-import de.codecrafter47.taboverlay.config.dsl.yaml.TagInheritanceHandler;
-import de.codecrafter47.taboverlay.config.dsl.yaml.TypeFieldInheritanceHandler;
+import de.codecrafter47.taboverlay.config.context.Context;
+import de.codecrafter47.taboverlay.config.dsl.*;
+import de.codecrafter47.taboverlay.config.dsl.components.*;
+import de.codecrafter47.taboverlay.config.dsl.yaml.*;
 import de.codecrafter47.taboverlay.config.expression.DefaultExpressionEngine;
 import de.codecrafter47.taboverlay.config.expression.ExpressionEngine;
 import de.codecrafter47.taboverlay.config.icon.IconManager;
@@ -35,11 +23,7 @@ import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.template.ping.PingTemplate;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
-import lombok.Value;
-import lombok.val;
+import lombok.*;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
@@ -61,7 +45,7 @@ public class ConfigTabOverlayManager {
     private final Platform platform;
     private final PlayerProvider playerProvider;
     private final AbstractPlayerPlaceholderResolver playerPlaceholderResolver;
-    private final Collection<PlaceholderResolver> additionalGlobalPlaceholderResolvers;
+    private final Collection<PlaceholderResolver<Context>> additionalGlobalPlaceholderResolvers;
     private final Yaml yaml;
     private final Logger logger;
     private final ScheduledExecutorService tabEventQueue;
@@ -80,7 +64,7 @@ public class ConfigTabOverlayManager {
 
     private final Map<TabView, Player> tabViews = new HashMap<>();
 
-    public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Collection<PlaceholderResolver> additionalGlobalPlaceholderResolvers, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
+    public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Collection<PlaceholderResolver<Context>> additionalGlobalPlaceholderResolvers, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
         this.platform = platform;
         this.playerProvider = playerProvider;
         this.playerPlaceholderResolver = playerPlaceholderResolver;
@@ -172,11 +156,11 @@ public class ConfigTabOverlayManager {
             tcc.setDefaultText(TextTemplate.EMPTY);
             tcc.setViewerAvailable(true);
             PlaceholderResolverChain placeholderResolverChain = new PlaceholderResolverChain();
-            placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholder.BindPoint.VIEWER));
-            placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholder.BindPoint.PLAYER));
+            placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholderResolver.BindPoint.VIEWER));
+            placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholderResolver.BindPoint.PLAYER));
             placeholderResolverChain.addResolver(new TimePlaceholderResolver());
             placeholderResolverChain.addResolver(new PlayerSetPlaceholderResolver());
-            for (PlaceholderResolver placeholderResolver : additionalGlobalPlaceholderResolvers) {
+            for (PlaceholderResolver<Context> placeholderResolver : additionalGlobalPlaceholderResolvers) {
                 placeholderResolverChain.addResolver(placeholderResolver);
             }
             tcc.setPlaceholderResolverChain(placeholderResolverChain);

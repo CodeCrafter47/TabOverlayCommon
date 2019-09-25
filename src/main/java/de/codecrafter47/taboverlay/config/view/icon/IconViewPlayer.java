@@ -4,16 +4,16 @@ import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.config.context.Context;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
+import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 
 public class IconViewPlayer extends AbstractActiveElement<IconViewUpdateListener> implements IconView, Runnable {
 
-    private final PlayerPlaceholder.BindPoint bindPoint;
+    private final PlayerPlaceholderResolver.BindPoint bindPoint;
     private final DataKey<Icon> dataKey;
     private DataHolder dataHolder;
 
-    public IconViewPlayer(PlayerPlaceholder.BindPoint bindPoint, DataKey<Icon> dataKey) {
+    public IconViewPlayer(PlayerPlaceholderResolver.BindPoint bindPoint, DataKey<Icon> dataKey) {
         this.bindPoint = bindPoint;
         this.dataKey = dataKey;
     }
@@ -45,11 +45,11 @@ public class IconViewPlayer extends AbstractActiveElement<IconViewUpdateListener
         }
     }
 
-    private static DataHolder getDataHolder(Context context, PlayerPlaceholder.BindPoint bindPoint) {
+    private static DataHolder getDataHolder(Context context, PlayerPlaceholderResolver.BindPoint bindPoint) {
         DataHolder dataHolder;
-        if (bindPoint == PlayerPlaceholder.BindPoint.PLAYER) {
+        if (bindPoint == PlayerPlaceholderResolver.BindPoint.PLAYER) {
             dataHolder = context.getPlayer();
-        } else if (bindPoint == PlayerPlaceholder.BindPoint.VIEWER) {
+        } else if (bindPoint == PlayerPlaceholderResolver.BindPoint.VIEWER) {
             dataHolder = context.getViewer();
         } else {
             throw new AssertionError();

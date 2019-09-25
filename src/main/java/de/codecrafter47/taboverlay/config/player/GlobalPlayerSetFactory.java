@@ -5,9 +5,11 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplates;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
+import de.codecrafter47.taboverlay.config.placeholder.PlaceholderBuilder;
+import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderDataProviderSupplier;
 import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 import lombok.SneakyThrows;
 
@@ -51,18 +53,22 @@ public class GlobalPlayerSetFactory {
         this.playerProvider = playerProvider;
         this.eventQueue = eventQueue;
         this.logger = logger;
-        expressionTemplateIsVisible = ExpressionTemplates.negate(new PlayerPlaceholder<>(PlayerPlaceholder.BindPoint.PLAYER,
-                TypeToken.BOOLEAN,
-                DATA_KEY_IS_HIDDEN,
-                i -> i,
-                p -> false,
-                b -> Boolean.toString(b)));
-        expressionTemplateCanSeeInvisible = new PlayerPlaceholder<>(PlayerPlaceholder.BindPoint.VIEWER,
-                TypeToken.BOOLEAN,
-                DATA_KEY_CAN_SEE_INVISIBLE,
-                i -> i,
-                p -> false,
-                b -> Boolean.toString(b));
+        expressionTemplateIsVisible = ExpressionTemplates.negate(PlaceholderBuilder.create()
+                .transformContext(Context::getPlayer)
+                .acquireData(new PlayerPlaceholderDataProviderSupplier<>(TypeToken.BOOLEAN,
+                                DATA_KEY_IS_HIDDEN,
+                                (p, i) -> i == null ? false : i),
+                        TypeToken.BOOLEAN)
+                .requireViewerContext(false)
+                .build());
+        expressionTemplateCanSeeInvisible = PlaceholderBuilder.create()
+                .transformContext(Context::getViewer)
+                .acquireData(new PlayerPlaceholderDataProviderSupplier<>(TypeToken.BOOLEAN,
+                                DATA_KEY_CAN_SEE_INVISIBLE,
+                                (p, i) -> i == null ? false : i),
+                        TypeToken.BOOLEAN)
+                .requireViewerContext(true)
+                .build();
     }
 
     /**

@@ -2,13 +2,14 @@ package de.codecrafter47.taboverlay.config.player;
 
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.config.context.Context;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
 import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
+import lombok.val;
 
 import java.text.Collator;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +43,7 @@ public class OrderedPlayerSetImpl implements OrderedPlayerSet {
         Comparator<Player> chain = null;
         for (PlayerOrderTemplate.Entry entry : playerOrderTemplate.getEntries()) {
             Comparator<Player> comparator = null;
-            PlayerPlaceholder<?, ?> placeholder = entry.getPlaceholder();
+            val placeholder = entry.getPlaceholder();
             switch (entry.getType()) {
                 case TEXT:
                     comparator = Comparator.comparing(placeholder.getToStringFunction(), Collator.getInstance());
@@ -59,7 +60,8 @@ public class OrderedPlayerSetImpl implements OrderedPlayerSet {
                     break;
                 case VIEWER_FIRST:
                     viewer = context.getViewer();
-                    comparator = Comparator.comparingInt(player -> Objects.equals(placeholder.getString(player), placeholder.getString(viewer)) ? 0 : 1);
+                    Function<Player, String> toStringFunction = placeholder.getToStringFunction();
+                    comparator = Comparator.comparingInt(player -> Objects.equals(toStringFunction.apply(player), toStringFunction.apply(viewer)) ? 0 : 1);
                     break;
             }
             if (chain == null) {

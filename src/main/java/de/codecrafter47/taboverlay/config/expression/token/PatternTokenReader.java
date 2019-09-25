@@ -1,5 +1,10 @@
 package de.codecrafter47.taboverlay.config.expression.token;
 
+import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
+import org.yaml.snakeyaml.error.Mark;
+
+import java.text.ParsePosition;
+
 public class PatternTokenReader extends TokenReader {
     private final Token token;
     private final String pattern;
@@ -17,9 +22,9 @@ public class PatternTokenReader extends TokenReader {
     }
 
     @Override
-    public Token read(ExpressionTokenizer.State state) {
-        if (state.input.regionMatches(ignoreCase, state.index, pattern, 0, pattern.length())) {
-            state.index += pattern.length();
+    public Token read(String text, ParsePosition position, Mark mark, TemplateCreationContext tcc) {
+        if (text.regionMatches(ignoreCase, position.getIndex(), pattern, 0, pattern.length())) {
+            position.setIndex(position.getIndex() + pattern.length());
             return token;
         }
         return null;

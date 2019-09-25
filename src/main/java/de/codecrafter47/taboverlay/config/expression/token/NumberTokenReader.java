@@ -1,5 +1,8 @@
 package de.codecrafter47.taboverlay.config.expression.token;
 
+import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
+import org.yaml.snakeyaml.error.Mark;
+
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.Locale;
@@ -13,12 +16,10 @@ public class NumberTokenReader extends TokenReader {
     }
 
     @Override
-    public Token read(ExpressionTokenizer.State state) {
-        ParsePosition parsePosition = new ParsePosition(state.index);
-        Number number = format.parse(state.input, parsePosition);
-        if (parsePosition.getIndex() != state.index) {
-            state.index = parsePosition.getIndex();
-
+    public Token read(String text, ParsePosition position, Mark mark, TemplateCreationContext tcc) {
+        int previous = position.getIndex();
+        Number number = format.parse(text, position);
+        if (position.getIndex() != previous) {
             return new NumberToken(number.doubleValue());
         }
         return null;

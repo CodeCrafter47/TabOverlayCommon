@@ -1,84 +1,41 @@
 package de.codecrafter47.taboverlay.config.placeholder;
 
+import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.context.ContextKeys;
-import de.codecrafter47.taboverlay.config.expression.*;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
-import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
-import de.codecrafter47.taboverlay.config.view.text.TextView;
-import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 
-// todo allow format
-public class OtherCountPlaceholderResolver implements PlaceholderResolver {
+import javax.annotation.Nonnull;
+import java.util.List;
+
+public class OtherCountPlaceholderResolver implements PlaceholderResolver<Context> {
+    @Nonnull
     @Override
-    public Placeholder resolve(String[] value, TemplateCreationContext tcc) throws UnknownPlaceholderException {
-        if (value.length >= 1 && "other_count".equalsIgnoreCase(value[0])) {
-            return new OtherCountPlaceholder();
+    public PlaceholderBuilder<?, ?> resolve(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) throws UnknownPlaceholderException {
+        if (args.size() >= 1 && args.get(0) instanceof PlaceholderArg.Text && "other_count".equalsIgnoreCase(((PlaceholderArg.Text) args.get(0)).getValue())) {
+            args.remove(0);
+            return builder.acquireData(OtherCountDataProvider::new, TypeToken.INTEGER, false);
         }
         throw new UnknownPlaceholderException();
     }
 
-    public static class OtherCountPlaceholder implements Placeholder {
+    private static class OtherCountDataProvider implements PlaceholderDataProvider<Context, Integer> {
+
+        private Context context;
 
         @Override
-        public ToStringExpression instantiateWithStringResult() {
-            return new ToStringInstance();
-        }
-
-        @Override
-        public ToDoubleExpression instantiateWithDoubleResult() {
-            return new ToDoubleInstance();
+        public void activate(Context context, Runnable listener) {
+            this.context = context;
         }
 
         @Override
-        public ToBooleanExpression instantiateWithBooleanResult() {
-            return Conversions.toBoolean(instantiateWithDoubleResult());
+        public void deactivate() {
+
         }
 
         @Override
-        public boolean requiresViewerContext() {
-            return true; // todo too lazy to check, playing safe
-        }
-
-        @Override
-        public TextView instantiate() {
-            return new TextViewInstance();
-        }
-
-        private static class AbstractInstance<T> extends AbstractActiveElement<T> {
-
-            @Override
-            protected void onActivation() {
-
-            }
-
-            @Override
-            protected void onDeactivation() {
-
-            }
-        }
-
-        private static class ToDoubleInstance extends AbstractInstance<ExpressionUpdateListener> implements ToDoubleExpression {
-
-            @Override
-            public double evaluate() {
-                return getContext().getCustomObject(ContextKeys.OTHER_COUNT).doubleValue();
-            }
-        }
-
-        private static class ToStringInstance extends AbstractInstance<ExpressionUpdateListener> implements ToStringExpression {
-
-            @Override
-            public String evaluate() {
-                return Integer.toString(getContext().getCustomObject(ContextKeys.OTHER_COUNT));
-            }
-        }
-
-        private static class TextViewInstance extends AbstractInstance<TextViewUpdateListener> implements TextView {
-
-            @Override
-            public String getText() {
-                return Integer.toString(getContext().getCustomObject(ContextKeys.OTHER_COUNT));
-            }
+        public Integer getData() {
+            return context.getCustomObject(ContextKeys.OTHER_COUNT);
         }
     }
 }

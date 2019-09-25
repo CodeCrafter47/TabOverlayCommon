@@ -1,136 +1,70 @@
 package de.codecrafter47.taboverlay.config.placeholder;
 
-import de.codecrafter47.taboverlay.config.expression.*;
+import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
-import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
-import de.codecrafter47.taboverlay.config.view.text.TextView;
-import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
-import lombok.EqualsAndHashCode;
 
+import javax.annotation.Nonnull;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class TimePlaceholderResolver implements PlaceholderResolver {
-    @Override
-    public Placeholder resolve(String[] value, TemplateCreationContext tcc) throws UnknownPlaceholderException, PlaceholderException {
-        if (value.length >= 1 && "time".equals(value[0])) {
-            StringBuilder formatString = new StringBuilder(value.length >= 2 ? value[1] : "");
-            for (int i = 2; i < value.length; i++) {
-                String s = value[i];
-                formatString.append(' ');
-                formatString.append(s);
-            }
-            SimpleDateFormat format;
-            try {
-                format = new SimpleDateFormat(formatString.toString()); // todo apply locale
-            } catch (IllegalArgumentException ex) {
-                throw new PlaceholderException("Invalid time format", ex);
-            }
+public class TimePlaceholderResolver implements PlaceholderResolver<Context> {
 
-            return new TimePlaceholder(format);
+    private static final SimpleDateFormat DEFAULT_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    // todo replace with type token from data api once available
+    private static final TypeToken<Long> TYPE_TOKEN_LONG = TypeToken.create();
+
+    @Nonnull
+    @Override
+    public PlaceholderBuilder<?, ?> resolve(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) throws UnknownPlaceholderException, PlaceholderException {
+        if (args.size() >= 1 && args.get(0) instanceof PlaceholderArg.Text && "time".equalsIgnoreCase(((PlaceholderArg.Text) args.get(0)).getValue())) {
+            SimpleDateFormat format = DEFAULT_FORMAT;
+            if (args.size() > 1) {
+                StringBuilder formatString = new StringBuilder("");
+                for (int i = 1; i < args.size(); i++) {
+                    if (args.get(i) instanceof PlaceholderArg.Text) {
+                        String s = ((PlaceholderArg.Text) args.get(i)).getValue();
+                        if (i != 1) {
+                            formatString.append(' ');
+                        }
+                        formatString.append(s);
+                    } else {
+                        throw new PlaceholderException("Use of placeholder in time format is not allowed");
+                    }
+                }
+                try {
+                    format = new SimpleDateFormat(formatString.toString()); // todo apply locale
+                } catch (IllegalArgumentException ex) {
+                    throw new PlaceholderException("Invalid time format", ex);
+                }
+            }
+            args.clear();
+            return builder.acquireData(TimeProvider::new, TYPE_TOKEN_LONG, false)
+                    .transformData(format::format, TypeToken.STRING);
         }
         throw new UnknownPlaceholderException();
     }
 
-    @EqualsAndHashCode
-    private static class TimePlaceholder implements Placeholder {
+    private static class TimeProvider implements PlaceholderDataProvider<Context, Long> {
 
-        private final SimpleDateFormat format;
+        private ScheduledFuture<?> future;
 
-        public TimePlaceholder(SimpleDateFormat format) {
-            this.format = format;
+        @Override
+        public void activate(Context context, Runnable listener) {
+            // todo can do better if seconds not used?
+            future = context.getTabEventQueue().scheduleWithFixedDelay(listener, 1, 1, TimeUnit.SECONDS);
         }
 
         @Override
-        public ToStringExpression instantiateWithStringResult() {
-            return null;
+        public void deactivate() {
+            future.cancel(false);
         }
 
         @Override
-        public ToDoubleExpression instantiateWithDoubleResult() {
-            return Conversions.toDouble(instantiateWithStringResult());
-        }
-
-        @Override
-        public ToBooleanExpression instantiateWithBooleanResult() {
-            return Conversions.toBoolean(instantiateWithStringResult());
-        }
-
-        @Override
-        public boolean requiresViewerContext() {
-            return false;
-        }
-
-        @Override
-        public TextView instantiate() {
-            return new TextViewInstance(format);
-        }
-
-        private static abstract class AbstractInstance<T> extends AbstractActiveElement<T> implements Runnable {
-
-            protected final SimpleDateFormat format;
-            private ScheduledFuture<?> future;
-
-            protected AbstractInstance(SimpleDateFormat format) {
-                this.format = format;
-            }
-
-            @Override
-            protected void onActivation() {
-                // todo can do better if seconds not used?
-                future = getContext().getTabEventQueue().scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
-            }
-
-            @Override
-            protected void onDeactivation() {
-                future.cancel(false);
-            }
-
-            @Override
-            public void run() {
-                notifyListener();
-            }
-
-            protected abstract void notifyListener();
-        }
-
-        private static class ToStringInstance extends AbstractInstance<ExpressionUpdateListener> implements ToStringExpression {
-
-            protected ToStringInstance(SimpleDateFormat format) {
-                super(format);
-            }
-
-            @Override
-            public String evaluate() {
-                return format.format(System.currentTimeMillis());
-            }
-
-            @Override
-            protected void notifyListener() {
-                if (hasListener()) {
-                    getListener().onExpressionUpdate();
-                }
-            }
-        }
-
-        private static class TextViewInstance extends AbstractInstance<TextViewUpdateListener> implements TextView {
-
-            protected TextViewInstance(SimpleDateFormat format) {
-                super(format);
-            }
-
-            @Override
-            protected void notifyListener() {
-                if (hasListener()) {
-                    getListener().onTextUpdated();
-                }
-            }
-
-            @Override
-            public String getText() {
-                return format.format(System.currentTimeMillis());
-            }
+        public Long getData() {
+            return System.currentTimeMillis();
         }
     }
 }

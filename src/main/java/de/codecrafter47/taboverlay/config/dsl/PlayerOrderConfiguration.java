@@ -2,15 +2,16 @@ package de.codecrafter47.taboverlay.config.dsl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.taboverlay.config.SortingRulePreprocessor;
+import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
-import de.codecrafter47.taboverlay.config.placeholder.UnknownPlaceholderException;
+import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
+import de.codecrafter47.taboverlay.util.Unchecked;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.*;
 
@@ -37,7 +38,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
     private final String order;
 
-    public PlayerOrderTemplate toTemplate(TemplateCreationContext tcc) {
+    public <T, R> PlayerOrderTemplate toTemplate(TemplateCreationContext tcc) {
 
         SortingRulePreprocessor preprocessor = tcc.getSortingRulePreprocessor();
 
@@ -60,11 +61,25 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
                 String placeholderId = tokens[0];
 
-                PlayerPlaceholder<?, ?> placeholder;
+                PlayerPlaceholderDataProviderSupplier<?, ?> playerPlaceholder;
                 try {
-                    placeholder = tcc.getPlayerPlaceholderResolver().resolve(PlayerPlaceholder.BindPoint.VIEWER, new String[]{placeholderId});
+                    PlaceholderBuilder<?, ?> builderPlayer = tcc.getPlayerPlaceholderResolver().resolve(PlaceholderBuilder.create().transformContext(Context::getPlayer), new ArrayList<>(Collections.singletonList(new PlaceholderArg.Text(placeholderId))), tcc);
+                    val dataProviderFactory = Unchecked.cast(builderPlayer.getDataProviderFactory());
+                    if (dataProviderFactory instanceof PlayerPlaceholderDataProviderSupplier) {
+                        playerPlaceholder = Unchecked.cast(dataProviderFactory);
+                    } else {
+                        tcc.getErrorHandler().addWarning("Unsuitable placeholder in playerOrder option: `" + placeholderId + "`. This placeholder cannot be used for sorting.", getStartMark());
+                        continue;
+                    }
                 } catch (UnknownPlaceholderException e) {
                     tcc.getErrorHandler().addWarning("Unknown placeholder in playerOrder option: `" + placeholderId + "`", getStartMark());
+                    continue;
+                } catch (PlaceholderException e) {
+                    String message = "Error in placeholder in playerOrder option: `" + placeholderId + "`:\n" + e.getMessage();
+                    if (e.getCause() != null) {
+                        message = message + "\nCaused by: " + e.getCause().getMessage();
+                    }
+                    tcc.getErrorHandler().addWarning(message, getStartMark());
                     continue;
                 }
 
@@ -105,7 +120,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
                 if (type == null) {
                     // defaults
-                    TypeToken<?> placeholderType = placeholder.getType();
+                    TypeToken<?> placeholderType = playerPlaceholder.getType();
                     if (STRING_TYPES.contains(placeholderType)) {
                         type = PlayerOrderTemplate.Type.TEXT;
                     }
@@ -131,7 +146,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                     continue;
                 }
 
-                chain.add(new PlayerOrderTemplate.Entry(placeholder, direction, type));
+                chain.add(new PlayerOrderTemplate.Entry(playerPlaceholder, direction, type));
             }
         }
 

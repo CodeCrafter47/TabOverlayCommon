@@ -2,15 +2,20 @@ package de.codecrafter47.taboverlay.config.placeholder;
 
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 
-public interface PlaceholderResolver {
+import javax.annotation.Nonnull;
+import java.util.List;
+
+public interface PlaceholderResolver<C> {
 
     /**
      * Resolves a placeholder
      *
-     * @param value placeholder (without ${})
+     * @param builder
+     * @param args placeholder (without ${})
      * @param tcc
      * @return the placeholder
      * @throws UnknownPlaceholderException if the placeholder cannot be resolved
      */
-    Placeholder resolve(String[] value, TemplateCreationContext tcc) throws UnknownPlaceholderException, PlaceholderException;
+    @Nonnull
+    PlaceholderBuilder<?, ?> resolve(PlaceholderBuilder<C, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) throws UnknownPlaceholderException, PlaceholderException;
 }

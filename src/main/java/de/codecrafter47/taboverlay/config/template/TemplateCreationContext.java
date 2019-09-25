@@ -4,15 +4,16 @@ import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
 import de.codecrafter47.taboverlay.config.SortingRulePreprocessor;
+import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.PlayerSetConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
 import de.codecrafter47.taboverlay.config.expression.ExpressionEngine;
 import de.codecrafter47.taboverlay.config.icon.IconManager;
-import de.codecrafter47.taboverlay.config.placeholder.AbstractPlayerPlaceholderResolver;
+import de.codecrafter47.taboverlay.config.placeholder.AbstractPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.placeholder.PlaceholderResolver;
 import de.codecrafter47.taboverlay.config.placeholder.PlaceholderResolverChain;
-import de.codecrafter47.taboverlay.config.player.PlayerSetFactory;
+import de.codecrafter47.taboverlay.config.player.Player;
 import de.codecrafter47.taboverlay.config.template.component.BasicComponentTemplate;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
 import de.codecrafter47.taboverlay.config.template.component.ListComponentTemplate;
@@ -53,7 +54,7 @@ public class TemplateCreationContext implements Cloneable {
 
     private PlaceholderResolverChain placeholderResolverChain;
 
-    private AbstractPlayerPlaceholderResolver playerPlaceholderResolver;
+    private AbstractPlaceholderResolver<Player> playerPlaceholderResolver;
 
     private PlayerSetConfiguration.Visibility defaultHiddenPlayerVisibility = PlayerSetConfiguration.Visibility.VISIBLE_TO_ADMINS;
 
@@ -102,7 +103,7 @@ public class TemplateCreationContext implements Cloneable {
                 .build();
     }
 
-    public void addPlaceholderResolver(@Nonnull @NonNull PlaceholderResolver resolver) {
+    public void addPlaceholderResolver(@Nonnull @NonNull PlaceholderResolver<Context> resolver) {
         this.placeholderResolverChain = placeholderResolverChain.clone();
         this.placeholderResolverChain.addResolver(resolver);
     }

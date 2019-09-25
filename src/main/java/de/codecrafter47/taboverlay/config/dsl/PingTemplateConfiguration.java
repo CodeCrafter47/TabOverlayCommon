@@ -3,7 +3,7 @@ package de.codecrafter47.taboverlay.config.dsl;
 import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholder;
+import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.ping.ConstantPingTemplate;
 import de.codecrafter47.taboverlay.config.template.ping.ExpressionPingTemplate;
@@ -33,13 +33,13 @@ public class PingTemplateConfiguration extends MarkedPropertyBase {
                 tcc.getErrorHandler().addWarning("${player ping} cannot be used here", getStartMark());
                 return tcc.getDefaultPing();
             }
-            return new PlayerPingTemplate(PlayerPlaceholder.BindPoint.PLAYER, tcc.getPlayerPingDataKey());
+            return new PlayerPingTemplate(PlayerPlaceholderResolver.BindPoint.PLAYER, tcc.getPlayerPingDataKey());
         } else if (value.equals("${viewer ping}")) {
             if (!tcc.isViewerAvailable()) {
                 tcc.getErrorHandler().addWarning("${viewer ping} cannot be used here", getStartMark());
                 return tcc.getDefaultPing();
             }
-            return new PlayerPingTemplate(PlayerPlaceholder.BindPoint.VIEWER, tcc.getPlayerPingDataKey());
+            return new PlayerPingTemplate(PlayerPlaceholderResolver.BindPoint.VIEWER, tcc.getPlayerPingDataKey());
         } else {
             int ping;
             try {

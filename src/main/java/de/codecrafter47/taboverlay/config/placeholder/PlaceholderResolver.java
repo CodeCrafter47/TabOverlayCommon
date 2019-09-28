@@ -5,6 +5,7 @@ import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import javax.annotation.Nonnull;
 import java.util.List;
 
+@FunctionalInterface
 public interface PlaceholderResolver<C> {
 
     /**

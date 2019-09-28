@@ -8,11 +8,10 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class AbstractPlaceholderResolver<C> implements PlaceholderResolver<C> {
-    private Map<String, BiFunction<PlaceholderBuilder<C, ?>, List<PlaceholderArg>, PlaceholderBuilder<?, ?>>> placeholders = new HashMap<>();
+    private Map<String, PlaceholderResolver<C>> placeholders = new HashMap<>();
     @Setter
     private Function<PlaceholderBuilder<C, ?>, PlaceholderBuilder<C, ?>> defaultPlaceholder;
 
@@ -30,8 +29,8 @@ public abstract class AbstractPlaceholderResolver<C> implements PlaceholderResol
         } else {
             String token = args.get(0).getText();
 
-            val placeholderResolutionFunction = placeholders.get(token);
-            if (placeholderResolutionFunction == null) {
+            val placeholderResolver = placeholders.get(token);
+            if (placeholderResolver == null) {
                 throw new UnknownPlaceholderException();
             }
 
@@ -39,12 +38,12 @@ public abstract class AbstractPlaceholderResolver<C> implements PlaceholderResol
                 args.remove(0);
             }
 
-            return placeholderResolutionFunction.apply(builder, args);
+            return placeholderResolver.resolve(builder, args, tcc);
         }
     }
 
-    protected final <R, T> void addPlaceholder(String name, BiFunction<PlaceholderBuilder<C, ?>, List<PlaceholderArg>, PlaceholderBuilder<?, ?>> function) {
-        placeholders.put(name, function);
+    protected final <R, T> void addPlaceholder(String name, PlaceholderResolver<C> resolver) {
+        placeholders.put(name, resolver);
     }
 
 }

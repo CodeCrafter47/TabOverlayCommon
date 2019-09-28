@@ -76,6 +76,8 @@ public class GenericPlaceholder<C, D> implements Placeholder {
                 double val = ((Number) value).doubleValue();
                 if ((val % 1) == 0) {
                     return Integer.toString((int) val);
+                } else {
+                    return String.format("%1.2f", val);
                 }
             }
             return value == null ? "" : Objects.toString(value);
@@ -110,6 +112,8 @@ public class GenericPlaceholder<C, D> implements Placeholder {
                 double val = ((Number) value).doubleValue();
                 if ((val % 1) == 0) {
                     return Integer.toString((int) val);
+                } else {
+                    return String.format("%1.2f", val);
                 }
             }
             return value == null ? "" : Objects.toString(value);

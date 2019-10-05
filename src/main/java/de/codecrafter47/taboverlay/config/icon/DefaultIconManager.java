@@ -360,7 +360,6 @@ public class DefaultIconManager implements IconManager {
             factory = IconViewDelegate::new;
             iconProvider.exceptionally(th -> ICON_ERROR)
                     .thenAcceptAsync(icon -> {
-                        this.icon = icon;
                         IconViewConstant iconView = new IconViewConstant(icon);
                         factory = () -> iconView;
                         synchronized (IconEntry.this) {

@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,18 +77,19 @@ public class DefaultIconManager implements IconManager {
     }
 
     @Override
-    public void createIcon(String s, Consumer<Icon> listener) throws Exception {
-        ErrorHandler errorHandler = new ErrorHandler();
-        IconTemplate template = createIconTemplate(s, null, errorHandler);
-        List<ErrorHandler.Entry> errors = errorHandler.getEntries();
-        if (!errors.isEmpty()) {
-            throw new Exception(errors.get(0).getMessage());
+    public CompletableFuture<Icon> createIcon(BufferedImage image) {
+        if (image.getWidth() != 8 || image.getHeight() != 8) {
+            throw new IllegalArgumentException("Image has the wrong size. Required 8x8 actual " + image.getWidth() + "x" + image.getHeight());
         }
-        if (template instanceof IconEntry) {
-            ((IconEntry) template).addIconListener(listener);
-        } else {
-            throw new Exception("Unknown error occurred while creating icon");
-        }
+        CompletableFuture<Icon> future = new CompletableFuture<>();
+        asyncExecutor.submit(() -> {
+            try {
+                fetchIconFromImage(image, future);
+            } catch (Exception e) {
+                future.completeExceptionally(e);
+            }
+        });
+        return future;
     }
 
     @Override
@@ -165,60 +165,63 @@ public class DefaultIconManager implements IconManager {
     private CompletableFuture<Icon> fetchIconFromImage(Path path) {
         CompletableFuture<Icon> future = new CompletableFuture<>();
 
-        asyncExecutor.submit(() -> fetchIconFromImage(path, future));
+        asyncExecutor.submit(() -> {
+            try {
+                BufferedImage image = ImageIO.read(Files.newInputStream(path));
+                if (image.getWidth() != 8 || image.getHeight() != 8) {
+                    logger.warning("Image " + path.toString() + " has the wrong size. Required 8x8 actual " + image.getWidth() + "x" + image.getHeight());
+                    future.completeExceptionally(new Exception("wrong image size"));
+                    return;
+                }
+                fetchIconFromImage(image, future);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Failed to load file " + path.toString(), ex);
+                future.completeExceptionally(ex);
+            }
+        });
 
         return future;
     }
 
-    private void fetchIconFromImage(Path path, CompletableFuture<Icon> future) {
+    private void fetchIconFromImage(BufferedImage image, CompletableFuture<Icon> future) {
 
-        try {
-            BufferedImage head = ImageIO.read(Files.newInputStream(path));
-            if (head.getWidth() != 8 || head.getHeight() != 8) {
-                logger.warning("Image " + path.toString() + " has the wrong size. Required 8x8 actual " + head.getWidth() + "x" + head.getHeight()); // todo better error handling
-                future.completeExceptionally(new Exception("wrong image size"));
-                return;
-            }
+        int[] rgb = image.getRGB(0, 0, 8, 8, null, 0, 8);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
+        byteBuffer.asIntBuffer().put(rgb);
+        byte[] headArray = byteBuffer.array();
 
-            int[] rgb = head.getRGB(0, 0, 8, 8, null, 0, 8);
-            ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
-            byteBuffer.asIntBuffer().put(rgb);
-            byte[] headArray = byteBuffer.array();
+        IconImageData imageData = IconImageData.of(headArray);
+        if (iconCache.containsKey(imageData)) {
+            future.complete(iconCache.get(imageData));
+        } else {
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL("http://skinservice.codecrafter47.dyndns.eu/api/customhead").openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                try (DataOutputStream out = new DataOutputStream(connection.
+                        getOutputStream())) {
+                    out.write((Base64.getEncoder().encodeToString(headArray)).getBytes(Charsets.UTF_8));
+                    out.flush();
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
+                LinkedHashTreeMap map = gson.fromJson(reader, LinkedHashTreeMap.class);
+                if (map.get("state").equals("ERROR")) {
+                    future.completeExceptionally(new Exception("Server side error occurred. Try again later"));
+                    // todo retry or fall back to a different service in this case
+                } else if (map.get("state").equals("QUEUED")) {
+                    asyncExecutor.schedule(() -> fetchIconFromImage(image, future), 5, TimeUnit.SECONDS);
+                } else if (map.get("state").equals("SUCCESS")) {
+                    Icon icon = new Icon(new ProfileProperty("textures", (String) map.get("skin"), (String) map.get("signature")));
+                    iconCache.put(imageData, icon);
 
-            IconImageData imageData = IconImageData.of(headArray);
-            if (iconCache.containsKey(imageData)) {
-                future.complete(iconCache.get(imageData));
-            } else {
-                HttpURLConnection connection = null;
-                try {
-                    connection = (HttpURLConnection) new URL("http://skinservice.codecrafter47.dyndns.eu/api/customhead").openConnection();
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Content-Type", "application/json");
-                    connection.setUseCaches(false);
-                    connection.setDoInput(true);
-                    connection.setDoOutput(true);
-                    try (DataOutputStream out = new DataOutputStream(connection.
-                            getOutputStream())) {
-                        out.write((Base64.getEncoder().encodeToString(headArray)).getBytes(Charsets.UTF_8));
-                        out.flush();
-                    }
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
-                    LinkedHashTreeMap map = gson.fromJson(reader, LinkedHashTreeMap.class);
-                    if (map.get("state").equals("ERROR")) {
-                        logger.warning("An server side error occurred while preparing head " + path.toString()); // todo better error handling
-                        future.completeExceptionally(new Exception()); // todo retry or fall back to a different service in this case
-                    } else if (map.get("state").equals("QUEUED")) {
-                        logger.info("Preparing head " + path.toString() + " approx. " + map.get("timeLeft") + " minutes remaining."); // todo silence this message
-                        asyncExecutor.schedule(() -> fetchIconFromImage(path, future), 5, TimeUnit.SECONDS); // todo make reading the file a separate step to avoid reading it many times
-                    } else if (map.get("state").equals("SUCCESS")) {
-                        Icon icon = new Icon(new ProfileProperty("textures", (String) map.get("skin"), (String) map.get("signature")));
-                        iconCache.put(imageData, icon);
-                        logger.info("Head " + path.toString() + " is now ready for use."); // todo silence message
+                    future.complete(icon);
 
-                        future.complete(icon);
-
+                    synchronized (DefaultIconManager.this) {
                         // save to cache
-                        // todo lock
                         Path cacheFile = iconFolder.resolve("cache.txt");
                         BufferedWriter writer = new BufferedWriter(Files.newBufferedWriter(cacheFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND));
                         writer.write(Base64.getEncoder().encodeToString(headArray));
@@ -228,25 +231,27 @@ public class DefaultIconManager implements IconManager {
                         writer.write(icon.getTextureProperty().getSignature());
                         writer.newLine();
                         writer.close();
-                    } else {
-                        logger.severe("Unexpected response from server: " + map.get("state")); // todo better error handling
-                        future.completeExceptionally(new Exception()); // todo retry or fallback to a different service in this case
                     }
-                } catch (IOException ex) {
-                    logger.log(Level.WARNING, "An error occurred while trying to contact skinservice.codecrafter47.dyndns.eu", ex);
-                    logger.warning("Unable to prepare head " + path.toString()); // todo better error handling
-                    // retry after 5 minutes
-                    // todo limit retries/ switch to a different service
-                    asyncExecutor.schedule(() -> fetchIconFromImage(path, future), 5, TimeUnit.MINUTES); // todo make reading the file a separate step to avoid reading it many times
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
+                } else {
+                    future.completeExceptionally(new Exception("Server side error occurred. Unexpected response. Try again later"));
+                }
+            } catch (IOException ex) {
+                logger.log(Level.WARNING, "An error occurred while trying to contact skinservice.codecrafter47.dyndns.eu", ex);
+                // retry after 5 minutes
+                // todo limit retries/ switch to a different service
+                // todo exception handling during retries
+                asyncExecutor.schedule(() -> {
+                    try {
+                        fetchIconFromImage(image, future);
+                    } catch (Exception e) {
+                        future.completeExceptionally(ex);
                     }
+                }, 5, TimeUnit.MINUTES);
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
                 }
             }
-        } catch (IOException ex) {
-            logger.warning("Failed to load file " + path.toString()); // todo better error handling
-            future.completeExceptionally(ex);
         }
     }
 
@@ -330,7 +335,7 @@ public class DefaultIconManager implements IconManager {
                 // mojang rate limit; try again later
                 logger.warning("Hit Mojang rate limits while fetching uuid for " + username + ".");
                 String headerField = connection.getHeaderField("Retry-After");
-                asyncExecutor.schedule(() -> fetchUuidFromMojang(username, future), headerField == null ? 300 : Integer.valueOf(headerField), TimeUnit.SECONDS);
+                asyncExecutor.schedule(() -> fetchUuidFromMojang(username, future), headerField == null ? 300 : Integer.parseInt(headerField), TimeUnit.SECONDS);
             } else if (e instanceof IOException) {
                 // generic connection error, retry in 5 minutes
                 logger.warning("An error occurred while connecting to Mojang servers: " + e.getMessage() + ". Will retry in 5 minutes.");
@@ -350,7 +355,6 @@ public class DefaultIconManager implements IconManager {
         private Supplier<IconView> factory;
         @Nullable
         private List<Runnable> listeners = new ArrayList<>();
-        private Icon icon;
 
         IconEntry(CompletableFuture<Icon> iconProvider) {
             factory = IconViewDelegate::new;
@@ -366,19 +370,6 @@ public class DefaultIconManager implements IconManager {
                             listeners = null;
                         }
                     }, tabEventQueue);
-        }
-
-        void addIconListener(Consumer<Icon> listener) {
-            boolean added = false;
-            synchronized (IconEntry.this) {
-                if (listeners != null) {
-                    listeners.add(() -> listener.accept(icon));
-                    added = true;
-                }
-            }
-            if (!added) {
-                listener.accept(icon);
-            }
         }
 
         public IconView createIconView() {

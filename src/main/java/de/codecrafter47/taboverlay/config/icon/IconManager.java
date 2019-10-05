@@ -5,11 +5,12 @@ import de.codecrafter47.taboverlay.config.ErrorHandler;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import org.yaml.snakeyaml.error.Mark;
 
-import java.util.function.Consumer;
+import java.awt.image.BufferedImage;
+import java.util.concurrent.CompletableFuture;
 
 public interface IconManager {
 
     IconTemplate createIconTemplate(String s, Mark mark, ErrorHandler errorHandler);
 
-    void createIcon(String s, Consumer<Icon> listener) throws Exception;
+    CompletableFuture<Icon> createIcon(BufferedImage image);
 }

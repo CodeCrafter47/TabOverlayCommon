@@ -8,7 +8,6 @@ import com.google.gson.internal.LinkedHashTreeMap;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
-import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.icon.ConstantIconTemplate;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
@@ -20,11 +19,7 @@ import org.yaml.snakeyaml.error.Mark;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -32,11 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,9 +78,25 @@ public class DefaultIconManager implements IconManager {
     }
 
     @Override
+    public void createIcon(String s, Consumer<Icon> listener) throws Exception {
+        ErrorHandler errorHandler = new ErrorHandler();
+        IconTemplate template = createIconTemplate(s, null, errorHandler);
+        List<ErrorHandler.Entry> errors = errorHandler.getEntries();
+        if (!errors.isEmpty()) {
+            throw new Exception(errors.get(0).getMessage());
+        }
+        if (template instanceof IconEntry) {
+            ((IconEntry) template).addIconListener(listener);
+        } else {
+            throw new Exception("Unknown error occurred while creating icon");
+        }
+    }
+
+    @Override
     public synchronized IconTemplate createIconTemplate(String s, Mark mark, ErrorHandler errorHandler) {
         if (s.contains("\\$\\{")) {
-            // todo contains a placeholder
+            // This error message is misleading. Actually placeholders in icon paths are supported. However they are
+            // resolved before calling this method.
             errorHandler.addWarning("Icon definition contains placeholder. This is not supported yet.", mark);
         } else {
             IconTemplate entry = cache.getIfPresent(s);
@@ -342,18 +350,35 @@ public class DefaultIconManager implements IconManager {
         private Supplier<IconView> factory;
         @Nullable
         private List<Runnable> listeners = new ArrayList<>();
+        private Icon icon;
 
         IconEntry(CompletableFuture<Icon> iconProvider) {
             factory = IconViewDelegate::new;
             iconProvider.exceptionally(th -> ICON_ERROR)
                     .thenAcceptAsync(icon -> {
+                        this.icon = icon;
                         IconViewConstant iconView = new IconViewConstant(icon);
                         factory = () -> iconView;
-                        for (Runnable listener : listeners) {
-                            listener.run();
+                        synchronized (IconEntry.this) {
+                            for (Runnable listener : listeners) {
+                                listener.run();
+                            }
+                            listeners = null;
                         }
-                        listeners = null;
                     }, tabEventQueue);
+        }
+
+        void addIconListener(Consumer<Icon> listener) {
+            boolean added = false;
+            synchronized (IconEntry.this) {
+                if (listeners != null) {
+                    listeners.add(() -> listener.accept(icon));
+                    added = true;
+                }
+            }
+            if (!added) {
+                listener.accept(icon);
+            }
         }
 
         public IconView createIconView() {
@@ -371,16 +396,20 @@ public class DefaultIconManager implements IconManager {
 
             @Override
             protected void onActivation() {
-                if (listeners != null) {
-                    listeners.add(this);
+                synchronized (IconEntry.this) {
+                    if (listeners != null) {
+                        listeners.add(this);
+                    }
                 }
                 delegate.activate(getContext(), getListener());
             }
 
             @Override
             protected void onDeactivation() {
-                if (listeners != null) {
-                    listeners.remove(this);
+                synchronized (IconEntry.this) {
+                    if (listeners != null) {
+                        listeners.remove(this);
+                    }
                 }
                 delegate.deactivate();
             }

@@ -268,7 +268,7 @@ public class ConfigTabOverlayManager {
             tabView.getTabOverlayProviders().removeProviders(ConfigTabOverlayProvider.class);
             // add new ones
             for (AbstractTabOverlayTemplate template : templates) {
-                tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory));
+                tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
             }
         }
     }
@@ -284,7 +284,7 @@ public class ConfigTabOverlayManager {
             // todo concurrency????
             tabViews.put(tabView, viewer);
             for (AbstractTabOverlayTemplate template : templates) {
-                tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory));
+                tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
             }
         }
 

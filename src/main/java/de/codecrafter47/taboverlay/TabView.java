@@ -17,15 +17,20 @@ public class TabView {
     @Getter
     private final TabOverlayProviderSet tabOverlayProviders;
 
-    public TabView(TabOverlayHandler tabOverlayHandler, Logger logger, Executor updateExecutor) {
+    public TabView(Logger logger, Executor updateExecutor) {
         this.logger = logger;
-        tabOverlayProviders = new TabOverlayProviderSet(this, updateExecutor, tabOverlayHandler);
+        tabOverlayProviders = new TabOverlayProviderSet(this, updateExecutor);
+    }
+
+    public TabView(TabOverlayHandler tabOverlayHandler, Logger logger, Executor updateExecutor) {
+        this(logger, updateExecutor);
+        tabOverlayProviders.activate(tabOverlayHandler);
     }
 
     /**
      * Deactivates the tab view.
      */
-    protected void deactivate() {
+    public void deactivate() {
         tabOverlayProviders.deactivate();
     }
 }

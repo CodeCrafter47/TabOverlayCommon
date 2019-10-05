@@ -47,7 +47,7 @@ public abstract class TabOverlayProvider {
      * {@link TabView}.
      * <p>
      * Note that this method is <em>not</em> invoked periodically. The code implementing this interface is expected to
-     * call {@link TabOverlayProviderSet#update()} when its state is changed.
+     * call {@link TabOverlayProviderSet#scheduleUpdate()} when its state is changed.
      *
      * @param tabView the tab view
      * @return true if it should be activated, false otherwise

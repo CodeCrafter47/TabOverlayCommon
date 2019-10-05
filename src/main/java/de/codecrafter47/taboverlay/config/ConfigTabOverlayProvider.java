@@ -18,19 +18,22 @@ import lombok.SneakyThrows;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-// todo maybe catch exceptions here? in onAttach, etc.
 public class ConfigTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
 
     private final AbstractTabOverlayTemplate template;
     private final ActivationHandler activationHandler;
+    private final Logger logger;
     private final Context context;
-    private TabOverlayView tabView;
+    private TabOverlayView tabOverlayView;
 
-    public ConfigTabOverlayProvider(@Nonnull @NonNull TabView tabView, @Nonnull @NonNull AbstractTabOverlayTemplate template, @Nonnull @NonNull Player viewer, @Nonnull @NonNull ScheduledExecutorService eventQueue, @Nonnull @NonNull PlayerProvider playerProvider, @Nonnull @NonNull GlobalPlayerSetFactory globalPlayerSetFactory) {
+    ConfigTabOverlayProvider(@Nonnull @NonNull TabView tabView, @Nonnull @NonNull AbstractTabOverlayTemplate template, @Nonnull @NonNull Player viewer, @Nonnull @NonNull ScheduledExecutorService eventQueue, @Nonnull @NonNull PlayerProvider playerProvider, @Nonnull @NonNull GlobalPlayerSetFactory globalPlayerSetFactory, @Nonnull @NonNull Logger logger) {
         super(tabView, template.getPath().toString(), template.getPriority());
         this.template = template;
         this.activationHandler = new ActivationHandler(template.getViewerPredicate().instantiateWithBooleanResult());
+        this.logger = logger;
         this.context = Context.from(viewer, eventQueue);
         this.context.setPlayerSetFactory(new PlayerSetFactory(playerProvider, globalPlayerSetFactory, tabView.getLogger(), context));
     }
@@ -38,25 +41,49 @@ public class ConfigTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
     @Override
     @SneakyThrows
     protected void onAttach() {
-        context.getTabEventQueue().submit(() -> activationHandler.activate(context)).get();
+        context.getTabEventQueue().submit(() -> {
+            try {
+                activationHandler.activate(context);
+            } catch (Throwable th) {
+                logger.log(Level.SEVERE, "Failed to activate activationHandler for " + template.getPath().toString(), th);
+            }
+        }).get();
     }
 
     @Override
     @SneakyThrows
     protected void onActivate(TabOverlayHandler handler) {
-        context.getTabEventQueue().submit(() -> tabView = TabOverlayView.create(getTabView(), handler, context, template)).get();
+        context.getTabEventQueue().submit(() -> {
+            try {
+                tabOverlayView = TabOverlayView.create(getTabView(), handler, context, template);
+            } catch (Throwable th) {
+                logger.log(Level.SEVERE, "Failed to activate tab overlay " + template.getPath().toString(), th);
+            }
+        }).get();
     }
 
     @Override
     @SneakyThrows
     protected void onDeactivate() {
-        context.getTabEventQueue().submit(() -> tabView.deactivate()).get();
+        context.getTabEventQueue().submit(() -> {
+            try {
+                tabOverlayView.deactivate();
+            } catch (Throwable th) {
+                logger.log(Level.SEVERE, "Failed to deactivate tab overlay " + template.getPath().toString(), th);
+            }
+        }).get();
     }
 
     @Override
     @SneakyThrows
     protected void onDetach() {
-        context.getTabEventQueue().submit(activationHandler::deactivate).get();
+        context.getTabEventQueue().submit(() -> {
+            try {
+                activationHandler.deactivate();
+            } catch (Throwable th) {
+                logger.log(Level.SEVERE, "Failed to deactivate activationHandler for " + template.getPath().toString(), th);
+            }
+        }).get();
     }
 
     @Override

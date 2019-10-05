@@ -1,9 +1,12 @@
 package de.codecrafter47.taboverlay;
 
 import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
-import lombok.val;
 
-import java.util.LinkedList;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -15,6 +18,8 @@ import java.util.logging.Level;
  */
 public final class TabOverlayProviderSet {
 
+    private static final Comparator<TabOverlayProvider> PRIORITY_COMPARATOR = Comparator.comparingInt(TabOverlayProvider::getPriority);
+
     /**
      * The parent {@link TabView}.
      */
@@ -24,120 +29,48 @@ public final class TabOverlayProviderSet {
 
     private final Runnable update = this::update;
 
-    private AtomicBoolean updateScheduled = new AtomicBoolean(false);
+    private final AtomicBoolean updateScheduled = new AtomicBoolean(false);
 
     /**
      * The list of {@link TabOverlayProvider}'s.
      */
-    private final LinkedList<TabOverlayProvider> providers;
+    private final List<TabOverlayProvider> providers;
 
+    @Nullable
     private TabOverlayProvider activeProvider;
 
-    private final TabOverlayHandler tabOverlayHandler;
+    @Nullable
+    private TabOverlayHandler tabOverlayHandler;
 
     private boolean active = true;
 
-    TabOverlayProviderSet(TabView tabView, Executor updateExecutor, TabOverlayHandler tabOverlayHandler) {
+    TabOverlayProviderSet(TabView tabView, Executor updateExecutor) {
         this.tabView = tabView;
         this.updateExecutor = updateExecutor;
-        this.tabOverlayHandler = tabOverlayHandler;
-        this.providers = new LinkedList<>();
-        this.providers.add(this.activeProvider = DefaultTabOverlayProvider.getInstance());
-        this.activeProvider.activate(tabView, this.tabOverlayHandler);
+        this.providers = new ArrayList<>();
     }
 
-    private void setActiveProvider(TabOverlayProvider activeProvider) {
-        try {
-            this.activeProvider.deactivate(tabView);
-        } catch (Throwable th) {
-            tabView.getLogger().log(Level.SEVERE, "Failed to deactivate TabOverlayProvider " + activeProvider.getName(), th);
+    private synchronized void setActiveProvider(@Nonnull TabOverlayProvider provider) {
+        if (!active) {
+            return;
         }
-        this.activeProvider = activeProvider;
+        if (this.activeProvider != null) {
+            try {
+                this.activeProvider.deactivate(tabView);
+            } catch (Throwable th) {
+                tabView.getLogger().log(Level.SEVERE, "Failed to deactivate TabOverlayProvider " + provider.getName(), th);
+            }
+        }
+        this.activeProvider = provider;
         try {
             this.activeProvider.activate(tabView, this.tabOverlayHandler);
         } catch (Throwable th) {
-            tabView.getLogger().log(Level.SEVERE, "Failed to activate TabOverlayProvider " + activeProvider.getName(), th);
-        }
-    }
-
-    public synchronized void addProvider(TabOverlayProvider provider) {
-        if (!active) {
-            return;
-        }
-
-        if (providers.stream().anyMatch(p -> p.getName().equals(provider.getName()))) {
-            throw new IllegalArgumentException("Duplicate provider name " + provider.getName());
-        }
-
-        val iterator = providers.listIterator();
-
-        while (iterator.hasNext()) {
-            if (iterator.next().getPriority() < provider.getPriority()) {
-                iterator.previous();
-                break;
-            }
-        }
-
-        iterator.add(provider);
-
-        provider.attach(tabView);
-
-        scheduleUpdate();
-    }
-
-    public synchronized void removeProvider(TabOverlayProvider provider) {
-        if (!active) {
-            return;
-        }
-
-        if (providers.remove(provider)) {
-            provider.deactivate(tabView);
-            scheduleUpdate();
-        }
-    }
-
-    public synchronized void removeProviders(Class<? extends TabOverlayProvider> providerClass) {
-        if (!active) {
-            return;
-        }
-
-        val iterator = providers.iterator();
-        while (iterator.hasNext()) {
-            val provider = iterator.next();
-            if (providerClass.isAssignableFrom(provider.getClass())) {
-                provider.detach(tabView);
-            }
-        }
-
-        providers.removeIf(p -> providerClass.isAssignableFrom(p.getClass()));
-        scheduleUpdate();
-    }
-
-    public synchronized void removeProvider(final String name) {
-        if (!active) {
-            return;
-        }
-
-        val iterator = providers.iterator();
-        while (iterator.hasNext()) {
-            val provider = iterator.next();
-            if (provider.getName().equals(name)) {
-                provider.detach(tabView);
-            }
-        }
-
-        providers.removeIf(p -> p.getName().equals(name));
-        scheduleUpdate();
-    }
-
-    public void scheduleUpdate() {
-        if (updateScheduled.compareAndSet(false, true)) {
-            updateExecutor.execute(update);
+            tabView.getLogger().log(Level.SEVERE, "Failed to activate TabOverlayProvider " + provider.getName(), th);
         }
     }
 
     private synchronized void update() {
-        if (!active) {
+        if (tabOverlayHandler == null) {
             return;
         }
 
@@ -147,7 +80,7 @@ public final class TabOverlayProviderSet {
             try {
                 shouldActivate = provider.shouldActivate(tabView);
             } catch (Throwable th) {
-                tabView.getLogger().log(Level.SEVERE, "Unexpected exception invoking shouldActivate on TabOverlayProvider " + activeProvider.getName(), th);
+                tabView.getLogger().log(Level.SEVERE, "Unexpected exception invoking shouldActivate on TabOverlayProvider " + provider.getName(), th);
             }
             if (shouldActivate) {
                 if (provider != activeProvider) {
@@ -159,13 +92,85 @@ public final class TabOverlayProviderSet {
         setActiveProvider(DefaultTabOverlayProvider.getInstance());
     }
 
-    synchronized void deactivate() {
-        setActiveProvider(DefaultTabOverlayProvider.getInstance());
-        for (TabOverlayProvider provider : providers) {
-            if (provider != DefaultTabOverlayProvider.getInstance()) {
+    public synchronized void addProvider(TabOverlayProvider provider) {
+        if (!active) {
+            return;
+        }
+        if (providers.stream().anyMatch(p -> p.getName().equals(provider.getName()))) {
+            throw new IllegalArgumentException("Duplicate provider name " + provider.getName());
+        }
+
+        providers.add(provider);
+        providers.sort(PRIORITY_COMPARATOR);
+
+        updateExecutor.execute(() -> {
+            provider.attach(tabView);
+            update();
+        });
+    }
+
+    public synchronized void removeProvider(TabOverlayProvider provider) {
+        if (!active) {
+            return;
+        }
+        if (providers.remove(provider)) {
+            updateExecutor.execute(() -> {
+                update();
                 provider.detach(tabView);
+            });
+        }
+    }
+
+    public synchronized void removeProviders(Class<? extends TabOverlayProvider> providerClass) {
+        if (!active) {
+            return;
+        }
+        for (TabOverlayProvider provider : providers) {
+            if (providerClass.isAssignableFrom(provider.getClass())) {
+                updateExecutor.execute(() -> {
+                    update();
+                    provider.detach(tabView);
+                });
             }
         }
+
+        providers.removeIf(p -> providerClass.isAssignableFrom(p.getClass()));
+    }
+
+    public synchronized void removeProvider(final String name) {
+        if (!active) {
+            return;
+        }
+        for (TabOverlayProvider provider : providers) {
+            if (provider.getName().equals(name)) {
+                removeProvider(provider);
+            }
+        }
+    }
+
+    public void scheduleUpdate() {
+        if (!active) {
+            return;
+        }
+        if (updateScheduled.compareAndSet(false, true)) {
+            updateExecutor.execute(update);
+        }
+    }
+
+    public synchronized void activate(TabOverlayHandler handler) {
+        this.tabOverlayHandler = handler;
+        scheduleUpdate();
+    }
+
+    synchronized void deactivate() {
+        updateExecutor.execute(() -> {
+            for (TabOverlayProvider provider : providers) {
+                if (provider != DefaultTabOverlayProvider.getInstance()) {
+                    provider.detach(tabView);
+                }
+            }
+            update();
+        });
         active = false;
     }
 }

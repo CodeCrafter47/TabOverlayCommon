@@ -1,8 +1,8 @@
 package de.codecrafter47.taboverlay;
 
+import de.codecrafter47.taboverlay.handler.ContentOperationMode;
 import de.codecrafter47.taboverlay.handler.HeaderAndFooterOperationMode;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandle;
-import de.codecrafter47.taboverlay.handler.ContentOperationMode;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
 import lombok.NonNull;
 
@@ -23,8 +23,7 @@ public abstract class AbstractTabOverlayProvider<T1 extends TabOverlayHandle, T2
 
     /**
      * Called when this {@link AbstractTabOverlayProvider} is activated for a specific {@link TabView}.
-     *
-     * @param tabView           the tab view
+     *  @param tabView           the tab view
      * @param tabOverlayHandler the tab list handler providing access to the tab list
      */
     @Override

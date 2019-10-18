@@ -93,6 +93,11 @@ public class DefaultIconManager implements IconManager {
     }
 
     @Override
+    public CompletableFuture<Icon> createIconFromName(String name) {
+        return fetchUuid(name).thenCompose(this::fetchIcon);
+    }
+
+    @Override
     public synchronized IconTemplate createIconTemplate(String s, Mark mark, ErrorHandler errorHandler) {
         if (s.contains("\\$\\{")) {
             // This error message is misleading. Actually placeholders in icon paths are supported. However they are

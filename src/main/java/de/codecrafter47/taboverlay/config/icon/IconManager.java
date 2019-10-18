@@ -13,4 +13,6 @@ public interface IconManager {
     IconTemplate createIconTemplate(String s, Mark mark, ErrorHandler errorHandler);
 
     CompletableFuture<Icon> createIcon(BufferedImage image);
+
+    CompletableFuture<Icon> createIconFromName(String name);
 }

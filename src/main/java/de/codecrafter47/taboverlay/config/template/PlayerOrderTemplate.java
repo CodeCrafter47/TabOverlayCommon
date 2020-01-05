@@ -1,6 +1,7 @@
 package de.codecrafter47.taboverlay.config.template;
 
-import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderDataProviderSupplier;
+import de.codecrafter47.data.api.DataHolder;
+import de.codecrafter47.taboverlay.config.placeholder.DataHolderPlaceholderDataProviderSupplier;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -25,7 +26,7 @@ public class PlayerOrderTemplate {
     public static class Entry {
         @Nonnull
         @NonNull
-        PlayerPlaceholderDataProviderSupplier<?, ?> placeholder;
+        DataHolderPlaceholderDataProviderSupplier<DataHolder, ?, ?> placeholder;
 
         @Nonnull
         @NonNull

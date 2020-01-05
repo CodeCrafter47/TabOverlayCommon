@@ -2,6 +2,7 @@ package de.codecrafter47.taboverlay.config.dsl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.taboverlay.config.SortingRulePreprocessor;
 import de.codecrafter47.taboverlay.config.context.Context;
@@ -61,12 +62,12 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
                 String placeholderId = tokens[0];
 
-                PlayerPlaceholderDataProviderSupplier<?, ?> playerPlaceholder;
+                DataHolderPlaceholderDataProviderSupplier<DataHolder, ?, ?> dataHolderPlaceholder;
                 try {
                     PlaceholderBuilder<?, ?> builderPlayer = tcc.getPlayerPlaceholderResolver().resolve(PlaceholderBuilder.create().transformContext(Context::getPlayer), new ArrayList<>(Collections.singletonList(new PlaceholderArg.Text(placeholderId))), tcc);
                     val dataProviderFactory = Unchecked.cast(builderPlayer.getDataProviderFactory());
-                    if (dataProviderFactory instanceof PlayerPlaceholderDataProviderSupplier) {
-                        playerPlaceholder = Unchecked.cast(dataProviderFactory);
+                    if (dataProviderFactory instanceof DataHolderPlaceholderDataProviderSupplier) {
+                        dataHolderPlaceholder = Unchecked.cast(dataProviderFactory);
                     } else {
                         tcc.getErrorHandler().addWarning("Unsuitable placeholder in playerOrder option: `" + placeholderId + "`. This placeholder cannot be used for sorting.", getStartMark());
                         continue;
@@ -120,7 +121,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
                 if (type == null) {
                     // defaults
-                    TypeToken<?> placeholderType = playerPlaceholder.getType();
+                    TypeToken<?> placeholderType = dataHolderPlaceholder.getType();
                     if (STRING_TYPES.contains(placeholderType)) {
                         type = PlayerOrderTemplate.Type.TEXT;
                     }
@@ -146,7 +147,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                     continue;
                 }
 
-                chain.add(new PlayerOrderTemplate.Entry(playerPlaceholder, direction, type));
+                chain.add(new PlayerOrderTemplate.Entry(dataHolderPlaceholder, direction, type));
             }
         }
 

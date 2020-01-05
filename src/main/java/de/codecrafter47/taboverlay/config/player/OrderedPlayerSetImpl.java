@@ -1,5 +1,6 @@
 package de.codecrafter47.taboverlay.config.player;
 
+import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
@@ -60,7 +61,7 @@ public class OrderedPlayerSetImpl implements OrderedPlayerSet {
                     break;
                 case VIEWER_FIRST:
                     viewer = context.getViewer();
-                    Function<Player, String> toStringFunction = placeholder.getToStringFunction();
+                    Function<? super DataHolder, String> toStringFunction = placeholder.getToStringFunction();
                     comparator = Comparator.comparingInt(player -> Objects.equals(toStringFunction.apply(player), toStringFunction.apply(viewer)) ? 0 : 1);
                     break;
             }

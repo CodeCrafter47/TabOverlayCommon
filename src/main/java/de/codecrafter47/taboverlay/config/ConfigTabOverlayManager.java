@@ -180,43 +180,11 @@ public class ConfigTabOverlayManager {
             // TODO notify our tab overlay providers of change in available templates. - can be done by caller!
             success = true;
         }
-        List<ErrorHandler.Entry> errors = errorHandler.getEntries();
-        if (errors.size() > 0) {
-            StringBuilder message = new StringBuilder();
-            int errCnt = 0;
-            int warnCnt = 0;
-            for (ErrorHandler.Entry error : errors) {
-                message.append("\n");
-                if (error.getSeverity() == ErrorHandler.Severity.WARNING) {
-                    message.append("WARNING: ").append(error.getMessage());
-                    warnCnt += 1;
-                } else if (error.getSeverity() == ErrorHandler.Severity.ERROR) {
-                    message.append("ERROR: ").append(error.getMessage());
-                    errCnt += 1;
-                } else {
-                    throw new AssertionError("Unknown error severity");
-                }
-                Mark position = error.getPosition();
-                if (position != null) {
-                    message.append("\n").append(position.toString());
-                }
-                List<ErrorHandler.Context> context = error.getContext();
-                if (context != null) {
-                    for (ErrorHandler.Context contextElement : context) {
-                        message.append("\n ").append(contextElement.getMessage());
-                        position = contextElement.getPosition();
-                        if (position != null) {
-                            message.append("\n").append(position.toString());
-                        }
-                    }
-                }
-            }
-            if (success) {
-                logger.log(Level.WARNING, "There have been " + warnCnt + " warnings while loading " + configuration.getPath() + message + "\n");
-            } else {
 
-                logger.log(Level.WARNING, "Failed to load tab list configuration file " + configuration.getPath() + ".\n" + errCnt + " errors and " + warnCnt + " warnings" + message + "\n");
-            }
+        if (errorHandler.getEntries().size() > 0) {
+            String fileName = configuration.getPath().toString();
+            String msg = errorHandler.formatErrors(fileName);
+            logger.log(Level.WARNING, msg);
         }
         return success;
     }

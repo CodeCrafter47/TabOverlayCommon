@@ -18,7 +18,7 @@ import java.util.logging.Level;
  */
 public final class TabOverlayProviderSet {
 
-    private static final Comparator<TabOverlayProvider> PRIORITY_COMPARATOR = Comparator.comparingInt(TabOverlayProvider::getPriority);
+    private static final Comparator<TabOverlayProvider> PRIORITY_COMPARATOR = Comparator.comparingInt(TabOverlayProvider::getPriority).reversed();
 
     /**
      * The parent {@link TabView}.

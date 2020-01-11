@@ -164,13 +164,15 @@ public final class TabOverlayProviderSet {
 
     synchronized void deactivate() {
         updateExecutor.execute(() -> {
-            for (TabOverlayProvider provider : providers) {
-                if (provider != DefaultTabOverlayProvider.getInstance()) {
-                    provider.detach(tabView);
+            synchronized (TabOverlayProviderSet.this) {
+                for (TabOverlayProvider provider : providers) {
+                    if (provider != DefaultTabOverlayProvider.getInstance()) {
+                        provider.detach(tabView);
+                    }
                 }
+                update();
+                active = false;
             }
-            update();
         });
-        active = false;
     }
 }

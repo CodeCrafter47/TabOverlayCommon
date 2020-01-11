@@ -160,7 +160,7 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
                     }
                 }
 
-                template.setHeader(footerTemplates.build());
+                template.setFooter(footerTemplates.build());
 
                 if (ConfigValidationUtil.checkNotNull(tcc, "tab overlay", "footerAnimationUpdateInterval", footerAnimationUpdateInterval, null)
                         && ConfigValidationUtil.checkRange(tcc, "tab overlay", "footerAnimationUpdateInterval", footerAnimationUpdateInterval.getValue(), 0.01f, 9999.0f, footerAnimationUpdateInterval.getStartMark())) {

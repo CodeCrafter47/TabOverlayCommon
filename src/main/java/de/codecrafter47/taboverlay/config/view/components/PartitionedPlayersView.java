@@ -24,18 +24,18 @@ public class PartitionedPlayersView extends ListComponentView implements PlayerS
     private final ComponentTemplate morePlayerComponentTemplate;
     private final int morePlayerComponentSize;
     private final PlayerOrderTemplate playerOrderTemplate;
-    private final TextTemplate defaultTextTemplate;
-    private final PingTemplate defaultPingTemplate;
-    private final IconTemplate defaultIconTemplate;
+    protected final TextTemplate defaultTextTemplate;
+    protected final PingTemplate defaultPingTemplate;
+    protected final IconTemplate defaultIconTemplate;
     private final ExpressionTemplate partitionFunction;
-    private PlayerSetPartition playerSetPartition;
-    private final ComponentTemplate sectionHeader;
-    private final ComponentTemplate sectionFooter;
-    private final ComponentTemplate sectionSeparator;
-    private final int minSizePerSection;
-    private final int maxSizePerSection; // -1 denotes no limit
-    private final SectionContextFactory sectionContextFactory;
-    private final Map<String, ComponentView> sectionMap = new HashMap<>();
+    protected PlayerSetPartition playerSetPartition;
+    protected final ComponentTemplate sectionHeader;
+    protected final ComponentTemplate sectionFooter;
+    protected final ComponentTemplate sectionSeparator;
+    protected final int minSizePerSection;
+    protected final int maxSizePerSection; // -1 denotes no limit
+    protected final SectionContextFactory sectionContextFactory;
+    protected final Map<String, ComponentView> sectionMap = new HashMap<>();
 
     public PartitionedPlayersView(int columns, PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, PlayerOrderTemplate playerOrderTemplate, TextTemplate defaultTextTemplate, PingTemplate defaultPingTemplate, IconTemplate defaultIconTemplate, ExpressionTemplate partitionFunction, ComponentTemplate sectionHeader, ComponentTemplate sectionFooter, ComponentTemplate sectionSeparator, int minSizePerSection, int maxSizePerSection, SectionContextFactory sectionContextFactory) {
         super(new ArrayList<>(), columns, defaultTextTemplate.instantiate(), defaultPingTemplate.instantiate(), defaultIconTemplate.instantiate());
@@ -81,7 +81,7 @@ public class PartitionedPlayersView extends ListComponentView implements PlayerS
         addPartition(id, playerSet, true);
     }
 
-    private void addPartition(String id, PlayerSet playerSet, boolean notify) {
+    protected void addPartition(String id, PlayerSet playerSet, boolean notify) {
         Context sectionContext = sectionContextFactory.createSectionContext(getContext(), id, playerSet);
         ComponentView componentView = createSectionView(id, playerSet, sectionContext);
         componentView.activate(sectionContext, this);
@@ -109,6 +109,8 @@ public class PartitionedPlayersView extends ListComponentView implements PlayerS
             super.components.remove(index);
             ComponentView separator = super.components.remove(index);
             separator.deactivate();
+        } else {
+            super.components.remove(index);
         }
         componentView.deactivate();
         updateLayoutRequirements(true);

@@ -56,9 +56,12 @@ public final class PlayerSetPartition {
         active = false;
     }
 
-
     public Collection<? extends Map.Entry<String, ? extends PlayerSet>> getPartitions() {
         return partitions.entrySet();
+    }
+
+    public PlayerSet getPartition(String name) {
+        return partitions.get(name);
     }
 
     public void addListener(PlayerSetPartition.Listener listener) {

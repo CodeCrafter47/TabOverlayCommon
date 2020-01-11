@@ -1,27 +1,36 @@
 package de.codecrafter47.taboverlay.config.dsl.yaml;
 
 import com.google.common.collect.ImmutableMap;
-import de.codecrafter47.taboverlay.config.ErrorHandler;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.constructor.ConstructorException;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import java.beans.IntrospectionException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class CustomYamlConstructor extends Constructor {
+    private static final Set<Tag> PRIMITIVE_TAGS = new HashSet<Tag>() {{
+        add(Tag.YAML);
+        add(Tag.MERGE);
+        add(Tag.SET);
+        add(Tag.PAIRS);
+        add(Tag.OMAP);
+        add(Tag.BINARY);
+        add(Tag.INT);
+        add(Tag.FLOAT);
+        add(Tag.TIMESTAMP);
+        add(Tag.BOOL);
+        add(Tag.NULL);
+        add(Tag.STR);
+        add(Tag.SEQ);
+        add(Tag.MAP);
+    }};
 
     private final ImmutableMap<Class<?>, InheritanceHandler> typeInheritanceHandlerMap;
 
@@ -30,29 +39,19 @@ public class CustomYamlConstructor extends Constructor {
 
     public CustomYamlConstructor(ImmutableMap<Class<?>, InheritanceHandler> typeInheritanceHandlerMap) {
         this.typeInheritanceHandlerMap = typeInheritanceHandlerMap;
-        this.yamlClassConstructors.put(NodeId.mapping, new ConstructMapping() {
-            @Override
-            protected Object constructJavaBean2ndStep(MappingNode node, Object object) {
-                try {
-                    // todo better way to do this
-                    return super.constructJavaBean2ndStep(node, object);
-                } catch (ConstructorException e) {
-                    Matcher matcher = PATTERN_UNKNOWN_PROPERTY.matcher(e.getMessage());
-                    if (matcher.find()) {
-                        String attribute = matcher.group(1);
-                        ErrorHandler.get().addError("Unknown option " + attribute + " in " + node.getType().getSimpleName(), e.getProblemMark());
-                    } else {
-                        throw e;
-                    }
-                    return object;
-                }
-            }
-        });
     }
 
     @Override
-    protected void flattenMapping(MappingNode node) {
-        // do nothing
+    protected void processDuplicateKeys(MappingNode node) {
+        for (NodeTuple tuple : node.getValue()) {
+            Node key = tuple.getKeyNode();
+            Tag tag = key.getTag();
+            if (Tag.INT.equals(tag) || Tag.BOOL.equals(tag)) {
+                key.setTag(Tag.STR);
+            }
+        }
+
+        super.processDuplicateKeys(node);
     }
 
     @Override
@@ -115,10 +114,21 @@ public class CustomYamlConstructor extends Constructor {
     }
 
     private Class<?> getClassForTag(Tag tag) {
-        try {
-            return Class.forName(tag.getClassName());
-        } catch (ClassNotFoundException | NullPointerException | YAMLException ignore) {
+        if (!PRIMITIVE_TAGS.contains(tag)) {
+            try {
+                return Class.forName(tag.getClassName());
+            } catch (ClassNotFoundException | NullPointerException | YAMLException ignore) {
+            }
         }
         return null;
+    }
+
+    @Override
+    protected Class<?> getClassForName(String name) throws ClassNotFoundException {
+        try {
+            return Class.forName(name, true, CustomYamlConstructor.class.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            return Class.forName(name);
+        }
     }
 }

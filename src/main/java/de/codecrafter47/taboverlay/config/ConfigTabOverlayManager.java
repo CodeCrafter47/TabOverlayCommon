@@ -25,8 +25,8 @@ import de.codecrafter47.taboverlay.config.template.ping.PingTemplate;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import lombok.*;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -64,12 +64,12 @@ public class ConfigTabOverlayManager {
 
     private final Map<TabView, Player> tabViews = new HashMap<>();
 
-    public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Collection<PlaceholderResolver<Context>> additionalGlobalPlaceholderResolvers, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
+    public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Collection<PlaceholderResolver<Context>> additionalGlobalPlaceholderResolvers, Yaml yaml, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
         this.platform = platform;
         this.playerProvider = playerProvider;
         this.playerPlaceholderResolver = playerPlaceholderResolver;
         this.additionalGlobalPlaceholderResolvers = additionalGlobalPlaceholderResolvers;
-        this.yaml = constructYamlInstance(options);
+        this.yaml = yaml;
         this.logger = logger;
         this.expressionEngine = constructExpressionEngine(options);
         this.tabEventQueue = tabEventQueue;
@@ -91,8 +91,9 @@ public class ConfigTabOverlayManager {
         return new DefaultExpressionEngine(expressionEngineOptions);
     }
 
-    static Yaml constructYamlInstance(Options options) {
+    public static Yaml constructYamlInstance(Options options) {
         val inheritanceHandlerMap = ImmutableMap.<Class<?>, InheritanceHandler>builder();
+        val representer = new CustomRepresenter();
 
         // different types of tab overlays
         val tabOverlayTypeMap = ImmutableMap.<String, Class<?>>builder();
@@ -105,6 +106,7 @@ public class ConfigTabOverlayManager {
         val componentMap = ImmutableMap.<String, Class<?>>builder();
         for (ComponentSpec component : options.getComponents()) {
             componentMap.put(component.getTag(), component.getConfigurationClass());
+            representer.addClassTag(component.getConfigurationClass(), new Tag(component.getTag()));
         }
         inheritanceHandlerMap.put(ComponentConfiguration.class, new ComponentConfigurationInheritanceHandler(componentMap.build()));
 
@@ -116,9 +118,15 @@ public class ConfigTabOverlayManager {
                 .put("!animated", CustomPlaceholderConfiguration.Animated.class)
                 .build();
         inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, null));
+        representer.addClassTag(CustomPlaceholderConfiguration.Conditional.class, new Tag("!conditional"));
+        representer.addClassTag(CustomPlaceholderConfiguration.Switch.class, new Tag("!switch"));
+        representer.addClassTag(CustomPlaceholderConfiguration.Compute.class, new Tag("!compute"));
+        representer.addClassTag(CustomPlaceholderConfiguration.Animated.class, new Tag("!animated"));
 
         val constructor = new CustomYamlConstructor(inheritanceHandlerMap.build());
-        return new Yaml(constructor);
+        constructor.setPropertyUtils(new CustomPropertyUtils());
+        constructor.setAllowDuplicateKeys(false);
+        return new Yaml(constructor, representer);
     }
 
     private void loadConfig(Path path) {

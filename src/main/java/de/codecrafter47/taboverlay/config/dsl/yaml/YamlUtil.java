@@ -19,6 +19,7 @@
 
 package de.codecrafter47.taboverlay.config.dsl.yaml;
 
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.*;
 
 import java.util.Iterator;
@@ -55,6 +56,6 @@ public class YamlUtil {
 
     public static void put(MappingNode node, String id, Node value) {
         remove(node, id);
-        node.getValue().add(new NodeTuple(new ScalarNode(Tag.STR, id, null, null, null), value));
+        node.getValue().add(new NodeTuple(new ScalarNode(Tag.STR, id, null, null, id.contains("\n") ? DumperOptions.ScalarStyle.LITERAL : DumperOptions.ScalarStyle.PLAIN), value));
     }
 }

@@ -185,7 +185,6 @@ public class ConfigTabOverlayManager {
         boolean success = false;
         if (template != null && !errorHandler.hasErrors()) {
             templates.add(template);
-            // TODO notify our tab overlay providers of change in available templates. - can be done by caller!
             success = true;
         }
 
@@ -197,8 +196,7 @@ public class ConfigTabOverlayManager {
         return success;
     }
 
-    private void loadConfigs(Path path) {
-        // TODO think about synchronization here
+    private synchronized void loadConfigs(Path path) {
         if (Files.isDirectory(path)) {
             try {
                 Files.find(path, 1, (p, attr) -> p.getFileName().toString().endsWith(".yml") && attr.isRegularFile()).forEach(this::loadConfig);
@@ -208,11 +206,8 @@ public class ConfigTabOverlayManager {
         }
     }
 
-    public void reloadConfigs(Iterable<Path> paths) {
-        // TODO think about synchronization here
-
+    public synchronized void reloadConfigs(Iterable<Path> paths) {
         // clean up old ones
-        templates.clear();
         configurations.clear();
 
         for (Path path : paths) {
@@ -223,8 +218,8 @@ public class ConfigTabOverlayManager {
         refreshConfigs();
     }
 
-    public void refreshConfigs() {
-        // TODO think about synchronization here
+    public synchronized void refreshConfigs() {
+        templates.clear();
 
         // load all configuration files
         val iterator = configurations.iterator();
@@ -234,7 +229,6 @@ public class ConfigTabOverlayManager {
                 iterator.remove();
             }
         }
-
 
         // update tab views
         for (val entry : tabViews.entrySet()) {
@@ -257,10 +251,11 @@ public class ConfigTabOverlayManager {
 
         @Override
         public void onTabViewAdded(TabView tabView, Player viewer) {
-            // todo concurrency????
-            tabViews.put(tabView, viewer);
-            for (AbstractTabOverlayTemplate template : templates) {
-                tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
+            synchronized (ConfigTabOverlayManager.this) {
+                tabViews.put(tabView, viewer);
+                for (AbstractTabOverlayTemplate template : templates) {
+                    tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
+                }
             }
         }
 

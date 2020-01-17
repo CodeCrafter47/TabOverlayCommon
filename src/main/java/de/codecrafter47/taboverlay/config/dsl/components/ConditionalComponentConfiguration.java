@@ -44,8 +44,11 @@ public class ConditionalComponentConfiguration extends MarkedPropertyBase implem
             try {
                 expressionTemplate = tcc.getExpressionEngine().compile(tcc, condition.getValue(), condition.getStartMark());
             } catch (Throwable th) {
-                // todo better error reporting
-                tcc.getErrorHandler().addError("Failed to configure conditional component. Failed to parse condition: " + th.getMessage(), condition.getStartMark());
+
+                // Usually the expression parser will record errors. If that is not the case raise a generic error here.
+                if (!tcc.getErrorHandler().hasErrors()) {
+                    tcc.getErrorHandler().addError("Failed to configure conditional component. Failed to parse condition: " + th.getMessage(), condition.getStartMark());
+                }
             }
         }
 

@@ -1,11 +1,8 @@
 package de.codecrafter47.taboverlay.config.template;
 
-import de.codecrafter47.taboverlay.TabView;
-import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
-import de.codecrafter47.taboverlay.config.view.TabOverlayView;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
 import lombok.Data;
 
@@ -14,7 +11,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-// TODO should we have the showHeaderAndFooter config option?
 @Data
 public abstract class AbstractTabOverlayTemplate {
 

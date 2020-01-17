@@ -1,18 +1,18 @@
 package de.codecrafter47.taboverlay.config.dsl.yaml;
 
 import com.google.common.collect.ImmutableMap;
-import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CustomYamlConstructor extends Constructor {
     private static final Set<Tag> PRIMITIVE_TAGS = new HashSet<Tag>() {{
@@ -35,7 +35,6 @@ public class CustomYamlConstructor extends Constructor {
     private final ImmutableMap<Class<?>, InheritanceHandler> typeInheritanceHandlerMap;
 
     private final Map<Tag, Class<?>> tagToClassMap = new HashMap<>();
-    private final static Pattern PATTERN_UNKNOWN_PROPERTY = Pattern.compile("Unable to find property '(.*)' on class");
 
     public CustomYamlConstructor(ImmutableMap<Class<?>, InheritanceHandler> typeInheritanceHandlerMap) {
         this.typeInheritanceHandlerMap = typeInheritanceHandlerMap;
@@ -56,7 +55,6 @@ public class CustomYamlConstructor extends Constructor {
 
     @Override
     protected Object constructObject(Node node) {
-        // todo do we need that? ensureTypeDefinitionPresent(node.getType());
         Object object = super.constructObject(node);
         if (object instanceof MarkedPropertyBase) {
             ((MarkedProperty) object).setStartMark(node.getStartMark());
@@ -82,35 +80,6 @@ public class CustomYamlConstructor extends Constructor {
             return inheritanceHandler;
         }
         return typeInheritanceHandlerMap.get(node.getType());
-    }
-
-    private void ensureTypeDefinitionPresent(Class<?> type) {
-        if (!typeDefinitions.containsKey(type)) {
-            addTypeDescription(computeTypeDescription(type));
-        }
-    }
-
-    private TypeDescription computeTypeDescription(Class<?> clazz) {
-        TypeDescription typeDescription = new TypeDescription(clazz, new Tag(clazz));
-        Set<Property> properties = null;
-        properties = getPropertyUtils().getProperties(clazz);
-        if (properties != null) {
-            for (Property property : properties) {
-                if (Collection.class.isAssignableFrom(property.getType()) || property.getClass().isArray()) {
-                    Class<?>[] typeArguments = property.getActualTypeArguments();
-                    if (typeArguments != null && typeArguments.length == 1 && typeArguments[0] != null) {
-                        typeDescription.addPropertyParameters(property.getName(), typeArguments[0]);
-                    }
-                }
-                if (Map.class.isAssignableFrom(property.getType())) {
-                    Class<?>[] typeArguments = property.getActualTypeArguments();
-                    if (typeArguments != null && typeArguments.length == 2 && typeArguments[0] != null && typeArguments[1] != null) {
-                        typeDescription.addPropertyParameters(property.getName(), typeArguments[0], typeArguments[1]);
-                    }
-                }
-            }
-        }
-        return typeDescription;
     }
 
     private Class<?> getClassForTag(Tag tag) {

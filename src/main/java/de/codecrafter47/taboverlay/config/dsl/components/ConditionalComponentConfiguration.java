@@ -1,7 +1,6 @@
 package de.codecrafter47.taboverlay.config.dsl.components;
 
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
@@ -38,7 +37,7 @@ public class ConditionalComponentConfiguration extends MarkedPropertyBase implem
     }
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
         ExpressionTemplate expressionTemplate = ConstantExpressionTemplate.of(true); // dummy value
         if (ConfigValidationUtil.checkNotNull(tcc, "!conditional component", "condition", condition, getStartMark())) {
             try {

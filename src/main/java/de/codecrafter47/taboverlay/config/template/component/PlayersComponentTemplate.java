@@ -44,6 +44,7 @@ public class PlayersComponentTemplate implements ComponentTemplate {
         return LayoutInfo.builder()
                 .constantSize(false)
                 .minSize(0)
+                .blockAligned(false)
                 .build();
     }
 

@@ -1,6 +1,5 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
@@ -19,13 +18,13 @@ public class TextTemplateConfiguration extends MarkedPropertyBase {
         this.templateConstructor = templateConstructor;
     }
 
-    public TextTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public TextTemplate toTemplate(TemplateCreationContext tcc) {
         return templateConstructor.apply(tcc);
     }
 
     @FunctionalInterface
     private interface TemplateConstructor {
 
-        TextTemplate apply(TemplateCreationContext tcc) throws ConfigurationException;
+        TextTemplate apply(TemplateCreationContext tcc);
     }
 }

@@ -19,8 +19,6 @@
 
 package de.codecrafter47.taboverlay.config.dsl.util;
 
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
-import de.codecrafter47.taboverlay.config.dsl.exception.MarkedConfigurationException;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import org.yaml.snakeyaml.error.Mark;
 

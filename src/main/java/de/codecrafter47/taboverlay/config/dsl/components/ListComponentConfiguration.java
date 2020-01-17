@@ -1,7 +1,6 @@
 package de.codecrafter47.taboverlay.config.dsl.components;
 
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
@@ -27,7 +26,7 @@ public class ListComponentConfiguration extends ArrayList<ComponentConfiguration
     }
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
 
         val componentTemplates = new ArrayList<ComponentTemplate>(size());
 

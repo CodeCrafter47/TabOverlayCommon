@@ -1,6 +1,5 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
@@ -40,13 +39,13 @@ public class IconTemplateConfiguration extends MarkedPropertyBase {
         }
     }
 
-    public IconTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public IconTemplate toTemplate(TemplateCreationContext tcc) {
         return templateConstructor.apply(tcc);
     }
 
     @FunctionalInterface
     private interface TemplateConstructor {
 
-        IconTemplate apply(TemplateCreationContext tcc) throws ConfigurationException;
+        IconTemplate apply(TemplateCreationContext tcc);
     }
 }

@@ -1,6 +1,5 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
@@ -27,11 +26,11 @@ public class DynamicSizeTabOverlayTemplateConfiguration extends AbstractTabOverl
     }
 
     @Override
-    protected void populateTemplate(DynamicSizeTabOverlayTemplate template, TemplateCreationContext tcc) throws ConfigurationException {
+    protected void populateTemplate(DynamicSizeTabOverlayTemplate template, TemplateCreationContext tcc) {
         super.populateTemplate(template, tcc);
 
         if (ConfigValidationUtil.checkNotNull(tcc, "DYNAMIC_SIZE tab overlay", "playerSet", playerSet, null)) {
-            if(!tcc.getPlayerSets().containsKey(playerSet.getValue())) {
+            if (!tcc.getPlayerSets().containsKey(playerSet.getValue())) {
                 tcc.getErrorHandler().addError("No player set definition available for player set \"" + playerSet.getValue() + "\"", playerSet.getStartMark());
             } else {
                 template.setPlayerSet(tcc.getPlayerSets().get(playerSet.getValue()));

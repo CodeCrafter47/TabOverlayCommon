@@ -22,6 +22,7 @@ public class ContainerComponentTemplate implements ComponentTemplate {
                 .minSize(maxSize != -1
                         ? Integer.max(content.getLayoutInfo().getMinSize(), maxSize)
                         : content.getLayoutInfo().getMinSize())
+                .blockAligned(fillSlotsVertical || content.getLayoutInfo().isBlockAligned())
                 .build();
     }
 

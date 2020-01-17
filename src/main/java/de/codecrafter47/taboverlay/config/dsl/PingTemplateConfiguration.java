@@ -1,6 +1,5 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
 import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
@@ -25,9 +24,7 @@ public class PingTemplateConfiguration extends MarkedPropertyBase {
         this.templateConstructor = tcc -> create(value, tcc);
     }
 
-    // todo need clearer, simple control flow path
-
-    private PingTemplate create(String value, TemplateCreationContext tcc) throws ConfigurationException {
+    private PingTemplate create(String value, TemplateCreationContext tcc) {
         if (value.equals("${player ping}")) {
             if (!tcc.isPlayerAvailable()) {
                 tcc.getErrorHandler().addWarning("${player ping} cannot be used here", getStartMark());
@@ -53,13 +50,13 @@ public class PingTemplateConfiguration extends MarkedPropertyBase {
         }
     }
 
-    public PingTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public PingTemplate toTemplate(TemplateCreationContext tcc) {
         return templateConstructor.apply(tcc);
     }
 
     @FunctionalInterface
     private interface TemplateConstructor {
 
-        PingTemplate apply(TemplateCreationContext tcc) throws ConfigurationException;
+        PingTemplate apply(TemplateCreationContext tcc);
     }
 }

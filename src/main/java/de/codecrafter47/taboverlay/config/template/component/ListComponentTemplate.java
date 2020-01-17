@@ -23,7 +23,6 @@ public class ListComponentTemplate implements ComponentTemplate {
 
     @Override
     public LayoutInfo getLayoutInfo() {
-        // todo consider block aligned components here
         return LayoutInfo.builder()
                 .constantSize(components.stream()
                         .map(ComponentTemplate::getLayoutInfo)
@@ -32,6 +31,9 @@ public class ListComponentTemplate implements ComponentTemplate {
                         .map(ComponentTemplate::getLayoutInfo)
                         .mapToInt(LayoutInfo::getMinSize)
                         .sum())
+                .blockAligned(components.stream()
+                        .map(ComponentTemplate::getLayoutInfo)
+                        .anyMatch(LayoutInfo::isBlockAligned))
                 .build();
     }
 

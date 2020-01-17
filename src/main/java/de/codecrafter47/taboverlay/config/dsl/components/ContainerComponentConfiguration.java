@@ -1,7 +1,6 @@
 package de.codecrafter47.taboverlay.config.dsl.components;
 
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
@@ -37,7 +36,7 @@ public class ContainerComponentConfiguration extends MarkedPropertyBase implemen
     }
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
 
         if (minSize != null && minSize.getValue() < 0) {
             tcc.getErrorHandler().addError("Failed to configure container component. MinSize is negative", minSize.getStartMark());

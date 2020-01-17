@@ -2,10 +2,11 @@ package de.codecrafter47.taboverlay.config.dsl.components;
 
 import com.google.common.collect.ImmutableList;
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
-import de.codecrafter47.taboverlay.config.dsl.exception.MarkedConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
-import de.codecrafter47.taboverlay.config.dsl.yaml.*;
+import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
+import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedMapProperty;
+import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
+import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
 import de.codecrafter47.taboverlay.config.template.component.TableComponentTemplate;
@@ -22,7 +23,7 @@ public class TableComponentConfiguration extends MarkedPropertyBase implements C
     private MarkedMapProperty<MarkedStringProperty, ComponentConfiguration> columns = new MarkedMapProperty<>();
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
 
         OptionalInt columnsCount = tcc.getColumns();
         if (!columnsCount.isPresent()) {

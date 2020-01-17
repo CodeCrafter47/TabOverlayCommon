@@ -1,7 +1,6 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
 import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.template.RectangularTabOverlayTemplate;
@@ -31,7 +30,7 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
     }
 
     @Override
-    protected void populateTemplate(RectangularTabOverlayTemplate template, TemplateCreationContext tcc) throws ConfigurationException {
+    protected void populateTemplate(RectangularTabOverlayTemplate template, TemplateCreationContext tcc) {
         super.populateTemplate(template, tcc);
 
         TemplateCreationContext child = tcc.clone();

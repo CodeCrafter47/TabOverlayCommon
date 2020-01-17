@@ -17,6 +17,11 @@ public interface ComponentTemplate {
         boolean constantSize;
 
         /**
+         * True if the component may require block alignment.
+         */
+        boolean blockAligned;
+
+        /**
          * Minimum number of slots required for the component. Should be conservative, i.e. this should always be enough
          * to render the component.
          */

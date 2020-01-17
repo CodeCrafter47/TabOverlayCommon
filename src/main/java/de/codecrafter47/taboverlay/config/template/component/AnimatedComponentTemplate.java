@@ -19,6 +19,7 @@ public class AnimatedComponentTemplate implements ComponentTemplate {
         return LayoutInfo.builder()
                 .constantSize(true)
                 .minSize(components.get(0).getLayoutInfo().getMinSize())
+                .blockAligned(components.get(0).getLayoutInfo().isBlockAligned())
                 .build();
     }
 

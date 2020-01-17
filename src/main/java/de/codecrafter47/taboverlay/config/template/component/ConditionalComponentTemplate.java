@@ -20,6 +20,7 @@ public class ConditionalComponentTemplate implements ComponentTemplate {
         return LayoutInfo.builder()
                 .constantSize(layout1.isConstantSize() && layout2.isConstantSize() && layout1.getMinSize() == layout2.getMinSize())
                 .minSize(Integer.max(layout1.getMinSize(), layout2.getMinSize()))
+                .blockAligned(layout1.isBlockAligned() || layout2.isBlockAligned())
                 .build();
     }
 

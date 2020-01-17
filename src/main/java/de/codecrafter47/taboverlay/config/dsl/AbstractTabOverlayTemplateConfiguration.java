@@ -2,9 +2,9 @@ package de.codecrafter47.taboverlay.config.dsl;
 
 import com.google.common.collect.ImmutableList;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedFloatProperty;
+import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderResolver;
@@ -31,7 +31,7 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
 
     private MarkedStringProperty showTo = new MarkedStringProperty("all");
 
-    private int priority = 0;
+    private MarkedIntegerProperty priority = new MarkedIntegerProperty(0);
 
     private boolean showHeaderFooter = false;
 
@@ -49,7 +49,7 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
 
     private Map<MarkedStringProperty, PlayerSetConfiguration> playerSets = new HashMap<>();
 
-    public T toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public T toTemplate(TemplateCreationContext tcc) {
         T template = createTemplate();
         populateTemplate(template, tcc);
         return template;
@@ -57,7 +57,7 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
 
     protected abstract T createTemplate();
 
-    protected void populateTemplate(T template, TemplateCreationContext tcc) throws ConfigurationException {
+    protected void populateTemplate(T template, TemplateCreationContext tcc) {
 
         if (ConfigValidationUtil.checkNotNull(tcc, "tab overlay", "hiddenPlayers", hiddenPlayers, null)) {
             tcc.setDefaultHiddenPlayerVisibility(hiddenPlayers);
@@ -100,8 +100,6 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
                 }
             }
 
-            // todo is this alright?
-            // todo probably should be done in ConfigTabOverlayManager???
             tcc.addPlaceholderResolver(new CustomPlaceholderResolver(tcc.getCustomPlaceholders()));
         }
 
@@ -115,8 +113,15 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
         }
 
         // priority
-        // todo restrictions?
-        template.setPriority(priority);
+        if (ConfigValidationUtil.checkNotNull(tcc, "tab overlay", "priority", priority, null)) {
+            if (priority.getValue() > 10000) {
+                tcc.getErrorHandler().addError("Priority must not be larger than 10000.", priority.getStartMark());
+            }
+            if (priority.getValue() < -10000) {
+                tcc.getErrorHandler().addError("Priority must not be smaller than -10000.", priority.getStartMark());
+            }
+            template.setPriority(priority.getValue());
+        }
 
         // header & footer
         if (showHeaderFooter) {

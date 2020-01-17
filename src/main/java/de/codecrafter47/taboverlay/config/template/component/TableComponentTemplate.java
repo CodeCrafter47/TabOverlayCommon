@@ -30,6 +30,7 @@ public class TableComponentTemplate implements ComponentTemplate {
                 .minSize(size != -1
                         ? size
                         : columns.stream().mapToInt(Column::getMinSize).max().orElse(0))
+                .blockAligned(true)
                 .build();
     }
 

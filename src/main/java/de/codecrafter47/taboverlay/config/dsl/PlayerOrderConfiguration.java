@@ -116,7 +116,6 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                         tcc.getErrorHandler().addWarning("In playerOrder: Ignoring option `" + token + "` for `" + placeholderId + "`. Unknown option.", getStartMark());
                         continue;
                     }
-                    // todo other options
                 }
 
                 if (type == null) {

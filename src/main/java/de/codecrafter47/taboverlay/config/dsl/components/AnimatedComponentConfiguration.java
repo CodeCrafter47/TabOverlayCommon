@@ -1,8 +1,6 @@
 package de.codecrafter47.taboverlay.config.dsl.components;
 
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
-import de.codecrafter47.taboverlay.config.dsl.exception.MarkedConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedFloatProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedListProperty;
@@ -24,7 +22,7 @@ public class AnimatedComponentConfiguration extends MarkedPropertyBase implement
     private MarkedFloatProperty interval;
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
 
         if ((ConfigValidationUtil.checkNotNull(tcc, "!animated component", "components", components, getStartMark())
                 && ConfigValidationUtil.checkNotEmpty(tcc, "!animated component", "components", components, components.getStartMark()))
@@ -42,16 +40,20 @@ public class AnimatedComponentConfiguration extends MarkedPropertyBase implement
 
             // check child templates for constant size
             if (!componentTemplates.get(0).getLayoutInfo().isConstantSize()) {
-                throw new MarkedConfigurationException("Animated components can only contain components of constant size.", components.get(0).getStartMark());
+                tcc.getErrorHandler().addError("Animated components can only contain components of constant size.", components.get(0).getStartMark());
             }
             int size = componentTemplates.get(0).getLayoutInfo().getMinSize();
+            boolean blockAligned = componentTemplates.get(0).getLayoutInfo().isBlockAligned();
 
             for (int i = 1; i < componentTemplates.size(); i++) {
                 if (!componentTemplates.get(i).getLayoutInfo().isConstantSize()) {
-                    throw new MarkedConfigurationException("Animated components can only contain components of constant size.", (components.get(i) != null ? components.get(i) : components).getStartMark());
+                    tcc.getErrorHandler().addError("Animated components can only contain components of constant size.", (components.get(i) != null ? components.get(i) : components).getStartMark());
                 }
                 if (componentTemplates.get(i).getLayoutInfo().getMinSize() != size) {
-                    throw new MarkedConfigurationException("Animated components can only contain components of the same size.", (components.get(i) != null ? components.get(i) : components).getStartMark());
+                    tcc.getErrorHandler().addError("Animated components can only contain components of the same size.", (components.get(i) != null ? components.get(i) : components).getStartMark());
+                }
+                if (componentTemplates.get(i).getLayoutInfo().isBlockAligned() != blockAligned) {
+                    tcc.getErrorHandler().addError("Animated components can only contain components with the same alignment requirement.", (components.get(i) != null ? components.get(i) : components).getStartMark());
                 }
             }
 

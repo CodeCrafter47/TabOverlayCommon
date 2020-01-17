@@ -4,9 +4,7 @@ import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.IconTemplateConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.PingTemplateConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.TextTemplateConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
-import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.component.BasicComponentTemplate;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
@@ -46,11 +44,11 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
     }
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
         if (alignment != null && alignment != Alignment.LEFT && !tcc.getSlotWidth().isPresent()) {
             tcc.getErrorHandler().addWarning("Option `alignment: " + alignment + "` is not supported in this configuration.", getStartMark());
         }
-        if (longText != null && longText != LongTextBehaviour.DISPLAY_ALL && !tcc.getSlotWidth().isPresent()){
+        if (longText != null && longText != LongTextBehaviour.DISPLAY_ALL && !tcc.getSlotWidth().isPresent()) {
             tcc.getErrorHandler().addWarning("Option `longText: " + longText + "` is not supported in this configuration.", getStartMark());
         }
         return BasicComponentTemplate.builder()

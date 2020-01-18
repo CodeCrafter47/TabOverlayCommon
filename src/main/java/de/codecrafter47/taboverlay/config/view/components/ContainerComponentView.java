@@ -119,49 +119,41 @@ public final class ContainerComponentView extends ComponentView {
         @Override
         public void setSlot(int index, UUID uuid, Icon icon, String text, int ping) {
             delegate.setSlot(index / delegate.getRows(), index % delegate.getRows(), uuid, icon, text, ping);
-            // todo debug index out of bounds
         }
 
         @Override
         public void setUuid(int index, UUID uuid) {
             delegate.setUuid(index / delegate.getRows(), index % delegate.getRows(), uuid);
-            // todo debug index out of bounds
         }
 
         @Override
         public void setIcon(int index, Icon icon) {
             delegate.setIcon(index / delegate.getRows(), index % delegate.getRows(), icon);
-            // todo debug index out of bounds
         }
 
         @Override
         public void setText(int index, String text) {
             delegate.setText(index / delegate.getRows(), index % delegate.getRows(), text);
-            // todo debug index out of bounds
         }
 
         @Override
         public void setText(int index, String text, char alternateColorChar) {
             delegate.setText(index / delegate.getRows(), index % delegate.getRows(), text, alternateColorChar);
-            // todo debug index out of bounds
         }
 
         @Override
         public void setPing(int index, int ping) {
             delegate.setPing(index / delegate.getRows(), index % delegate.getRows(), ping);
-            // todo debug index out of bounds
         }
 
         @Override
         public void setSlot(int index, Icon icon, String text, int ping) {
             delegate.setSlot(index / delegate.getRows(), index % delegate.getRows(), icon, text, ping);
-            // todo debug index out of bounds
         }
 
         @Override
         public void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
             delegate.setSlot(index / delegate.getRows(), index % delegate.getRows(), uuid, icon, text, alternateColorChar, ping);
-            // todo debug index out of bounds
         }
 
         @Override
@@ -186,7 +178,6 @@ public final class ContainerComponentView extends ComponentView {
                 if (column == 0) {
                     TransformedArea.this.setSlot(row, uuid, icon, text, ping);
                 }
-                // todo debug index out of bounds
             }
 
             @Override
@@ -194,7 +185,6 @@ public final class ContainerComponentView extends ComponentView {
                 if (column == 0) {
                     TransformedArea.this.setSlot(row, uuid, icon, text, alternateColorChar, ping);
                 }
-                // todo debug index out of bounds
 
             }
 
@@ -203,7 +193,6 @@ public final class ContainerComponentView extends ComponentView {
                 if (column == 0) {
                     TransformedArea.this.setUuid(row, uuid);
                 }
-                // todo debug index out of bounds
             }
 
             @Override
@@ -211,7 +200,6 @@ public final class ContainerComponentView extends ComponentView {
                 if (column == 0) {
                     TransformedArea.this.setIcon(row, icon);
                 }
-                // todo debug index out of bounds
             }
 
             @Override
@@ -219,7 +207,6 @@ public final class ContainerComponentView extends ComponentView {
                 if (column == 0) {
                     TransformedArea.this.setText(row, text);
                 }
-                // todo debug index out of bounds
             }
 
             @Override
@@ -227,7 +214,6 @@ public final class ContainerComponentView extends ComponentView {
                 if (column == 0) {
                     TransformedArea.this.setText(row, text, alternateColorChar);
                 }
-                // todo debug index out of bounds
             }
 
             @Override
@@ -235,7 +221,6 @@ public final class ContainerComponentView extends ComponentView {
                 if (column == 0) {
                     TransformedArea.this.setPing(row, ping);
                 }
-                // todo debug index out of bounds
             }
 
             @Override

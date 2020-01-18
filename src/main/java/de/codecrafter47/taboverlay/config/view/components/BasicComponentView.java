@@ -97,7 +97,8 @@ public final class BasicComponentView extends ComponentView implements TextViewU
 
     @Override
     protected void requestLayoutUpdate(ComponentView source) {
-        // todo shouldn't be called
+        // shouldn't be called
+        throw new AssertionError();
     }
 
     @Override

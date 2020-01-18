@@ -11,7 +11,7 @@ public class PatternTokenReader extends TokenReader {
     private final boolean ignoreCase;
 
     public PatternTokenReader(Token token, String pattern) {
-        this(token, pattern, false);
+        this(token, pattern, true);
     }
 
     public PatternTokenReader(Token token, String pattern, boolean ignoreCase) {

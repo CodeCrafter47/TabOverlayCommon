@@ -9,17 +9,18 @@ import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class CustomPlaceholderAnimated extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, String>, TextViewUpdateListener {
 
     private Future<?> task;
-    private final List<TextTemplate> elements; // todo using text views instead of templates here might improve performance
+    private final List<TextView> elements;
     private TextView activeElement;
     private int nextElementIndex;
     private final long intervalMS;
 
     public CustomPlaceholderAnimated(List<TextTemplate> elements, float interval) {
-        this.elements = elements;
+        this.elements = elements.stream().map(TextTemplate::instantiate).collect(Collectors.toList());
         this.intervalMS = (long) (interval * 1000);
     }
 
@@ -33,7 +34,7 @@ public class CustomPlaceholderAnimated extends AbstractActiveElement<Runnable> i
         if (nextElementIndex >= elements.size()) {
             nextElementIndex = 0;
         }
-        activeElement = elements.get(nextElementIndex++).instantiate();
+        activeElement = elements.get(nextElementIndex++);
         activeElement.activate(getContext(), this);
         if (hasListener()) {
             getListener().run();
@@ -43,7 +44,7 @@ public class CustomPlaceholderAnimated extends AbstractActiveElement<Runnable> i
     @Override
     protected void onActivation() {
         task = getContext().getTabEventQueue().scheduleAtFixedRate(this::switchActiveElement, intervalMS, intervalMS, TimeUnit.MILLISECONDS);
-        activeElement = elements.get(0).instantiate();
+        activeElement = elements.get(0);
         activeElement.activate(getContext(), this);
         nextElementIndex = 1;
     }

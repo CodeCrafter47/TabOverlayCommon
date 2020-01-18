@@ -55,7 +55,7 @@ public class CustomPlaceholderSwitch extends AbstractActiveElement<Runnable> imp
 
     @Override
     public void onExpressionUpdate() {
-        update(true); // todo use scheduled update for better performance
+        update(true);
     }
 
     @Override

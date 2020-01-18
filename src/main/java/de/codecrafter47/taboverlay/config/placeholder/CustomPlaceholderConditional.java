@@ -55,7 +55,7 @@ public class CustomPlaceholderConditional extends AbstractActiveElement<Runnable
 
     @Override
     public void onExpressionUpdate() {
-        update(true); // todo use scheduled updates
+        update(true);
     }
 
     @Override

@@ -42,7 +42,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConfigTabOverlayManager {
-    private final Platform platform;
     private final PlayerProvider playerProvider;
     private final AbstractPlayerPlaceholderResolver playerPlaceholderResolver;
     private final Collection<PlaceholderResolver<Context>> additionalGlobalPlaceholderResolvers;
@@ -69,7 +68,6 @@ public class ConfigTabOverlayManager {
     private final Map<TabView, Player> tabViews = new HashMap<>();
 
     public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Collection<PlaceholderResolver<Context>> additionalGlobalPlaceholderResolvers, Yaml yaml, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
-        this.platform = platform;
         this.playerProvider = playerProvider;
         this.playerPlaceholderResolver = playerPlaceholderResolver;
         this.additionalGlobalPlaceholderResolvers = additionalGlobalPlaceholderResolvers;
@@ -83,7 +81,7 @@ public class ConfigTabOverlayManager {
         this.playerPingDataKey = options.playerPingDataKey;
         this.sortingRulePreprocessor = options.sortingRulePreprocessor;
 
-        this.platform.addEventListener(new Listener());
+        platform.addEventListener(new Listener());
     }
 
     private static ExpressionEngine constructExpressionEngine(Options options) {
@@ -161,8 +159,8 @@ public class ConfigTabOverlayManager {
         try {
             TemplateCreationContext tcc = new TemplateCreationContext(expressionEngine, iconManager, playerIconDataKey, playerPingDataKey, errorHandler, sortingRulePreprocessor);
             tcc.setPlayerPlaceholderResolver(playerPlaceholderResolver);
-            tcc.setCustomPlaceholders(new HashMap<>()); // TODO _copy_ of global custom placeholder map
-            tcc.setPlayerSets(new HashMap<>()); // todo maybe set to null and throw on get?
+            tcc.setCustomPlaceholders(new HashMap<>());
+            tcc.setPlayerSets(new HashMap<>());
             tcc.setDefaultIcon(IconTemplate.STEVE);
             tcc.setDefaultPing(PingTemplate.ZERO);
             tcc.setDefaultText(TextTemplate.EMPTY);

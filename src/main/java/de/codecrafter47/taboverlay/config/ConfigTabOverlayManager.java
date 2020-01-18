@@ -52,6 +52,10 @@ public class ConfigTabOverlayManager {
     @Getter
     private final ExpressionEngine expressionEngine;
     private final IconManager iconManager;
+    @Nullable
+    @Setter
+    @Getter
+    private TimeZone timeZone = null;
     private final GlobalPlayerSetFactory globalPlayerSetFactory;
 
     private final List<AbstractTabOverlayTemplateConfiguration<?>> configurations = new ArrayList<>();
@@ -166,7 +170,7 @@ public class ConfigTabOverlayManager {
             PlaceholderResolverChain placeholderResolverChain = new PlaceholderResolverChain();
             placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholderResolver.BindPoint.VIEWER));
             placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholderResolver.BindPoint.PLAYER));
-            placeholderResolverChain.addResolver(new TimePlaceholderResolver());
+            placeholderResolverChain.addResolver(new TimePlaceholderResolver(this));
             placeholderResolverChain.addResolver(new PlayerSetPlaceholderResolver());
             for (PlaceholderResolver<Context> placeholderResolver : additionalGlobalPlaceholderResolvers) {
                 placeholderResolverChain.addResolver(placeholderResolver);

@@ -1,12 +1,14 @@
 package de.codecrafter47.taboverlay.config.placeholder;
 
 import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 
 import javax.annotation.Nonnull;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +17,11 @@ public class TimePlaceholderResolver implements PlaceholderResolver<Context> {
     private static final SimpleDateFormat DEFAULT_FORMAT = new SimpleDateFormat("HH:mm:ss");
     // todo replace with type token from data api once available
     private static final TypeToken<Long> TYPE_TOKEN_LONG = TypeToken.create();
+    private final ConfigTabOverlayManager configTabOverlayManager;
+
+    public TimePlaceholderResolver(ConfigTabOverlayManager configTabOverlayManager) {
+        this.configTabOverlayManager = configTabOverlayManager;
+    }
 
     @Nonnull
     @Override
@@ -22,7 +29,7 @@ public class TimePlaceholderResolver implements PlaceholderResolver<Context> {
         if (args.size() >= 1 && args.get(0) instanceof PlaceholderArg.Text && "time".equalsIgnoreCase(((PlaceholderArg.Text) args.get(0)).getValue())) {
             SimpleDateFormat format = DEFAULT_FORMAT;
             if (args.size() > 1) {
-                StringBuilder formatString = new StringBuilder("");
+                StringBuilder formatString = new StringBuilder();
                 for (int i = 1; i < args.size(); i++) {
                     if (args.get(i) instanceof PlaceholderArg.Text) {
                         String s = ((PlaceholderArg.Text) args.get(i)).getValue();
@@ -35,7 +42,11 @@ public class TimePlaceholderResolver implements PlaceholderResolver<Context> {
                     }
                 }
                 try {
-                    format = new SimpleDateFormat(formatString.toString()); // todo apply locale
+                    TimeZone timeZone = configTabOverlayManager.getTimeZone();
+                    format = new SimpleDateFormat(formatString.toString());
+                    if (timeZone != null) {
+                        format.setTimeZone(timeZone);
+                    }
                 } catch (IllegalArgumentException ex) {
                     throw new PlaceholderException("Invalid time format", ex);
                 }

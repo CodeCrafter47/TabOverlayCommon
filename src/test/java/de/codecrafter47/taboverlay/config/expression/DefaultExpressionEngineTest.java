@@ -60,6 +60,10 @@ public class DefaultExpressionEngineTest {
 
         expression = expressionEngine.compile(tcc, "\"A\" . \"B\"", null);
         Assert.assertEquals("AB", expression.instantiateWithStringResult().evaluate());
+
+        expression = expressionEngine.compile(tcc, "4.25", null);
+        Assert.assertEquals(4.25, expression.instantiateWithDoubleResult().evaluate(), 0.001);
+        Assert.assertEquals("4.25", expression.instantiateWithStringResult().evaluate());
     }
 
     @Test

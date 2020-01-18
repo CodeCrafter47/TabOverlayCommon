@@ -101,7 +101,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             TextTemplate finalFalseReplacement = falseReplacement;
             return builder.acquireData(() -> new CustomPlaceholderConditional(finalCompiledCondition,
                     finalTrueReplacement,
-                    finalFalseReplacement), TypeToken.STRING, true); // todo check whether viewer is required
+                    finalFalseReplacement), TypeToken.STRING, finalCompiledCondition.requiresViewerContext() || finalTrueReplacement.requiresViewerContext() || finalFalseReplacement.requiresViewerContext());
         }
     }
 
@@ -158,7 +158,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             }
             ExpressionTemplate finalCompiledExpression = compiledExpression;
             TextTemplate finalDefaultReplacement = defaultReplacement;
-            return builder.acquireData(() -> new CustomPlaceholderSwitch(finalCompiledExpression, replacementMap, finalDefaultReplacement), TypeToken.STRING, true); // todo check if viewer context is required
+            return builder.acquireData(() -> new CustomPlaceholderSwitch(finalCompiledExpression, replacementMap, finalDefaultReplacement), TypeToken.STRING, finalCompiledExpression.requiresViewerContext() || finalDefaultReplacement.requiresViewerContext() || replacementMap.values().stream().anyMatch(TextTemplate::requiresViewerContext));
         }
     }
 
@@ -197,7 +197,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                 }
             }
             ExpressionTemplate finalCompiledExpression = compiledExpression;
-            return builder.acquireData(() -> new CustomPlaceholderCompute(finalCompiledExpression), TypeToken.DOUBLE, true); // todo check whether viewer is required
+            return builder.acquireData(() -> new CustomPlaceholderCompute(finalCompiledExpression), TypeToken.DOUBLE, finalCompiledExpression.requiresViewerContext());
         }
     }
 
@@ -227,7 +227,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                     }
                 }
             }
-            return builder.acquireData(() -> new CustomPlaceholderAnimated(elementTemplates, interval.getValue()), TypeToken.STRING, true); // todo check whether viewer is required
+            return builder.acquireData(() -> new CustomPlaceholderAnimated(elementTemplates, interval.getValue()), TypeToken.STRING, elementTemplates.stream().anyMatch(TextTemplate::requiresViewerContext));
         }
     }
 }

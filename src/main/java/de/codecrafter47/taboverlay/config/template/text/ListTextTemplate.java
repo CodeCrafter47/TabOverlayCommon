@@ -1,7 +1,7 @@
 package de.codecrafter47.taboverlay.config.template.text;
 
-import de.codecrafter47.taboverlay.config.view.text.TextViewList;
 import de.codecrafter47.taboverlay.config.view.text.TextView;
+import de.codecrafter47.taboverlay.config.view.text.TextViewList;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
@@ -25,5 +25,10 @@ public class ListTextTemplate implements TextTemplate {
             list.add(Objects.requireNonNull(template.instantiate()));
         }
         return new TextViewList(list);
+    }
+
+    @Override
+    public boolean requiresViewerContext() {
+        return templates.stream().anyMatch(TextTemplate::requiresViewerContext);
     }
 }

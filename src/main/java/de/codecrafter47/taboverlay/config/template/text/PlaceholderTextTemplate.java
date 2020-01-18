@@ -24,4 +24,9 @@ public class PlaceholderTextTemplate implements TextTemplate {
     public TextView instantiate() {
         return Objects.requireNonNull(placeholder.instantiate());
     }
+
+    @Override
+    public boolean requiresViewerContext() {
+        return placeholder.requiresViewerContext();
+    }
 }

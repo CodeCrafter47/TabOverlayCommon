@@ -1,7 +1,7 @@
 package de.codecrafter47.taboverlay.config.template.text;
 
-import de.codecrafter47.taboverlay.config.view.text.TextViewConstant;
 import de.codecrafter47.taboverlay.config.view.text.TextView;
+import de.codecrafter47.taboverlay.config.view.text.TextViewConstant;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
@@ -18,10 +18,16 @@ public class ConstantTextTemplate implements TextTemplate {
     public ConstantTextTemplate(String text) {
         view = new TextViewConstant(text);
     }
+
     @Override
     @Nonnull
     @NonNull
     public TextView instantiate() {
         return view;
+    }
+
+    @Override
+    public boolean requiresViewerContext() {
+        return false;
     }
 }

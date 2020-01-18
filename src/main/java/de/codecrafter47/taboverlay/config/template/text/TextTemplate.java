@@ -38,4 +38,6 @@ public interface TextTemplate {
     @Nonnull
     @NonNull
     TextView instantiate();
+
+    boolean requiresViewerContext();
 }

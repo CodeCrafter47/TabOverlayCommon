@@ -47,7 +47,7 @@ public class PlayerPlaceholderResolver implements PlaceholderResolver<Context> {
 
         args.remove(0);
         try {
-            return delegate.resolve(builder.transformContext(bindPoint.contextTransformation).requireViewerContext(bindPoint == BindPoint.VIEWER), args, tcc);
+            return delegate.resolve(builder.transformContext(bindPoint.contextTransformation), args, tcc).requireViewerContext(bindPoint == BindPoint.VIEWER);
         } catch (UnknownPlaceholderException ignored) {
             throw new PlaceholderException("Unknown placeholder");
         }

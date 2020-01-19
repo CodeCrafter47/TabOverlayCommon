@@ -127,8 +127,9 @@ public class ConfigTabOverlayManager {
 
         val constructor = new CustomYamlConstructor(inheritanceHandlerMap.build());
         constructor.setPropertyUtils(new CustomPropertyUtils());
+        Yaml yaml = new Yaml(constructor, representer);
         constructor.setAllowDuplicateKeys(false);
-        return new Yaml(constructor, representer);
+        return yaml;
     }
 
     private void loadConfig(Path path) {

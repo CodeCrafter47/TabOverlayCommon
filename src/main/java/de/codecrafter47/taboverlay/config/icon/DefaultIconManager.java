@@ -40,6 +40,7 @@ public class DefaultIconManager implements IconManager {
     private final ScheduledExecutorService tabEventQueue;
     private final Path iconFolder;
     private final Logger logger;
+    private final Cache<UUID, CompletableFuture<Icon>> cacheUUID = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build();
     private final Cache<String, IconTemplate> cache = CacheBuilder.newBuilder().weakValues().build();
     private final Map<IconImageData, Icon> iconCache = new ConcurrentHashMap<>();
 
@@ -260,11 +261,15 @@ public class DefaultIconManager implements IconManager {
         }
     }
 
-    private CompletableFuture<Icon> fetchIcon(UUID uuid) {
-        CompletableFuture<Icon> future = new CompletableFuture<>();
+    private synchronized CompletableFuture<Icon> fetchIcon(UUID uuid) {
+        CompletableFuture<Icon> future = cacheUUID.getIfPresent(uuid);
 
-        asyncExecutor.submit(() -> fetchIconFromMojang(uuid, future));
-
+        if (future == null) {
+            future = new CompletableFuture<>();
+            CompletableFuture<Icon> finalFuture = future;
+            asyncExecutor.submit(() -> fetchIconFromMojang(uuid, finalFuture));
+            cacheUUID.put(uuid, future);
+        }
         return future;
     }
 

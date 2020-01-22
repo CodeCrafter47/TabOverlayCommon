@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -16,6 +19,14 @@ import java.util.function.ToDoubleFunction;
 
 @RequiredArgsConstructor
 public class DataHolderPlaceholderDataProviderSupplier<C extends DataHolder, R, T> implements Supplier<PlaceholderDataProvider<C, T>> {
+
+    private final static NumberFormat NUMBER_FORMAT;
+
+    static {
+        NUMBER_FORMAT = NumberFormat.getNumberInstance(Locale.ROOT);
+        NUMBER_FORMAT.setGroupingUsed(false);
+    }
+
     @Nonnull
     @NonNull
     @Getter
@@ -39,10 +50,26 @@ public class DataHolderPlaceholderDataProviderSupplier<C extends DataHolder, R, 
     }
 
     public ToDoubleFunction<C> getToDoubleFunction() {
-        return context -> {
-            Number value = (Number) get(context);
-            return value == null ? 0 : value.doubleValue();
-        };
+        if (type == TypeToken.FLOAT || type == TypeToken.DOUBLE || type == TypeToken.INTEGER) {
+            return context -> {
+                Number value = (Number) get(context);
+                return value == null ? 0 : value.doubleValue();
+            };
+        } else if (type == TypeToken.BOOLEAN) {
+            return context -> {
+                Boolean bool = (Boolean) get(context);
+                return bool == Boolean.TRUE ? 1 : 0;
+            };
+        } else {
+            return context -> {
+                String result = String.valueOf(get(context));
+                try {
+                    return NUMBER_FORMAT.parse(result).doubleValue();
+                } catch (ParseException | NumberFormatException ignored) {
+                    return 0;
+                }
+            };
+        }
     }
 
     @Override

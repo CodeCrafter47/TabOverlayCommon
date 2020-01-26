@@ -5,7 +5,6 @@ import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.context.ContextKeys;
 import de.codecrafter47.taboverlay.config.player.OrderedPlayerSet;
 import de.codecrafter47.taboverlay.config.player.Player;
-import de.codecrafter47.taboverlay.config.player.PlayerSet;
 import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
 import de.codecrafter47.taboverlay.config.template.PlayerSetTemplate;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
@@ -105,7 +104,7 @@ public final class PlayersComponentView extends ComponentView implements Ordered
                 playerComponent.deactivate();
                 activePlayerComponents.remove(j);
             }
-            if (!allFit) {
+            if (!allFit && morePlayerComponentSize != 0) {
                 if (morePlayersComponent == null) {
                     morePlayersComponent = morePlayerComponentTemplate.instantiate();
                 }
@@ -165,7 +164,7 @@ public final class PlayersComponentView extends ComponentView implements Ordered
                 playerComponent.deactivate();
                 activePlayerComponents.remove(j);
             }
-            if (!allFit) {
+            if (!allFit && morePlayerComponentSize != 0) {
                 if (morePlayersComponent == null) {
                     morePlayersComponent = morePlayerComponentTemplate.instantiate();
                 }

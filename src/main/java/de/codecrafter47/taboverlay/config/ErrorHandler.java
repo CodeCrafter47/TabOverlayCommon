@@ -68,6 +68,14 @@ public class ErrorHandler {
         }
     }
 
+    public ErrorHandler copy() {
+        ErrorHandler copy = new ErrorHandler();
+        copy.accepting = accepting;
+        copy.entries.addAll(entries);
+        copy.contextStack.addAll(contextStack);
+        return copy;
+    }
+
     public String formatErrors(String fileName) {
         StringBuilder message = new StringBuilder();
         int errCnt = 0;

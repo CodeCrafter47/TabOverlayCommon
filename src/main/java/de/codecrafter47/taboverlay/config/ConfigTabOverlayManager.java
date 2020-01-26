@@ -155,7 +155,7 @@ public class ConfigTabOverlayManager {
     }
 
     private boolean load(AbstractTabOverlayTemplateConfiguration<?> configuration) {
-        ErrorHandler errorHandler = configuration.getErrorHandler();
+        ErrorHandler errorHandler = configuration.getErrorHandler().copy();
         AbstractTabOverlayTemplate template = null;
         try {
             TemplateCreationContext tcc = new TemplateCreationContext(expressionEngine, iconManager, playerIconDataKey, playerPingDataKey, errorHandler, sortingRulePreprocessor);

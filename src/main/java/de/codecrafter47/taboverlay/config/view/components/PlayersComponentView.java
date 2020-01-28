@@ -164,7 +164,7 @@ public final class PlayersComponentView extends ComponentView implements Ordered
                 playerComponent.deactivate();
                 activePlayerComponents.remove(j);
             }
-            if (!allFit && morePlayerComponentSize != 0) {
+            if (!allFit && morePlayerComponentSize != 0 && pos + morePlayerComponentSize <= area.getSize()) {
                 if (morePlayersComponent == null) {
                     morePlayersComponent = morePlayerComponentTemplate.instantiate();
                 }

@@ -67,7 +67,9 @@ public class ConfigTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
     protected void onDeactivate() {
         context.getTabEventQueue().submit(() -> {
             try {
-                tabOverlayView.deactivate();
+                if (tabOverlayView != null) {
+                    tabOverlayView.deactivate();
+                }
             } catch (Throwable th) {
                 logger.log(Level.SEVERE, "Failed to deactivate tab overlay " + template.getPath().toString(), th);
             }

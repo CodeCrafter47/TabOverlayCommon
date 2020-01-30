@@ -91,8 +91,10 @@ public final class BasicComponentView extends ComponentView implements TextViewU
 
     @Override
     protected void onAreaUpdated() {
-        updateText();
-        updateSlot();
+        if (getArea() != null) {
+            updateText();
+            updateSlot();
+        }
     }
 
     @Override

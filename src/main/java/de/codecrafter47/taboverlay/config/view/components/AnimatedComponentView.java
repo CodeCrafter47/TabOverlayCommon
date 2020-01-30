@@ -28,6 +28,7 @@ public final class AnimatedComponentView extends ComponentView {
 
         task = getContext().getTabEventQueue().scheduleAtFixedRate(this::switchActiveElement, intervalMS, intervalMS, TimeUnit.MILLISECONDS);
         activeView = components.get(0);
+        activeView.activate(getContext(), this);
         nextElementIndex = 1;
     }
 

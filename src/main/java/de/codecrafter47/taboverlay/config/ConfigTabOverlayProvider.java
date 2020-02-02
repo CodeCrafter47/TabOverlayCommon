@@ -65,27 +65,35 @@ public class ConfigTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
     @Override
     @SneakyThrows
     protected void onDeactivate() {
-        context.getTabEventQueue().submit(() -> {
-            try {
-                if (tabOverlayView != null) {
-                    tabOverlayView.deactivate();
+        try {
+            context.getTabEventQueue().submit(() -> {
+                try {
+                    if (tabOverlayView != null) {
+                        tabOverlayView.deactivate();
+                    }
+                } catch (Throwable th) {
+                    logger.log(Level.SEVERE, "Failed to deactivate tab overlay " + template.getPath().toString(), th);
                 }
-            } catch (Throwable th) {
-                logger.log(Level.SEVERE, "Failed to deactivate tab overlay " + template.getPath().toString(), th);
-            }
-        }).get();
+            }).get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
     @SneakyThrows
     protected void onDetach() {
-        context.getTabEventQueue().submit(() -> {
-            try {
-                activationHandler.deactivate();
-            } catch (Throwable th) {
-                logger.log(Level.SEVERE, "Failed to deactivate activationHandler for " + template.getPath().toString(), th);
-            }
-        }).get();
+        try {
+            context.getTabEventQueue().submit(() -> {
+                try {
+                    activationHandler.deactivate();
+                } catch (Throwable th) {
+                    logger.log(Level.SEVERE, "Failed to deactivate activationHandler for " + template.getPath().toString(), th);
+                }
+            }).get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override

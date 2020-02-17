@@ -28,6 +28,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -66,6 +67,11 @@ public class ConfigTabOverlayManager {
     private final SortingRulePreprocessor sortingRulePreprocessor;
 
     private final Map<TabView, Player> tabViews = new HashMap<>();
+    @NonNull
+    @Nonnull
+    @Setter
+    @Getter
+    private Map<String, CustomPlaceholderConfiguration> globalCustomPlaceholders = new HashMap<>();
 
     public ConfigTabOverlayManager(Platform platform, PlayerProvider playerProvider, AbstractPlayerPlaceholderResolver playerPlaceholderResolver, Collection<PlaceholderResolver<Context>> additionalGlobalPlaceholderResolvers, Yaml yaml, Options options, Logger logger, ScheduledExecutorService tabEventQueue, IconManager iconManager) {
         this.playerProvider = playerProvider;
@@ -160,7 +166,7 @@ public class ConfigTabOverlayManager {
         try {
             TemplateCreationContext tcc = new TemplateCreationContext(expressionEngine, iconManager, playerIconDataKey, playerPingDataKey, errorHandler, sortingRulePreprocessor);
             tcc.setPlayerPlaceholderResolver(playerPlaceholderResolver);
-            tcc.setCustomPlaceholders(new HashMap<>());
+            tcc.setCustomPlaceholders(new HashMap<>(globalCustomPlaceholders));
             tcc.setPlayerSets(new HashMap<>());
             tcc.setDefaultIcon(IconTemplate.STEVE);
             tcc.setDefaultPing(PingTemplate.ZERO);

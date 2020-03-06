@@ -54,7 +54,7 @@ public final class ContainerComponentView extends ComponentView {
     @Override
     public int getMinSize() {
         int minSize = content.getMinSize();
-        if (forceBlock) {
+        if (forceBlock || fillSlotsVertical) {
             minSize = ((minSize + columns - 1) / columns) * columns;
         }
         if (this.minSize >= 0) {

@@ -215,7 +215,7 @@ public class ListComponentView extends ComponentView implements TextViewUpdateLi
                 if (pos < area.getSize() && pos + sectionSize[i] <= area.getSize()) {
                     component.updateArea(area.createRectangularChild(0, pos / columns, area.getColumns(), sectionSize[i] / columns));
                 } else if (pos < area.getSize() && pos + component.getMinSize() <= area.getSize()) {
-                    component.updateArea(area.createRectangularChild(0, pos / columns, area.getColumns(), (sectionSize[i] = area.getRows() - pos) / columns));
+                    component.updateArea(area.createRectangularChild(0, pos / columns, area.getColumns(), (sectionSize[i] = area.getSize() - pos) / columns));
                 } else {
                     sectionSize[i] = 0;
                     component.updateArea(null);

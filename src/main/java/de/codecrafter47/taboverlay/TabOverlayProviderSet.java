@@ -121,6 +121,10 @@ public final class TabOverlayProviderSet {
         }
     }
 
+    public synchronized TabOverlayProvider getActiveProvider() {
+        return activeProvider;
+    }
+
     public synchronized void removeProviders(Class<? extends TabOverlayProvider> providerClass) {
         if (!active) {
             return;

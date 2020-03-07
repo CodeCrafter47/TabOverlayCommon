@@ -77,6 +77,12 @@ public class PartitionedPlayersView extends ListComponentView implements PlayerS
     }
 
     @Override
+    public int getMinSize() {
+        // ensure we get our share of space on the tab list
+        return 0;
+    }
+
+    @Override
     public void onPartitionAdded(String id, PlayerSet playerSet) {
         addPartition(id, playerSet, true);
     }

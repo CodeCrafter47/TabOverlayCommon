@@ -220,12 +220,12 @@ public final class PlayersComponentView extends ComponentView implements Ordered
 
     @Override
     public int getPreferredSize() {
-        return playerSet.getCount();
+        return playerSet.getCount() * playerComponentSize;
     }
 
     @Override
     public int getMaxSize() {
-        return playerSet.getCount();
+        return playerSet.getCount() * playerComponentSize;
     }
 
     @Override

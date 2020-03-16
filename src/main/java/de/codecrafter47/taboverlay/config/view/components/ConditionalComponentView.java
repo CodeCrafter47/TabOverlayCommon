@@ -5,6 +5,8 @@ import de.codecrafter47.taboverlay.config.expression.ExpressionUpdateListener;
 import de.codecrafter47.taboverlay.config.expression.ToBooleanExpression;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
 
+import java.util.concurrent.Future;
+
 public final class ConditionalComponentView extends ComponentView implements ExpressionUpdateListener {
 
     private final ToBooleanExpression condition;
@@ -14,6 +16,7 @@ public final class ConditionalComponentView extends ComponentView implements Exp
     private boolean previousResult = false;
     private int minSize, preferredSize, maxSize;
     private boolean blockAligned;
+    private Future<?> updateFuture = null;
 
     public ConditionalComponentView(ToBooleanExpression condition, ComponentTemplate trueReplacement, ComponentTemplate falseReplacement) {
         this.condition = condition;
@@ -46,6 +49,12 @@ public final class ConditionalComponentView extends ComponentView implements Exp
 
     @Override
     public void onExpressionUpdate() {
+        if (updateFuture == null || updateFuture.isDone()) {
+            updateFuture = getContext().getTabEventQueue().submit(this::update);
+        }
+    }
+
+    private void update() {
         boolean result = condition.evaluate();
         if (previousResult != result) {
             if (activeReplacement != null) {
@@ -122,6 +131,9 @@ public final class ConditionalComponentView extends ComponentView implements Exp
     protected void onDeactivation() {
         condition.deactivate();
         activeReplacement.deactivate();
+        if (updateFuture != null) {
+            updateFuture.cancel(false);
+        }
         super.onDeactivation();
     }
 }

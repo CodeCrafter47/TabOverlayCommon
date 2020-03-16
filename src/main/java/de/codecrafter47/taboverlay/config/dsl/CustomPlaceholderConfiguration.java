@@ -230,4 +230,19 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             return builder.acquireData(() -> new CustomPlaceholderAnimated(elementTemplates, interval.getValue()), TypeToken.STRING, elementTemplates.stream().anyMatch(TextTemplate::requiresViewerContext));
         }
     }
+
+    public static class Alias extends CustomPlaceholderConfiguration {
+
+        private String replacement;
+
+        public Alias(String replacement) {
+            this.replacement = replacement;
+        }
+
+        @Override
+        public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
+            TextTemplate textTemplate = TextTemplate.parse(replacement, getStartMark(), tcc);
+            return builder.acquireData(() -> new CustomPlaceholderAlias(textTemplate), TypeToken.STRING, textTemplate.requiresViewerContext());
+        }
+    }
 }

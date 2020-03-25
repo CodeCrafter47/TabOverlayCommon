@@ -24,6 +24,7 @@ import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.template.ping.PingTemplate;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import lombok.*;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import org.yaml.snakeyaml.nodes.Tag;
@@ -133,7 +134,9 @@ public class ConfigTabOverlayManager {
 
         val constructor = new CustomYamlConstructor(inheritanceHandlerMap.build());
         constructor.setPropertyUtils(new CustomPropertyUtils());
-        Yaml yaml = new Yaml(constructor, representer);
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = new Yaml(constructor, representer, dumperOptions);
         constructor.setAllowDuplicateKeys(false);
         return yaml;
     }

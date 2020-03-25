@@ -233,6 +233,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
     public static class Alias extends CustomPlaceholderConfiguration {
 
+        @Getter
         private String replacement;
 
         public Alias(String replacement) {

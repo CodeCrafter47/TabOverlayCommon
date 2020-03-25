@@ -74,6 +74,15 @@ public class CustomYamlConstructor extends Constructor {
         return super.getConstructor(node);
     }
 
+    @Override
+    protected Object newInstance(Node node) {
+        Object instance = super.newInstance(node);
+        if (node instanceof MappingNode && instance instanceof UpdateableConfig) {
+            ((UpdateableConfig) instance).update((MappingNode) node);
+        }
+        return instance;
+    }
+
     private InheritanceHandler getInheritanceHandler(Node node) {
         InheritanceHandler inheritanceHandler;
         if (null != (inheritanceHandler = typeInheritanceHandlerMap.get(tagToClassMap.computeIfAbsent(node.getTag(), this::getClassForTag)))) {

@@ -83,10 +83,10 @@ public class DefaultIconManager implements IconManager {
             throw new IllegalArgumentException("Image has the wrong size. Required 8x8 actual " + image.getWidth() + "x" + image.getHeight());
         }
         CompletableFuture<Icon> future = new CompletableFuture<>();
-        asyncExecutor.submit(() -> {
+        asyncExecutor.execute(() -> {
             try {
                 fetchIconFromImage(image, future);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 future.completeExceptionally(e);
             }
         });
@@ -171,7 +171,7 @@ public class DefaultIconManager implements IconManager {
     private CompletableFuture<Icon> fetchIconFromImage(Path path) {
         CompletableFuture<Icon> future = new CompletableFuture<>();
 
-        asyncExecutor.submit(() -> {
+        asyncExecutor.execute(() -> {
             try {
                 BufferedImage image = ImageIO.read(Files.newInputStream(path));
                 if (image.getWidth() != 8 || image.getHeight() != 8) {
@@ -180,7 +180,7 @@ public class DefaultIconManager implements IconManager {
                     return;
                 }
                 fetchIconFromImage(image, future);
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 logger.log(Level.WARNING, "Failed to load file " + path.toString() + ": " + ex.getMessage());
                 future.completeExceptionally(ex);
             }
@@ -267,7 +267,7 @@ public class DefaultIconManager implements IconManager {
         if (future == null) {
             future = new CompletableFuture<>();
             CompletableFuture<Icon> finalFuture = future;
-            asyncExecutor.submit(() -> fetchIconFromMojang(uuid, finalFuture));
+            asyncExecutor.execute(() -> fetchIconFromMojang(uuid, finalFuture));
             cacheUUID.put(uuid, future);
         }
         return future;
@@ -309,7 +309,7 @@ public class DefaultIconManager implements IconManager {
     private CompletableFuture<UUID> fetchUuid(String username) {
         CompletableFuture<UUID> future = new CompletableFuture<>();
 
-        asyncExecutor.submit(() -> fetchUuidFromMojang(username, future));
+        asyncExecutor.execute(() -> fetchUuidFromMojang(username, future));
 
         return future;
     }

@@ -156,7 +156,7 @@ public class ListComponentView extends ComponentView implements TextViewUpdateLi
     private void updateLayout() {
         this.sectionSize = new int[this.components.size()];
         for (int i = 0; i < components.size(); i++) {
-            sectionSize[i] = components.get(i).getMinSize();
+            sectionSize[i] = getInitialSizeEstimate(components.get(i));
         }
 
         RectangularArea area = getArea().asRectangularArea();
@@ -233,6 +233,10 @@ public class ListComponentView extends ComponentView implements TextViewUpdateLi
             pos += sectionSize[i];
         }
         setSlotsToDefault(pos, area.getSize());
+    }
+
+    protected int getInitialSizeEstimate(ComponentView componentView) {
+        return componentView.getMinSize();
     }
 
     private void updateDefaultSlots() {

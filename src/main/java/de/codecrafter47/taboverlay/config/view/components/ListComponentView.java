@@ -19,7 +19,7 @@ public class ListComponentView extends ComponentView implements TextViewUpdateLi
     private final TextView defaultTextView;
     private final PingView defaultPingView;
     private final IconView defaultIconView;
-    private int minSize, preferredSize, maxSize;
+    protected int minSize, preferredSize, maxSize;
     private boolean blockAligned;
     private Future<?> updateFuture = null;
     private int[] sectionSize;

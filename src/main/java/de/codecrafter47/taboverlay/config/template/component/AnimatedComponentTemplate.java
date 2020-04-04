@@ -11,8 +11,9 @@ import java.util.List;
 @Value
 @Builder
 public class AnimatedComponentTemplate implements ComponentTemplate {
-    private List<ComponentTemplate> components;
-    private float interval;
+    List<ComponentTemplate> components;
+    float interval;
+    boolean randomize;
 
     @Override
     public LayoutInfo getLayoutInfo() {
@@ -29,6 +30,6 @@ public class AnimatedComponentTemplate implements ComponentTemplate {
         for (ComponentTemplate component : components) {
             componentViews.add(component.instantiate());
         }
-        return new AnimatedComponentView(componentViews, interval, components.get(0).getLayoutInfo().getMinSize());
+        return new AnimatedComponentView(componentViews, interval, components.get(0).getLayoutInfo().getMinSize(), randomize);
     }
 }

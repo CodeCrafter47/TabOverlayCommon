@@ -2,6 +2,7 @@ package de.codecrafter47.taboverlay.config.view.components;
 
 import de.codecrafter47.taboverlay.config.area.Area;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -11,15 +12,20 @@ public final class AnimatedComponentView extends ComponentView {
     private final List<ComponentView> components;
     private final long intervalMS;
     private final int size;
+    private final boolean randomize;
 
     private ComponentView activeView;
     private Future<?> task;
     private int nextElementIndex;
 
-    public AnimatedComponentView(List<ComponentView> components, float interval, int size) {
+    public AnimatedComponentView(List<ComponentView> components, float interval, int size, boolean randomize) {
         this.components = components;
         this.intervalMS = (long) (interval * 1000);
         this.size = size;
+        this.randomize = randomize;
+        if (randomize) {
+            Collections.shuffle(components);
+        }
     }
 
     @Override
@@ -36,6 +42,9 @@ public final class AnimatedComponentView extends ComponentView {
         activeView.deactivate();
         if (nextElementIndex >= components.size()) {
             nextElementIndex = 0;
+            if (randomize) {
+                Collections.shuffle(components);
+            }
         }
         activeView = components.get(nextElementIndex++);
         activeView.activate(getContext(), this);

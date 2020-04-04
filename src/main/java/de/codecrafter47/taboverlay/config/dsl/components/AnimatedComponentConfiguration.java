@@ -19,6 +19,7 @@ import java.util.List;
 public class AnimatedComponentConfiguration extends MarkedPropertyBase implements ComponentConfiguration {
 
     private MarkedListProperty<ComponentConfiguration> components;
+    private boolean randomize = false;
     private MarkedFloatProperty interval;
 
     @Override
@@ -60,6 +61,7 @@ public class AnimatedComponentConfiguration extends MarkedPropertyBase implement
             return AnimatedComponentTemplate.builder()
                     .components(componentTemplates)
                     .interval(interval.getValue())
+                    .randomize(randomize)
                     .build();
         } else {
             return tcc.emptyComponent(); // dummy component

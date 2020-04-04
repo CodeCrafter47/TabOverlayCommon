@@ -6,6 +6,7 @@ import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.text.TextView;
 import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -18,10 +19,15 @@ public class CustomPlaceholderAnimated extends AbstractActiveElement<Runnable> i
     private TextView activeElement;
     private int nextElementIndex;
     private final long intervalMS;
+    private final boolean randomize;
 
-    public CustomPlaceholderAnimated(List<TextTemplate> elements, float interval) {
+    public CustomPlaceholderAnimated(List<TextTemplate> elements, float interval, boolean randomize) {
         this.elements = elements.stream().map(TextTemplate::instantiate).collect(Collectors.toList());
         this.intervalMS = (long) (interval * 1000);
+        this.randomize = randomize;
+        if (randomize) {
+            Collections.shuffle(elements);
+        }
     }
 
     @Override
@@ -33,6 +39,9 @@ public class CustomPlaceholderAnimated extends AbstractActiveElement<Runnable> i
         activeElement.deactivate();
         if (nextElementIndex >= elements.size()) {
             nextElementIndex = 0;
+            if (randomize) {
+                Collections.shuffle(elements);
+            }
         }
         activeElement = elements.get(nextElementIndex++);
         activeElement.activate(getContext(), this);

@@ -211,6 +211,10 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         @Setter
         private MarkedFloatProperty interval;
 
+        @Getter
+        @Setter
+        private boolean randomize = false;
+
         @Override
         public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             List<TextTemplate> elementTemplates = new ArrayList<>(elements.size());
@@ -227,7 +231,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                     }
                 }
             }
-            return builder.acquireData(() -> new CustomPlaceholderAnimated(elementTemplates, interval.getValue()), TypeToken.STRING, elementTemplates.stream().anyMatch(TextTemplate::requiresViewerContext));
+            return builder.acquireData(() -> new CustomPlaceholderAnimated(elementTemplates, interval.getValue(), randomize), TypeToken.STRING, elementTemplates.stream().anyMatch(TextTemplate::requiresViewerContext));
         }
     }
 

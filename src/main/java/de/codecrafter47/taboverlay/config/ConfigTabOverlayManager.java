@@ -179,6 +179,7 @@ public class ConfigTabOverlayManager {
             placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholderResolver.BindPoint.VIEWER));
             placeholderResolverChain.addResolver(new PlayerPlaceholderResolver(playerPlaceholderResolver, PlayerPlaceholderResolver.BindPoint.PLAYER));
             placeholderResolverChain.addResolver(new TimePlaceholderResolver(this));
+            placeholderResolverChain.addResolver(new TextTransformPlaceholderResolver());
             placeholderResolverChain.addResolver(new PlayerSetPlaceholderResolver());
             for (PlaceholderResolver<Context> placeholderResolver : additionalGlobalPlaceholderResolvers) {
                 placeholderResolverChain.addResolver(placeholderResolver);

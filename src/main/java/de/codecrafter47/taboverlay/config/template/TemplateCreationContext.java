@@ -66,17 +66,11 @@ public class TemplateCreationContext implements Cloneable {
 
     private int columns = -1;
 
-    private int slotWidth = -1;
-
     // used for recursion detection
     private HashSet<String> visitedCustomPlaceholders = new HashSet<>();
 
     public OptionalInt getColumns() {
         return columns != -1 ? OptionalInt.of(columns) : OptionalInt.empty();
-    }
-
-    public OptionalInt getSlotWidth() {
-        return slotWidth != -1 ? OptionalInt.of(slotWidth) : OptionalInt.empty();
     }
 
     public Optional<BasicComponentConfiguration.LongTextBehaviour> getDefaultLongTextBehaviour() {

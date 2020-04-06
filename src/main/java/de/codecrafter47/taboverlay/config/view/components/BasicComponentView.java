@@ -22,19 +22,18 @@ public final class BasicComponentView extends ComponentView implements TextViewU
     private final IconView iconView;
     private final BasicComponentConfiguration.Alignment alignment;
     private final BasicComponentConfiguration.LongTextBehaviour longText;
-    private final int slotWidth;
+    private int slotWidth;
     @Nullable
     private UUID uuid;
     @Nullable
     private String textAfterAlignment;
 
-    public BasicComponentView(TextView textView, PingView pingView, IconView iconView, BasicComponentConfiguration.Alignment alignment, BasicComponentConfiguration.LongTextBehaviour longText, int slotWidth) {
+    public BasicComponentView(TextView textView, PingView pingView, IconView iconView, BasicComponentConfiguration.Alignment alignment, BasicComponentConfiguration.LongTextBehaviour longText) {
         this.textView = textView;
         this.pingView = pingView;
         this.iconView = iconView;
         this.alignment = alignment;
         this.longText = longText;
-        this.slotWidth = slotWidth;
     }
 
     @Override
@@ -92,6 +91,7 @@ public final class BasicComponentView extends ComponentView implements TextViewU
     @Override
     protected void onAreaUpdated() {
         if (getArea() != null) {
+            this.slotWidth = getArea().getSlotWidth();
             updateText();
             updateSlot();
         }

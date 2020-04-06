@@ -31,6 +31,8 @@ public interface Area {
 
     int getSize();
 
+    int getSlotWidth();
+
     default Area createChild(int firstIndex, int size) {
         Preconditions.checkArgument(firstIndex < getSize(), "firstIndex < getSize()");
         Preconditions.checkArgument(firstIndex + size <= getSize(), "firstIndex + size <= getSize()");

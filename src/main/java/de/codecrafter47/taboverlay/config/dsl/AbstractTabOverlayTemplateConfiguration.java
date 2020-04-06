@@ -2,6 +2,7 @@ package de.codecrafter47.taboverlay.config.dsl;
 
 import com.google.common.collect.ImmutableList;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
+import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedFloatProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
@@ -48,6 +49,8 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
     private Map<MarkedStringProperty, CustomPlaceholderConfiguration> customPlaceholders = new HashMap<>();
 
     private Map<MarkedStringProperty, PlayerSetConfiguration> playerSets = new HashMap<>();
+
+    private BasicComponentConfiguration.LongTextBehaviour longText = BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL;
 
     public T toTemplate(TemplateCreationContext tcc) {
         T template = createTemplate();
@@ -173,6 +176,8 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
                 }
             }
         }
+
+        tcc.setDefaultLongTextBehaviour(longText);
 
     }
 }

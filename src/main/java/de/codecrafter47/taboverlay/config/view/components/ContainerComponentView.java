@@ -162,6 +162,11 @@ public final class ContainerComponentView extends ComponentView {
         }
 
         @Override
+        public int getSlotWidth() {
+            return this.delegate.getSlotWidth();
+        }
+
+        @Override
         public RectangularArea asRectangularArea() {
             return rectangularView;
         }
@@ -236,6 +241,11 @@ public final class ContainerComponentView extends ComponentView {
             @Override
             public int getSize() {
                 return TransformedArea.this.delegate.getSize();
+            }
+
+            @Override
+            public int getSlotWidth() {
+                return TransformedArea.this.delegate.getSlotWidth();
             }
 
             @Override

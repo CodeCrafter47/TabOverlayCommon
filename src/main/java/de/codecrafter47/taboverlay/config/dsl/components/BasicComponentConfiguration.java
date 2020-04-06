@@ -45,19 +45,12 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
 
     @Override
     public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
-        if (alignment != null && alignment != Alignment.LEFT && !tcc.getSlotWidth().isPresent()) {
-            tcc.getErrorHandler().addWarning("Option `alignment: " + alignment + "` is not supported in this configuration.", getStartMark());
-        }
-        if (longText != null && longText != LongTextBehaviour.DISPLAY_ALL && !tcc.getSlotWidth().isPresent()) {
-            tcc.getErrorHandler().addWarning("Option `longText: " + longText + "` is not supported in this configuration.", getStartMark());
-        }
         return BasicComponentTemplate.builder()
                 .icon(icon != null ? icon.toTemplate(tcc) : tcc.getDefaultIcon())
                 .text(text != null ? text.toTemplate(tcc) : tcc.getDefaultText())
                 .ping(ping != null ? ping.toTemplate(tcc) : tcc.getDefaultPing())
                 .alignment(alignment != null ? alignment : Alignment.LEFT)
                 .longText(Optional.ofNullable(longText).orElse(tcc.getDefaultLongTextBehaviour().orElse(LongTextBehaviour.DISPLAY_ALL)))
-                .slotWidth(tcc.getSlotWidth().orElse(80))
                 .build();
     }
 

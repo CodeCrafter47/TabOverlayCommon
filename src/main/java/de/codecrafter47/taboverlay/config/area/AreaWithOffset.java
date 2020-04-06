@@ -88,6 +88,11 @@ public class AreaWithOffset implements Area {
     }
 
     @Override
+    public int getSlotWidth() {
+        return delegate.getSlotWidth();
+    }
+
+    @Override
     public Area createChild(int firstIndex, int size) {
         Preconditions.checkArgument(firstIndex < this.size, "firstIndex < this.size");
         Preconditions.checkArgument(firstIndex + size <= this.size, "firstIndex + size <= this.size");
@@ -225,6 +230,11 @@ public class AreaWithOffset implements Area {
         @Override
         public int getSize() {
             return AreaWithOffset.this.size;
+        }
+
+        @Override
+        public int getSlotWidth() {
+            return AreaWithOffset.this.getSlotWidth();
         }
 
         @Override

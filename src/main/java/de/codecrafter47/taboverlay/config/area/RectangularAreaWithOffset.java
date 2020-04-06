@@ -110,4 +110,9 @@ public class RectangularAreaWithOffset implements RectangularArea {
     public int getSize() {
         return size;
     }
+
+    @Override
+    public int getSlotWidth() {
+        return delegate.getSlotWidth();
+    }
 }

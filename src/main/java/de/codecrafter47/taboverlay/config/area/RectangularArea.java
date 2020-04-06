@@ -97,6 +97,19 @@ public interface RectangularArea extends Area {
         int columns = tabOverlay.getSize().getColumns();
         int rows = tabOverlay.getSize().getRows();
         int size = columns * rows;
+        int slotWidth = 80;
+        switch (columns) {
+            case 1:
+                slotWidth = 360;
+                break;
+            case 2:
+                slotWidth = 180;
+                break;
+            case 3:
+                slotWidth = 110;
+                break;
+        }
+        int finalSlotWidth = slotWidth;
         return new RectangularArea() {
             @Override
             public void setSlot(int column, int row, UUID uuid, Icon icon, String text, int ping) {
@@ -147,10 +160,25 @@ public interface RectangularArea extends Area {
             public int getSize() {
                 return size;
             }
+
+            @Override
+            public int getSlotWidth() {
+                return finalSlotWidth;
+            }
         };
     }
 
     static Area of(SimpleTabOverlay tabOverlay) {
+        int size = tabOverlay.getSize();
+        int slotWidth = 80;
+        if (size <= 20) {
+            slotWidth = 360;
+        } else if (size <= 40) {
+            slotWidth = 180;
+        } else if (size <= 60) {
+            slotWidth = 110;
+        }
+        int finalSlotWidth = slotWidth;
         return new RectangularArea() {
             @Override
             public void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
@@ -291,6 +319,11 @@ public interface RectangularArea extends Area {
             @Override
             public int getSize() {
                 return tabOverlay.getSize();
+            }
+
+            @Override
+            public int getSlotWidth() {
+                return finalSlotWidth;
             }
 
             @Override

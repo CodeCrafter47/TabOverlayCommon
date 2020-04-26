@@ -60,7 +60,7 @@ public class ContainerComponentConfiguration extends MarkedPropertyBase implemen
         }
 
         int contentMinSize = content.getLayoutInfo().getMinSize();
-        if (maxSize != null && contentMinSize < maxSize.getValue()) {
+        if (maxSize != null && contentMinSize > maxSize.getValue()) {
             tcc.getErrorHandler().addWarning("maxSize of !container set to " + maxSize.getValue() + " but content will require at least " + contentMinSize + " slots.", maxSize.getStartMark());
         }
 

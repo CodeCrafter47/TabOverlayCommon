@@ -181,7 +181,7 @@ public class DefaultIconManager implements IconManager {
                 }
                 fetchIconFromImage(image, future);
             } catch (Throwable ex) {
-                logger.log(Level.WARNING, "Failed to load file " + path.toString() + ": " + ex.getMessage());
+                logger.log(Level.WARNING, "Failed to load file " + path.toString() + ": " + ex.getMessage(), ex);
                 future.completeExceptionally(ex);
             }
         });

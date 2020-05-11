@@ -274,8 +274,10 @@ public class ConfigTabOverlayManager {
 
         @Override
         public void onTabViewRemoved(TabView tabView) {
-            tabViews.remove(tabView);
-            tabView.getTabOverlayProviders().removeProviders(ConfigTabOverlayProvider.class);
+            synchronized (ConfigTabOverlayManager.this) {
+                tabViews.remove(tabView);
+                tabView.getTabOverlayProviders().removeProviders(ConfigTabOverlayProvider.class);
+            }
         }
     }
 

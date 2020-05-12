@@ -4,12 +4,11 @@ import de.codecrafter47.taboverlay.handler.TabOverlayHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * A set of {@link TabOverlayProvider}'s.
@@ -92,6 +91,29 @@ public final class TabOverlayProviderSet {
         setActiveProvider(DefaultTabOverlayProvider.getInstance());
     }
 
+    public synchronized void addProviders(Collection<TabOverlayProvider> providers) {
+        if (!active) {
+            return;
+        }
+        ArrayList<TabOverlayProvider> tabOverlayProviders = new ArrayList<>(providers);
+        Set<String> names = tabOverlayProviders.stream().map(TabOverlayProvider::getName).collect(Collectors.toSet());
+        for (TabOverlayProvider provider : this.providers) {
+            if (names.contains(provider.getName())) {
+                throw new IllegalArgumentException("Duplicate provider name " + provider.getName());
+            }
+        }
+
+        this.providers.addAll(tabOverlayProviders);
+        this.providers.sort(PRIORITY_COMPARATOR);
+
+        updateExecutor.execute(() -> {
+            for (TabOverlayProvider provider : tabOverlayProviders) {
+                provider.attach(tabView);
+            }
+            update();
+        });
+    }
+
     public synchronized void addProvider(TabOverlayProvider provider) {
         if (!active) {
             return;
@@ -129,16 +151,19 @@ public final class TabOverlayProviderSet {
         if (!active) {
             return;
         }
-        for (TabOverlayProvider provider : providers) {
-            if (providerClass.isAssignableFrom(provider.getClass())) {
-                updateExecutor.execute(() -> {
-                    update();
-                    provider.detach(tabView);
-                });
-            }
-        }
+
+        List<TabOverlayProvider> toRemove = this.providers.stream()
+                .filter(p -> providerClass.isAssignableFrom(p.getClass()))
+                .collect(Collectors.toList());
 
         providers.removeIf(p -> providerClass.isAssignableFrom(p.getClass()));
+
+        updateExecutor.execute(() -> {
+            update();
+            for (TabOverlayProvider provider : toRemove) {
+                provider.detach(tabView);
+            }
+        });
     }
 
     public synchronized void removeProvider(final String name) {
@@ -148,6 +173,7 @@ public final class TabOverlayProviderSet {
         for (TabOverlayProvider provider : providers) {
             if (provider.getName().equals(name)) {
                 removeProvider(provider);
+                return;
             }
         }
     }

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.Icon;
+import de.codecrafter47.taboverlay.TabOverlayProvider;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.dsl.*;
@@ -250,9 +251,11 @@ public class ConfigTabOverlayManager {
             // remove old ones
             tabView.getTabOverlayProviders().removeProviders(ConfigTabOverlayProvider.class);
             // add new ones
+            List<TabOverlayProvider> providers = new ArrayList<>();
             for (AbstractTabOverlayTemplate template : templates) {
-                tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
+                providers.add(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
             }
+            tabView.getTabOverlayProviders().addProviders(providers);
         }
     }
 
@@ -266,9 +269,11 @@ public class ConfigTabOverlayManager {
         public void onTabViewAdded(TabView tabView, Player viewer) {
             synchronized (ConfigTabOverlayManager.this) {
                 tabViews.put(tabView, viewer);
+                List<TabOverlayProvider> providers = new ArrayList<>();
                 for (AbstractTabOverlayTemplate template : templates) {
-                    tabView.getTabOverlayProviders().addProvider(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
+                    providers.add(new ConfigTabOverlayProvider(tabView, template, viewer, tabEventQueue, playerProvider, globalPlayerSetFactory, logger));
                 }
+                tabView.getTabOverlayProviders().addProviders(providers);
             }
         }
 

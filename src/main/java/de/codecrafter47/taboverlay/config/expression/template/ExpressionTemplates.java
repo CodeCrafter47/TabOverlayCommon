@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -64,13 +65,19 @@ public class ExpressionTemplates {
         return new Sub(a, b);
     }
 
-    public  ExpressionTemplate div(ExpressionTemplate a, ExpressionTemplate b) {
+    public ExpressionTemplate div(ExpressionTemplate a, ExpressionTemplate b) {
         return new Div(a, b);
     }
 
-    public  ExpressionTemplate negateNumber(ExpressionTemplate template) {
+    public ExpressionTemplate negateNumber(ExpressionTemplate template) {
         return new NegationNumber(template);
     }
+
+    public ExpressionTemplate applyStringToStringFunction(ExpressionTemplate template, Function<String, String> function) {
+        return new ApplyStringToStringFunction(template, function);
+    }
+
+    ;
 
     @EqualsAndHashCode(callSuper = false)
     private static class Negation extends AbstractBooleanExpressionTemplate {
@@ -372,4 +379,26 @@ public class ExpressionTemplates {
             return template.requiresViewerContext();
         }
     }
+
+    @EqualsAndHashCode(callSuper = false)
+    private static class ApplyStringToStringFunction extends AbstractStringExpressionTemplate {
+        private final ExpressionTemplate template;
+        private final Function<String, String> function;
+
+        ApplyStringToStringFunction(ExpressionTemplate template, Function<String, String> function) {
+            this.template = template;
+            this.function = function;
+        }
+
+        @Override
+        public ToStringExpression instantiateWithStringResult() {
+            return Expressions.applyToStringFunction(template.instantiateWithStringResult(), function);
+        }
+
+        @Override
+        public boolean requiresViewerContext() {
+            return template.requiresViewerContext();
+        }
+    }
+
 }

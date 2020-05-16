@@ -5,6 +5,7 @@ import lombok.val;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.function.Function;
 
 @UtilityClass
 public class Expressions {
@@ -165,6 +166,15 @@ public class Expressions {
             @Override
             public double evaluate() {
                 return -delegate.evaluate();
+            }
+        };
+    }
+
+    public ToStringExpression applyToStringFunction(ToStringExpression expression, Function<String, String> function) {
+        return new AbstractUnaryToStringExpression<ToStringExpression>(expression) {
+            @Override
+            public String evaluate() {
+                return function.apply(delegate.evaluate());
             }
         };
     }

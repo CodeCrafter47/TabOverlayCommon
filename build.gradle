@@ -28,9 +28,12 @@ repositories {
 }
 
 dependencies {
-    compile "de.codecrafter47.data:api:1.0.2-SNAPSHOT"
-    compileOnly "org.projectlombok:lombok:1.16.10"
-    testCompileOnly "org.projectlombok:lombok:1.16.10"
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    testCompileOnly 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    compileOnly "de.codecrafter47.data:api:1.0.2-SNAPSHOT"
     compileOnly "com.google.code.findbugs:jsr305:3.0.1"
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.1"
     compileOnly "com.google.guava:guava:18.0"

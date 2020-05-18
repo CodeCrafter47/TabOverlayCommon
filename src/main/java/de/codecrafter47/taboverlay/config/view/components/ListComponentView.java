@@ -60,6 +60,10 @@ public class ListComponentView extends ComponentView implements TextViewUpdateLi
     protected void onAreaUpdated() {
         if (getArea() != null) {
             updateLayout();
+        } else {
+            for (ComponentView component : components) {
+                component.updateArea(null);
+            }
         }
     }
 

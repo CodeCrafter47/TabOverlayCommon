@@ -98,7 +98,9 @@ public class PartitionedPlayersView extends ListComponentView implements PlayerS
             super.components.add(separator);
         }
         super.components.add(componentView);
-        updateLayoutRequirements(notify);
+        if (notify) {
+            requestLayoutUpdate(this);
+        }
     }
 
     @Override
@@ -119,7 +121,7 @@ public class PartitionedPlayersView extends ListComponentView implements PlayerS
             super.components.remove(index);
         }
         componentView.deactivate();
-        updateLayoutRequirements(true);
+        requestLayoutUpdate(this);
     }
 
     private ComponentView createSectionView(String id, PlayerSet playerSet, Context sectionContext) {

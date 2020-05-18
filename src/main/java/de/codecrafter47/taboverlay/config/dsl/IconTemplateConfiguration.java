@@ -5,6 +5,8 @@ import de.codecrafter47.taboverlay.config.placeholder.PlayerPlaceholderResolver;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.template.icon.PlayerIconTemplate;
+import de.codecrafter47.taboverlay.config.template.icon.VariableIconTemplate;
+import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import org.yaml.snakeyaml.error.Mark;
 
 public class IconTemplateConfiguration extends MarkedPropertyBase {
@@ -35,7 +37,12 @@ public class IconTemplateConfiguration extends MarkedPropertyBase {
             }
             return new PlayerIconTemplate(PlayerPlaceholderResolver.BindPoint.VIEWER, tcc.getPlayerIconDataKey());
         } else {
-            return tcc.getIconManager().createIconTemplate(value, mark, tcc.getErrorHandler());
+            if (value.contains("${")) {
+                TextTemplate template = TextTemplate.parse(value, mark, tcc);
+                return new VariableIconTemplate(template, tcc.getIconManager());
+            } else {
+                return tcc.getIconManager().createIconTemplate(value, mark, tcc.getErrorHandler());
+            }
         }
     }
 

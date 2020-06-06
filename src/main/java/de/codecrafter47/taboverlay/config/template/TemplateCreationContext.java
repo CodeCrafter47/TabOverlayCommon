@@ -80,9 +80,8 @@ public class TemplateCreationContext implements Cloneable {
     public ComponentTemplate emptySlot() {
         return BasicComponentTemplate.builder()
                 .icon(defaultIcon)
-                .text(defaultText)
+                .leftText(defaultText)
                 .ping(defaultPing)
-                .alignment(BasicComponentConfiguration.Alignment.LEFT)
                 .build();
     }
 

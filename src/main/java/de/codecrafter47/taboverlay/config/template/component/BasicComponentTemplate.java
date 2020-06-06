@@ -12,10 +12,11 @@ import lombok.Value;
 @Value
 @Builder
 public class BasicComponentTemplate implements ComponentTemplate {
-    TextTemplate text;
+    TextTemplate leftText;
+    TextTemplate centerText;
+    TextTemplate rightText;
     PingTemplate ping;
     IconTemplate icon;
-    BasicComponentConfiguration.Alignment alignment;
     BasicComponentConfiguration.LongTextBehaviour longText;
 
     @Override
@@ -29,6 +30,9 @@ public class BasicComponentTemplate implements ComponentTemplate {
 
     @Override
     public ComponentView instantiate() {
-        return new BasicComponentView(text.instantiate(), ping.instantiate(), icon.instantiate(), alignment, longText);
+        return new BasicComponentView(leftText != null ? leftText.instantiate() : null,
+                centerText != null ? centerText.instantiate() : null,
+                rightText != null ? rightText.instantiate() : null,
+                ping.instantiate(), icon.instantiate(), longText);
     }
 }

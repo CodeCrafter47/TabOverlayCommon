@@ -8,6 +8,7 @@ import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedPropertyBase;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.component.BasicComponentTemplate;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
+import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +21,10 @@ import java.util.Optional;
 @NoArgsConstructor
 public class BasicComponentConfiguration extends MarkedPropertyBase implements ComponentConfiguration {
 
-    private TextTemplateConfiguration text = TextTemplateConfiguration.DEFAULT;
+    private TextTemplateConfiguration text = null;
+    private TextTemplateConfiguration left = null;
+    private TextTemplateConfiguration center = null;
+    private TextTemplateConfiguration right = null;
     private IconTemplateConfiguration icon = IconTemplateConfiguration.DEFAULT;
     private PingTemplateConfiguration ping = PingTemplateConfiguration.DEFAULT;
     private Alignment alignment = Alignment.LEFT;
@@ -45,11 +49,27 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
 
     @Override
     public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
+        if (alignment == null) {
+            alignment = Alignment.LEFT;
+        }
+        if (text != null && alignment == Alignment.LEFT && left != null) {
+            tcc.getErrorHandler().addWarning("Cannot use `text: \"...\", alignment: LEFT` and `left: \"...\"` at the same time", getStartMark());
+        }
+        if (text != null && alignment == Alignment.CENTER && center != null) {
+            tcc.getErrorHandler().addWarning("Cannot use `text: \"...\", alignment: LEFT` and `left: \"...\"` at the same time", getStartMark());
+        }
+        if (text != null && alignment == Alignment.RIGHT && right != null) {
+            tcc.getErrorHandler().addWarning("Cannot use `text: \"...\", alignment: LEFT` and `left: \"...\"` at the same time", getStartMark());
+        }
+        TextTemplate leftTemplate = left != null ? left.toTemplate(tcc) : alignment == Alignment.LEFT && text != null ? text.toTemplate(tcc) : null;
+        TextTemplate centerTemplate = center != null ? center.toTemplate(tcc) : alignment == Alignment.CENTER && text != null ? text.toTemplate(tcc) : null;
+        TextTemplate rightTemplate = right != null ? right.toTemplate(tcc) : alignment == Alignment.RIGHT && text != null ? text.toTemplate(tcc) : null;
         return BasicComponentTemplate.builder()
                 .icon(icon != null ? icon.toTemplate(tcc) : tcc.getDefaultIcon())
-                .text(text != null ? text.toTemplate(tcc) : tcc.getDefaultText())
+                .leftText(leftTemplate)
+                .centerText(centerTemplate)
+                .rightText(rightTemplate)
                 .ping(ping != null ? ping.toTemplate(tcc) : tcc.getDefaultPing())
-                .alignment(alignment != null ? alignment : Alignment.LEFT)
                 .longText(Optional.ofNullable(longText).orElse(tcc.getDefaultLongTextBehaviour().orElse(LongTextBehaviour.DISPLAY_ALL)))
                 .build();
     }

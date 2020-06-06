@@ -1,9 +1,8 @@
 package de.codecrafter47.taboverlay.config.view.components;
 
-import com.google.common.base.Strings;
 import de.codecrafter47.taboverlay.config.area.Area;
 import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
-import de.codecrafter47.taboverlay.config.misc.ChatAlignment;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.player.Player;
 import de.codecrafter47.taboverlay.config.view.icon.IconView;
 import de.codecrafter47.taboverlay.config.view.icon.IconViewUpdateListener;
@@ -17,10 +16,11 @@ import java.util.UUID;
 
 public final class BasicComponentView extends ComponentView implements TextViewUpdateListener, PingViewUpdateListener, IconViewUpdateListener {
 
-    private final TextView textView;
+    private final TextView leftTextView;
+    private final TextView centerTextView;
+    private final TextView rightTextView;
     private final PingView pingView;
     private final IconView iconView;
-    private final BasicComponentConfiguration.Alignment alignment;
     private final BasicComponentConfiguration.LongTextBehaviour longText;
     private int slotWidth;
     @Nullable
@@ -28,11 +28,12 @@ public final class BasicComponentView extends ComponentView implements TextViewU
     @Nullable
     private String textAfterAlignment;
 
-    public BasicComponentView(TextView textView, PingView pingView, IconView iconView, BasicComponentConfiguration.Alignment alignment, BasicComponentConfiguration.LongTextBehaviour longText) {
-        this.textView = textView;
+    public BasicComponentView(TextView leftTextView, TextView centerTextView, TextView rightTextView, PingView pingView, IconView iconView, BasicComponentConfiguration.LongTextBehaviour longText) {
+        this.leftTextView = leftTextView;
+        this.centerTextView = centerTextView;
+        this.rightTextView = rightTextView;
         this.pingView = pingView;
         this.iconView = iconView;
-        this.alignment = alignment;
         this.longText = longText;
     }
 
@@ -41,7 +42,12 @@ public final class BasicComponentView extends ComponentView implements TextViewU
         super.onActivation();
         Player player = getContext().getPlayer();
         uuid = player != null ? player.getUniqueID() : null;
-        textView.activate(getContext(), this);
+        if (leftTextView != null)
+            leftTextView.activate(getContext(), this);
+        if (centerTextView != null)
+            centerTextView.activate(getContext(), this);
+        if (rightTextView != null)
+            rightTextView.activate(getContext(), this);
         pingView.activate(getContext(), this);
         iconView.activate(getContext(), this);
     }
@@ -55,37 +61,44 @@ public final class BasicComponentView extends ComponentView implements TextViewU
 
     private void updateText() {
 
-        String text = textView.getText();
+        String leftText = leftTextView != null ? leftTextView.getText() : "";
 
-        if (alignment != BasicComponentConfiguration.Alignment.LEFT || longText != BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL) {
-            int textLength = ChatAlignment.legacyTextLength(text, '&');
+        if (centerTextView != null || rightTextView != null || longText != BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL) {
 
-            if (longText != BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL && textLength > slotWidth) {
+            float leftTextLength = ChatFormat.formattedTextLength(leftText);
+
+            if (centerTextView != null) {
+
+                String centerText = centerTextView.getText();
+                float centerTextLength = ChatFormat.formattedTextLength(centerText);
+
+                leftText = leftText + ChatFormat.createSpaces(Math.max(4f, slotWidth / 2f - leftTextLength - centerTextLength / 2f)) + centerText;
+                leftTextLength = ChatFormat.formattedTextLength(leftText);
+            }
+
+            String rightText = rightTextView != null ? rightTextView.getText() : "";
+            float rightTextLength = ChatFormat.formattedTextLength(rightText);
+
+            float totalTextLength = leftTextLength + (rightTextView != null ? 4f : 0f) + rightTextLength;
+
+            if (longText != BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL && totalTextLength > slotWidth) {
                 String suffix = "";
                 if (longText == BasicComponentConfiguration.LongTextBehaviour.CROP_2DOTS) {
                     suffix = "..";
                 } else if (longText == BasicComponentConfiguration.LongTextBehaviour.CROP_3DOTS) {
                     suffix = "...";
                 }
-                int suffixLength = ChatAlignment.legacyTextLength(suffix, '&');
-                text = ChatAlignment.cropLegacyText(text, '&', slotWidth - suffixLength) + suffix;
-                textLength = slotWidth;
+                float suffixLength = ChatFormat.formattedTextLength(suffix);
+                leftText = ChatFormat.cropFormattedText(leftText, slotWidth - ((rightTextView != null ? 4f : 0f) + rightTextLength) - suffixLength) + suffix;
+                leftTextLength = ChatFormat.formattedTextLength(leftText);
             }
 
-            int space = slotWidth - textLength;
-            if (alignment != BasicComponentConfiguration.Alignment.LEFT && space > 0) {
-                int spaces = (int) (space / ChatAlignment.getCharWidth(' ', false));
-                int spacesBefore = spaces;
-                int spacesBehind = 0;
-                if (alignment == BasicComponentConfiguration.Alignment.CENTER) {
-                    spacesBefore = spaces / 2;
-                    spacesBehind = spaces - spacesBefore;
-                }
-                text = Strings.repeat(" ", spacesBefore) + text + "&r" + Strings.repeat(" ", spacesBehind);
+            if (rightTextView != null) {
+                leftText = leftText + ChatFormat.createSpacesExact(Math.max(4f, slotWidth - rightTextLength - leftTextLength)) + rightText;
             }
         }
 
-        textAfterAlignment = text;
+        textAfterAlignment = leftText;
     }
 
     @Override
@@ -150,7 +163,12 @@ public final class BasicComponentView extends ComponentView implements TextViewU
 
     @Override
     protected void onDeactivation() {
-        textView.deactivate();
+        if (leftTextView != null)
+            leftTextView.deactivate();
+        if (centerTextView != null)
+            centerTextView.deactivate();
+        if (rightTextView != null)
+            rightTextView.deactivate();
         pingView.deactivate();
         iconView.deactivate();
         super.onDeactivation();

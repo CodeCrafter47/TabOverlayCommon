@@ -1,29 +1,14 @@
 group 'de.codecrafter47.taboverlay'
 version '1.0-SNAPSHOT'
 
-buildscript {
-    dependencies {
-        classpath 'org.hibernate.build.gradle:gradle-maven-publish-auth:2.0.1'
-    }
-    repositories {
-        maven {
-            url "http://repository.jboss.org/nexus/content/groups/public/"
-        }
-        mavenLocal()
-        mavenCentral()
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'maven-publish-auth'
+apply plugin: 'java-library'
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
     maven {
-        url "http://nexus.codecrafter47.dyndns.eu/content/repositories/public/"
+        url "https://nexus.codecrafter47.de/content/repositories/public/"
     }
 }
 
@@ -32,38 +17,19 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
-
-    compileOnly "de.codecrafter47.data:api:1.0.2-SNAPSHOT"
     compileOnly "com.google.code.findbugs:jsr305:3.0.1"
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.1"
+
+    api "de.codecrafter47.data:api:1.0.2-SNAPSHOT"
     compileOnly "com.google.guava:guava:18.0"
-    testCompile "com.google.guava:guava:18.0"
-    compileOnly "org.yaml:snakeyaml:1.25"
-    testCompile "org.yaml:snakeyaml:1.25"
+    testImplementation "com.google.guava:guava:18.0"
+    implementation "org.yaml:snakeyaml:1.25"
+    testImplementation "org.yaml:snakeyaml:1.25"
     compileOnly "com.google.code.gson:gson:2.3.1"
-    testCompile "com.google.code.gson:gson:2.3.1"
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testImplementation "com.google.code.gson:gson:2.3.1"
+    testImplementation group: 'junit', name: 'junit', version: '4.11'
 }
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
-}
-
-publishing {
-    repositories {
-        maven {
-            name "deployment"
-            url "http://nexus.codecrafter47.dyndns.eu/content/repositories/snapshots/"
-        }
-    }
-
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
 }

@@ -192,6 +192,8 @@ public class ChatFormat {
                 case 'e':
                 case 'E':
                     return COLOR_YELLOW;
+                case 'f':
+                case 'F':
                 case 'r':
                 case 'R':
                     return COLOR_WHITE;

@@ -124,7 +124,7 @@ public class ChatFormat {
             jsonBuilder.append("{\"text\":\"").append(builder.toString()).append("\"");
             jsonBuilder.append(",\"color\":\"").append(color).append("\"");
             if (font != null) {
-                jsonBuilder.append(",\"color\":\"").append(font).append("\"");
+                jsonBuilder.append(",\"font\":\"").append(font).append("\"");
             }
             if (bold) {
                 jsonBuilder.append(",\"bold\":\"true\"");
@@ -334,27 +334,27 @@ public class ChatFormat {
         private float[] advanceBf;
     }
 
-    private static Style STYLE_BOLD = new Style(Style.Type.BOLD, null, 2);
-    private static Style STYLE_ITALIC = new Style(Style.Type.ITALIC, null, 2);
-    private static Style STYLE_UNDERLINE = new Style(Style.Type.UNDERLINE, null, 2);
-    private static Style STYLE_STRIKE_THROUGH = new Style(Style.Type.STRIKE_THROUGH, null, 2);
-    private static Style STYLE_OBFUSCATED = new Style(Style.Type.OBFUSCATED, null, 2);
-    private static Style COLOR_WHITE = new Style(Style.Type.COLOR, "white", 2);
-    private static Style COLOR_YELLOW = new Style(Style.Type.COLOR, "yellow", 2);
-    private static Style COLOR_LIGHT_PURPLE = new Style(Style.Type.COLOR, "light_purple", 2);
-    private static Style COLOR_RED = new Style(Style.Type.COLOR, "red", 2);
-    private static Style COLOR_AQUA = new Style(Style.Type.COLOR, "aqua", 2);
-    private static Style COLOR_GREEN = new Style(Style.Type.COLOR, "green", 2);
-    private static Style COLOR_BLUE = new Style(Style.Type.COLOR, "blue", 2);
-    private static Style COLOR_DARK_GRAY = new Style(Style.Type.COLOR, "dark_gray", 2);
-    private static Style COLOR_GRAY = new Style(Style.Type.COLOR, "gray", 2);
-    private static Style COLOR_GOLD = new Style(Style.Type.COLOR, "gold", 2);
-    private static Style COLOR_DARK_PURPLE = new Style(Style.Type.COLOR, "dark_purple", 2);
-    private static Style COLOR_DARK_RED = new Style(Style.Type.COLOR, "dark_red", 2);
-    private static Style COLOR_DARK_AQUA = new Style(Style.Type.COLOR, "dark_aqua", 2);
-    private static Style COLOR_DARK_GREEN = new Style(Style.Type.COLOR, "dark_green", 2);
-    private static Style COLOR_DARK_BLUE = new Style(Style.Type.COLOR, "dark_blue", 2);
-    private static Style COLOR_BLACK = new Style(Style.Type.COLOR, "black", 2);
+    private static final Style STYLE_BOLD = new Style(Style.Type.BOLD, null, 2);
+    private static final Style STYLE_ITALIC = new Style(Style.Type.ITALIC, null, 2);
+    private static final Style STYLE_UNDERLINE = new Style(Style.Type.UNDERLINE, null, 2);
+    private static final Style STYLE_STRIKE_THROUGH = new Style(Style.Type.STRIKE_THROUGH, null, 2);
+    private static final Style STYLE_OBFUSCATED = new Style(Style.Type.OBFUSCATED, null, 2);
+    private static final Style COLOR_WHITE = new Style(Style.Type.COLOR, "white", 2);
+    private static final Style COLOR_YELLOW = new Style(Style.Type.COLOR, "yellow", 2);
+    private static final Style COLOR_LIGHT_PURPLE = new Style(Style.Type.COLOR, "light_purple", 2);
+    private static final Style COLOR_RED = new Style(Style.Type.COLOR, "red", 2);
+    private static final Style COLOR_AQUA = new Style(Style.Type.COLOR, "aqua", 2);
+    private static final Style COLOR_GREEN = new Style(Style.Type.COLOR, "green", 2);
+    private static final Style COLOR_BLUE = new Style(Style.Type.COLOR, "blue", 2);
+    private static final Style COLOR_DARK_GRAY = new Style(Style.Type.COLOR, "dark_gray", 2);
+    private static final Style COLOR_GRAY = new Style(Style.Type.COLOR, "gray", 2);
+    private static final Style COLOR_GOLD = new Style(Style.Type.COLOR, "gold", 2);
+    private static final Style COLOR_DARK_PURPLE = new Style(Style.Type.COLOR, "dark_purple", 2);
+    private static final Style COLOR_DARK_RED = new Style(Style.Type.COLOR, "dark_red", 2);
+    private static final Style COLOR_DARK_AQUA = new Style(Style.Type.COLOR, "dark_aqua", 2);
+    private static final Style COLOR_DARK_GREEN = new Style(Style.Type.COLOR, "dark_green", 2);
+    private static final Style COLOR_DARK_BLUE = new Style(Style.Type.COLOR, "dark_blue", 2);
+    private static final Style COLOR_BLACK = new Style(Style.Type.COLOR, "black", 2);
 
     private static class Style {
         private enum Type {

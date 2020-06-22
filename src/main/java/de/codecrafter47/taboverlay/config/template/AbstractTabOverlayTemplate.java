@@ -1,5 +1,6 @@
 package de.codecrafter47.taboverlay.config.template;
 
+import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
@@ -36,6 +37,6 @@ public abstract class AbstractTabOverlayTemplate {
         return getHeader() != null || getFooter() != null;
     }
 
-    public abstract AbstractActiveElement<?> createContentView(TabOverlayHandler handler);
+    public abstract AbstractActiveElement<?> createContentView(TabView tabView, TabOverlayHandler handler);
 
 }

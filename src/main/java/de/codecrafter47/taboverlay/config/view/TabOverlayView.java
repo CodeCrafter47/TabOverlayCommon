@@ -19,7 +19,7 @@ public class TabOverlayView {
             handler.enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.PASS_TROUGH);
             headerFooterView = null;
         }
-        AbstractActiveElement<?> contentView = template.createContentView(handler);
+        AbstractActiveElement<?> contentView = template.createContentView(tabView, handler);
 
         return new TabOverlayView(context, contentView, headerFooterView);
     }

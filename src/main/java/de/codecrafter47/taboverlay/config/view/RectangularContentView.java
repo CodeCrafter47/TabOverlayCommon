@@ -1,5 +1,6 @@
 package de.codecrafter47.taboverlay.config.view;
 
+import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.area.RectangularArea;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.template.RectangularTabOverlayTemplate;
@@ -16,7 +17,7 @@ public class RectangularContentView extends ComponentView {
 
     private List<RectangularTabOverlay.Dimension> possibleSizes = null;
 
-    public RectangularContentView(RectangularTabOverlayTemplate template, RectangularTabOverlay contentHandle) {
+    public RectangularContentView(TabView tabView, RectangularTabOverlayTemplate template, RectangularTabOverlay contentHandle) {
         this.contentHandle = contentHandle;
         if (template.getSize() != -1) {
             for (RectangularTabOverlay.Dimension dimension : contentHandle.getSupportedSizes()) {
@@ -25,9 +26,9 @@ public class RectangularContentView extends ComponentView {
                     break;
                 }
             }
-            // todo better error handling
             if (possibleSizes == null) {
-                throw new IllegalArgumentException("Unsupported size " + template.getSize());
+                tabView.getLogger().severe("Size " + template.getSize() + " defined in " + template.getPath().getFileName().toString() + " is not supported by client.");
+                possibleSizes = Collections.emptyList();
             }
         } else {
             possibleSizes = new ArrayList<>();

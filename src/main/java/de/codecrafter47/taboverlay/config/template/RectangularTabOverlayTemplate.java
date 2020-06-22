@@ -1,5 +1,6 @@
 package de.codecrafter47.taboverlay.config.template;
 
+import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.template.component.ComponentTemplate;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.RectangularContentView;
@@ -18,7 +19,7 @@ public class RectangularTabOverlayTemplate extends AbstractTabOverlayTemplate {
     private ComponentTemplate contentRoot;
 
     @Override
-    public AbstractActiveElement<?> createContentView(TabOverlayHandler handler) {
-        return new RectangularContentView(this, handler.enterContentOperationMode(ContentOperationMode.RECTANGULAR));
+    public AbstractActiveElement<?> createContentView(TabView tabView, TabOverlayHandler handler) {
+        return new RectangularContentView(tabView, this, handler.enterContentOperationMode(ContentOperationMode.RECTANGULAR));
     }
 }

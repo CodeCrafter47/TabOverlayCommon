@@ -95,6 +95,8 @@ public final class BasicComponentView extends ComponentView implements TextViewU
 
             if (rightTextView != null) {
                 leftText = leftText + ChatFormat.createSpacesExact(Math.max(4f, slotWidth - rightTextLength - leftTextLength)) + rightText;
+            } else if (centerTextView != null) {
+                leftText = leftText + ChatFormat.createSpacesExact(slotWidth - leftTextLength);
             }
         }
 

@@ -105,10 +105,8 @@ public class ChatFormat {
                 i += style.formatCodeLength - 1;
             } else {
                 char c = text.charAt(i);
-                if (c == '"') {
-                    builder.append("\\\"");
-                } else if (c == '\\') {
-                    builder.append("\\\\");
+                if (mustEscape(c)) {
+                    builder.append(escape(c));
                 } else {
                     builder.append(c);
                 }
@@ -155,7 +153,7 @@ public class ChatFormat {
 
     private static Style readFormatCode(String text, int index) {
         char c = text.charAt(index);
-        if (index + 1 < text.length() && (c == '&' || c == COLOR_CHAR)) {
+        if (index + 1 < text.length() && isFormatChar(c)) {
             switch (text.charAt(index + 1)) {
                 case '0':
                     return COLOR_BLACK;
@@ -213,21 +211,21 @@ public class ChatFormat {
                 case 'O':
                     return STYLE_ITALIC;
                 case 'x':
-                    if (c == COLOR_CHAR
+                    if (isFormatChar(c)
                             && index + 13 < text.length()
-                            && text.charAt(index + 2) == COLOR_CHAR
-                            && text.charAt(index + 4) == COLOR_CHAR
-                            && text.charAt(index + 6) == COLOR_CHAR
-                            && text.charAt(index + 8) == COLOR_CHAR
-                            && text.charAt(index + 10) == COLOR_CHAR
-                            && text.charAt(index + 12) == COLOR_CHAR) {
-                        return new Style(Style.Type.COLOR, "#"
+                            && isFormatChar(text.charAt(index + 2))
+                            && isFormatChar(text.charAt(index + 4))
+                            && isFormatChar(text.charAt(index + 6))
+                            && isFormatChar(text.charAt(index + 8))
+                            && isFormatChar(text.charAt(index + 10))
+                            && isFormatChar(text.charAt(index + 12))) {
+                        return new Style(Style.Type.COLOR, escape("#"
                                 + text.charAt(index + 3)
                                 + text.charAt(index + 5)
                                 + text.charAt(index + 7)
                                 + text.charAt(index + 9)
                                 + text.charAt(index + 11)
-                                + text.charAt(index + 13), 14);
+                                + text.charAt(index + 13)), 14);
                     }
                     break;
             }
@@ -236,17 +234,59 @@ public class ChatFormat {
             if (text.regionMatches(true, index, "[color=", 0, 7)) {
                 int endIdx = text.indexOf(']', index + 7);
                 if (endIdx >= 0) {
-                    return new Style(Style.Type.COLOR, text.substring(index + 7, endIdx), endIdx + 1 - index);
+                    return new Style(Style.Type.COLOR, escape(text.substring(index + 7, endIdx)), endIdx + 1 - index);
                 }
             }
             if (text.regionMatches(true, index, "[font=", 0, 6)) {
                 int endIdx = text.indexOf(']', index + 6);
                 if (endIdx >= 0) {
-                    return new Style(Style.Type.FONT, text.substring(index + 6, endIdx), endIdx + 1 - index);
+                    return new Style(Style.Type.FONT, escape(text.substring(index + 6, endIdx)), endIdx + 1 - index);
                 }
             }
         }
         return null;
+    }
+
+    private static boolean isFormatChar(char c) {
+        return c == '&' || c == COLOR_CHAR;
+    }
+
+    private static boolean mustEscape(char c) {
+        return c == '"' || c == '\\' || c <= 0x1F;
+    }
+
+    private static String escape(char c) {
+        if (c == '"') {
+            return "\\\"";
+        } else if (c == '\\') {
+            return "\\\\";
+        } else if (c == '\n') {
+            return "\\n";
+        } else if (c <= 0x000f){
+            return "\\u000" + Integer.toHexString(c).toUpperCase();
+        } else {
+            return "\\u00" + Integer.toHexString(c).toUpperCase();
+        }
+    }
+
+    private static String escape(String s) {
+        boolean mustEscape = false;
+        for (int i = 0; i < s.length(); i++) {
+            mustEscape |= mustEscape(s.charAt(i));
+        }
+        if (mustEscape) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < s.length(); i++) {
+                if (mustEscape(s.charAt(i))) {
+                    sb.append(escape(s.charAt(i)));
+                } else {
+                    sb.append(s.charAt(i));
+                }
+            }
+            return sb.toString();
+        } else {
+            return s;
+        }
     }
 
     private static double getCharWidth(int codePoint, FontInfo font, boolean isBold) {

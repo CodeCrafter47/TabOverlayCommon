@@ -170,7 +170,7 @@ public abstract class AbstractPlayerSet implements PlayerSet {
 
         @Override
         public void onPlayerRemoved(Player player) {
-            PlayerEntry playerEntry = playerEntryMap.get(player);
+            PlayerEntry playerEntry = playerEntryMap.remove(player);
             if (playerEntry != null) {
                 playerEntry.deactivate();
             } else {

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
 import it.unimi.dsi.fastutil.chars.CharSet;
-import it.unimi.dsi.fastutil.chars.CharSets;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,12 +16,14 @@ public class ChatFormat {
     private static final Map<String, FontInfo> CHAR_WIDTH;
     private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
     private static final CharSet HEX_CHARS = new CharOpenHashSet(new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F'});
+    private static final FontInfo DEFAULT_FONT;
 
     static {
         InputStream resourceAsStream = ChatFormat.class.getResourceAsStream("char-width.json");
         InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream);
         CHAR_WIDTH = new Gson().fromJson(inputStreamReader, new TypeToken<Map<String, FontInfo>>() {
         }.getType());
+        DEFAULT_FONT = CHAR_WIDTH.get("minecraft:default");
     }
 
     public static String formattedTextToJson(String text) {
@@ -234,12 +235,12 @@ public class ChatFormat {
                     break;
                 case '#':
                     if (index + 7 < text.length()
-                    && HEX_CHARS.contains(text.charAt(index + 2))
-                    && HEX_CHARS.contains(text.charAt(index + 3))
-                    && HEX_CHARS.contains(text.charAt(index + 4))
-                    && HEX_CHARS.contains(text.charAt(index + 5))
-                    && HEX_CHARS.contains(text.charAt(index + 6))
-                    && HEX_CHARS.contains(text.charAt(index + 7))) {
+                            && HEX_CHARS.contains(text.charAt(index + 2))
+                            && HEX_CHARS.contains(text.charAt(index + 3))
+                            && HEX_CHARS.contains(text.charAt(index + 4))
+                            && HEX_CHARS.contains(text.charAt(index + 5))
+                            && HEX_CHARS.contains(text.charAt(index + 6))
+                            && HEX_CHARS.contains(text.charAt(index + 7))) {
                         return new Style(Style.Type.COLOR, text.substring(index + 1, index + 8), 8);
                     }
                     break;
@@ -277,7 +278,7 @@ public class ChatFormat {
             return "\\\\";
         } else if (c == '\n') {
             return "\\n";
-        } else if (c <= 0x000f){
+        } else if (c <= 0x000f) {
             return "\\u000" + Integer.toHexString(c).toUpperCase();
         } else {
             return "\\u00" + Integer.toHexString(c).toUpperCase();
@@ -304,6 +305,10 @@ public class ChatFormat {
         }
     }
 
+    public static double getCharWidth(int codePoint) {
+        return getCharWidth(codePoint, DEFAULT_FONT, false);
+    }
+
     private static double getCharWidth(int codePoint, FontInfo font, boolean isBold) {
         int index = Arrays.binarySearch(font.codePoints, codePoint);
         if (index < 0) {
@@ -316,7 +321,7 @@ public class ChatFormat {
     public static float formattedTextLength(String text) {
         float length = 0;
         boolean bold = false;
-        FontInfo font = CHAR_WIDTH.get("minecraft:default");
+        FontInfo font = DEFAULT_FONT;
 
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             Style style = readFormatCode(text, i);
@@ -328,7 +333,7 @@ public class ChatFormat {
                 } else if (style.type == Style.Type.FONT) {
                     font = CHAR_WIDTH.get(style.stringValue);
                     if (font == null) {
-                        font = CHAR_WIDTH.get("minecraft:default");
+                        font = DEFAULT_FONT;
                     }
                 }
                 i += style.formatCodeLength - 1;
@@ -342,7 +347,7 @@ public class ChatFormat {
     public static String cropFormattedText(String text, float maxLength) {
         float length = 0;
         boolean bold = false;
-        FontInfo font = CHAR_WIDTH.get("minecraft:default");
+        FontInfo font = DEFAULT_FONT;
 
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             Style style = readFormatCode(text, i);
@@ -354,7 +359,7 @@ public class ChatFormat {
                 } else if (style.type == Style.Type.FONT) {
                     font = CHAR_WIDTH.get(style.stringValue);
                     if (font == null) {
-                        font = CHAR_WIDTH.get("minecraft:default");
+                        font = DEFAULT_FONT;
                     }
                 }
                 i += style.formatCodeLength - 1;
@@ -366,6 +371,17 @@ public class ChatFormat {
             }
         }
         return text;
+    }
+
+    public static String stripFormat(String text) {
+        StringBuilder sb = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
+            Style style = readFormatCode(text, i);
+            if (style == null) {
+                sb.appendCodePoint(text.codePointAt(i));
+            }
+        }
+        return sb.toString();
     }
 
     public static String createSpaces(float length) {

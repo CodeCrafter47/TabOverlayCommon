@@ -126,12 +126,14 @@ public class ConfigTabOverlayManager {
                 .put("!switch", CustomPlaceholderConfiguration.Switch.class)
                 .put("!compute", CustomPlaceholderConfiguration.Compute.class)
                 .put("!animated", CustomPlaceholderConfiguration.Animated.class)
+                .put("!color_animation", CustomPlaceholderConfiguration.ColorAnimation.class)
                 .build();
         inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, CustomPlaceholderConfiguration.Alias.class));
         representer.addClassTag(CustomPlaceholderConfiguration.Conditional.class, new Tag("!conditional"));
         representer.addClassTag(CustomPlaceholderConfiguration.Switch.class, new Tag("!switch"));
         representer.addClassTag(CustomPlaceholderConfiguration.Compute.class, new Tag("!compute"));
         representer.addClassTag(CustomPlaceholderConfiguration.Animated.class, new Tag("!animated"));
+        representer.addClassTag(CustomPlaceholderConfiguration.ColorAnimation.class, new Tag("!color_animation"));
 
         val constructor = new CustomYamlConstructor(inheritanceHandlerMap.build());
         constructor.setPropertyUtils(new CustomPropertyUtils());

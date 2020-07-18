@@ -15,10 +15,9 @@ import lombok.Setter;
 import lombok.val;
 import org.yaml.snakeyaml.error.Mark;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -238,6 +237,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
     public static class Alias extends CustomPlaceholderConfiguration {
 
         @Getter
+        @Setter
         private String replacement;
 
         public Alias(String replacement) {
@@ -248,6 +248,58 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             TextTemplate textTemplate = TextTemplate.parse(replacement, getStartMark(), tcc);
             return builder.acquireData(() -> new CustomPlaceholderAlias(textTemplate), TypeToken.STRING, textTemplate.requiresViewerContext());
+        }
+    }
+
+    public static class ColorAnimation extends CustomPlaceholderConfiguration {
+
+        @Getter
+        @Setter
+        private MarkedListProperty<String> colors;
+
+        @Getter
+        @Setter
+        private MarkedIntegerProperty distance;
+
+        @Getter
+        @Setter
+        private MarkedFloatProperty speed;
+
+        public ColorAnimation() {
+            setParameters(new MarkedIntegerProperty(1));
+        }
+
+        @Override
+        public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
+            List<Color> colors = new ArrayList<>();
+
+            if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
+                    && ConfigValidationUtil.checkNotEmpty(tcc,  "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
+
+                for (String color : this.colors) {
+                    if (!color.matches("#[0-9a-fA-F]{6}")) {
+                        tcc.getErrorHandler().addWarning("Specified color " + color + " does not match format #RRGGBB", this.colors.getStartMark());
+                    }
+                    int rgb = Integer.parseInt( color.substring( 1 ), 16 );
+                    colors.add(new Color(rgb));
+                }
+            }
+
+            OptionalInt distance = OptionalInt.empty();
+            if (this.distance != null) {
+                distance = OptionalInt.of(this.distance.getValue());
+            }
+
+            float speed = 2.0f;
+            if (this.speed != null) {
+                speed = this.speed.getValue();
+            }
+
+            TextTemplate textTemplate = TextTemplate.parse(replaceParameters("%0", args), getStartMark(), tcc);
+
+            OptionalInt finalDistance = distance;
+            float finalSpeed = speed;
+            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
         }
     }
 }

@@ -11,4 +11,10 @@ public class ChatFormatTest {
         String json = ChatFormat.formattedTextToJson("§x§r§r§g§g§b§bTest");
         assertEquals("{\"text\":\"\",\"extra\":[{\"text\":\"Test\",\"color\":\"#rrggbb\"}]}", json);
     }
+
+    @Test
+    public void textHexColorOption2() {
+        String json = ChatFormat.formattedTextToJson("&#012345Test");
+        assertEquals("{\"text\":\"\",\"extra\":[{\"text\":\"Test\",\"color\":\"#012345\"}]}", json);
+    }
 }

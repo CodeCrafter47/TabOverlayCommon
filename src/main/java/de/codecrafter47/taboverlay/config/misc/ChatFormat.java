@@ -2,6 +2,9 @@ package de.codecrafter47.taboverlay.config.misc;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
+import it.unimi.dsi.fastutil.chars.CharSet;
+import it.unimi.dsi.fastutil.chars.CharSets;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +15,8 @@ public class ChatFormat {
 
     private static final char COLOR_CHAR = '\u00a7';
     private static final Map<String, FontInfo> CHAR_WIDTH;
-    private final static String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
+    private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
+    private static final CharSet HEX_CHARS = new CharOpenHashSet(new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F'});
 
     static {
         InputStream resourceAsStream = ChatFormat.class.getResourceAsStream("char-width.json");
@@ -226,6 +230,17 @@ public class ChatFormat {
                                 + text.charAt(index + 9)
                                 + text.charAt(index + 11)
                                 + text.charAt(index + 13)), 14);
+                    }
+                    break;
+                case '#':
+                    if (index + 7 < text.length()
+                    && HEX_CHARS.contains(text.charAt(index + 2))
+                    && HEX_CHARS.contains(text.charAt(index + 3))
+                    && HEX_CHARS.contains(text.charAt(index + 4))
+                    && HEX_CHARS.contains(text.charAt(index + 5))
+                    && HEX_CHARS.contains(text.charAt(index + 6))
+                    && HEX_CHARS.contains(text.charAt(index + 7))) {
+                        return new Style(Style.Type.COLOR, text.substring(index + 1, index + 8), 8);
                     }
                     break;
             }

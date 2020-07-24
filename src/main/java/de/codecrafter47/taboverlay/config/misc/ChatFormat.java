@@ -27,10 +27,7 @@ public class ChatFormat {
     }
 
     public static String formattedTextToJson(String text) {
-        if (text == null) {
-            return null;
-        }
-        if (text.isEmpty()) {
+        if (text == null || text.isEmpty()) {
             return EMPTY_JSON_TEXT;
         }
 

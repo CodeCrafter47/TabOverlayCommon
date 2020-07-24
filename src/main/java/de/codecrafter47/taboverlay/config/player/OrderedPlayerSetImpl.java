@@ -64,6 +64,14 @@ public class OrderedPlayerSetImpl implements OrderedPlayerSet {
                     Function<? super DataHolder, String> toStringFunction = placeholder.getToStringFunction();
                     comparator = Comparator.comparingInt(player -> Objects.equals(toStringFunction.apply(player), toStringFunction.apply(viewer)) ? 0 : 1);
                     break;
+                case CUSTOM:
+                    toStringFunction = placeholder.getToStringFunction();
+                    List<String> customOrder = entry.getCustomOrder();
+                    comparator = Comparator.comparingInt(player -> {
+                        int index = customOrder.indexOf(toStringFunction.apply(player));
+                        return index < 0 ? Integer.MAX_VALUE : index;
+                    });
+                    break;
             }
             if (chain == null) {
                 chain = comparator;

@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Value
@@ -36,13 +37,16 @@ public class PlayerOrderTemplate {
         @NonNull
         Type type;
 
+        @Nullable
+        List<String> customOrder;
+
         boolean requiresViewerContext() {
             return direction == Direction.VIEWER_FIRST;
         }
     }
 
     public enum Direction {
-        ASCENDING, DESCENDING, VIEWER_FIRST
+        ASCENDING, DESCENDING, VIEWER_FIRST, CUSTOM;
     }
 
     public enum Type {

@@ -30,6 +30,8 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
             .put("descending", PlayerOrderTemplate.Direction.DESCENDING)
             .put("desc", PlayerOrderTemplate.Direction.DESCENDING)
             .put("viewer-first", PlayerOrderTemplate.Direction.VIEWER_FIRST)
+            .put("custom-order", PlayerOrderTemplate.Direction.CUSTOM)
+            .put("custom", PlayerOrderTemplate.Direction.CUSTOM)
             .build();
 
     private static final Map<String, PlayerOrderTemplate.Type> TYPE_ID_MAP = ImmutableMap.<String, PlayerOrderTemplate.Type>builder()
@@ -106,6 +108,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
                 PlayerOrderTemplate.Direction direction = null;
                 PlayerOrderTemplate.Type type = null;
+                List<String> customOrder = null;
 
                 for (int i = 0; i < args.size(); i++) {
                     PlaceholderArg arg = args.get(i);
@@ -118,6 +121,15 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                             continue;
                         }
                         direction = DIRECTION_ID_MAP.get(token);
+
+                        if (direction == PlayerOrderTemplate.Direction.CUSTOM) {
+                            customOrder = new ArrayList<>();
+                            while (i + 1 < args.size() &&
+                                    !("as".equals(args.get(i + 1).getText())
+                                            || DIRECTION_ID_MAP.containsKey(args.get(i + 1).getText()))) {
+                                customOrder.add(args.get(++i).getText());
+                            }
+                        }
                     } else if (token.equals("as")) {
                         if (++i == args.size()) {
                             tcc.getErrorHandler().addWarning("In playerOrder: In `" + element + "` the `as` needs to be followed by `text` or `number`.", getStartMark());
@@ -168,7 +180,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                     continue;
                 }
 
-                chain.add(new PlayerOrderTemplate.Entry(dataHolderPlaceholder, direction, type));
+                chain.add(new PlayerOrderTemplate.Entry(dataHolderPlaceholder, direction, type, customOrder));
             }
         }
 

@@ -1,5 +1,6 @@
 package de.codecrafter47.taboverlay.config.dsl;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.api.DataHolder;
@@ -20,7 +21,7 @@ import java.util.*;
 public class PlayerOrderConfiguration extends MarkedPropertyBase {
     public static final PlayerOrderConfiguration DEFAULT = new PlayerOrderConfiguration("name as text asc");
 
-    private static final Set<TypeToken<?>> NUMERIC_TYPES = ImmutableSet.of(TypeToken.INTEGER, TypeToken.FLOAT, TypeToken.DOUBLE);
+    private static final Set<TypeToken<?>> NUMERIC_TYPES = ImmutableSet.of(TypeToken.INTEGER, TypeToken.FLOAT, TypeToken.DOUBLE, TypeToken.BOOLEAN);
     private static final Set<TypeToken<?>> STRING_TYPES = ImmutableSet.of(TypeToken.STRING);
 
     private static final Map<String, PlayerOrderTemplate.Direction> DIRECTION_ID_MAP = ImmutableMap.<String, PlayerOrderTemplate.Direction>builder()
@@ -39,7 +40,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
 
     private final String order;
 
-    public <T, R> PlayerOrderTemplate toTemplate(TemplateCreationContext tcc) {
+    public PlayerOrderTemplate toTemplate(TemplateCreationContext tcc) {
 
         SortingRulePreprocessor preprocessor = tcc.getSortingRulePreprocessor();
 
@@ -60,23 +61,42 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                     continue;
                 }
 
-                String placeholderId = tokens[0];
+                List<PlaceholderArg> args = new ArrayList<>();
+                for (String token : tokens) {
+                    args.add(new PlaceholderArg.Text(token));
+                }
 
                 DataHolderPlaceholderDataProviderSupplier<DataHolder, ?, ?> dataHolderPlaceholder;
                 try {
-                    PlaceholderBuilder<?, ?> builderPlayer = tcc.getPlayerPlaceholderResolver().resolve(PlaceholderBuilder.create().transformContext(Context::getPlayer), new ArrayList<>(Collections.singletonList(new PlaceholderArg.Text(placeholderId))), tcc);
-                    val dataProviderFactory = Unchecked.cast(builderPlayer.getDataProviderFactory());
-                    if (dataProviderFactory instanceof DataHolderPlaceholderDataProviderSupplier) {
-                        dataHolderPlaceholder = Unchecked.cast(dataProviderFactory);
+                    if (args.size() >= 2
+                            && args.get(0).getText().equals("server")
+                            && ("as".equals(args.get(1).getText())
+                            || DIRECTION_ID_MAP.containsKey(args.get(1).getText()))) {
+                        val arg = args.remove(0);
+                        try {
+                            val builderPlayer = tcc.getPlayerPlaceholderResolver().resolve(PlaceholderBuilder.create().transformContext(Context::getPlayer), new ArrayList<>(Collections.singletonList(arg)), tcc);
+                            val dataProviderFactory = Unchecked.cast(builderPlayer.getDataProviderFactory());
+                            dataHolderPlaceholder = Unchecked.cast(dataProviderFactory);
+                        } catch (UnknownPlaceholderException | PlaceholderException ex) {
+                            // this doesn't happen
+                            // if it does there's a bug in the code
+                            throw new AssertionError();
+                        }
                     } else {
-                        tcc.getErrorHandler().addWarning("Unsuitable placeholder in playerOrder option: `" + placeholderId + "`. This placeholder cannot be used for sorting.", getStartMark());
-                        continue;
+                        PlaceholderBuilder<?, ?> builderPlayer = tcc.getPlayerPlaceholderResolver().resolve(PlaceholderBuilder.create().transformContext(Context::getPlayer), args, tcc);
+                        val dataProviderFactory = Unchecked.cast(builderPlayer.getDataProviderFactory());
+                        if (dataProviderFactory instanceof DataHolderPlaceholderDataProviderSupplier) {
+                            dataHolderPlaceholder = Unchecked.cast(dataProviderFactory);
+                        } else {
+                            tcc.getErrorHandler().addWarning("Unsuitable placeholder in playerOrder option: `" + Joiner.on(' ').join(Arrays.asList(tokens).subList(0, tokens.length - args.size())) + "`. This placeholder cannot be used for sorting.", getStartMark());
+                            continue;
+                        }
                     }
                 } catch (UnknownPlaceholderException e) {
-                    tcc.getErrorHandler().addWarning("Unknown placeholder in playerOrder option: `" + placeholderId + "`", getStartMark());
+                    tcc.getErrorHandler().addWarning("Unknown placeholder in playerOrder option: `" + Joiner.on(' ').join(Arrays.asList(tokens)) + "`", getStartMark());
                     continue;
                 } catch (PlaceholderException e) {
-                    String message = "Error in placeholder in playerOrder option: `" + placeholderId + "`:\n" + e.getMessage();
+                    String message = "Error in placeholder in playerOrder option: `" + Joiner.on(' ').join(Arrays.asList(tokens)) + "`:\n" + e.getMessage();
                     if (e.getCause() != null) {
                         message = message + "\nCaused by: " + e.getCause().getMessage();
                     }
@@ -87,33 +107,35 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                 PlayerOrderTemplate.Direction direction = null;
                 PlayerOrderTemplate.Type type = null;
 
-                for (int i = 1; i < tokens.length; i++) {
-                    String token = tokens[i];
+                for (int i = 0; i < args.size(); i++) {
+                    PlaceholderArg arg = args.get(i);
+                    String token = arg.getText();
 
                     if (DIRECTION_ID_MAP.containsKey(token)) {
                         // it's a direction-id
                         if (direction != null) {
-                            tcc.getErrorHandler().addWarning("In playerOrder: Ignoring option `" + token + "` for `" + placeholderId + "` because direction has already been set.", getStartMark());
+                            tcc.getErrorHandler().addWarning("In playerOrder: Ignoring option `" + token + "` for `" + element + "` because direction has already been set.", getStartMark());
                             continue;
                         }
                         direction = DIRECTION_ID_MAP.get(token);
                     } else if (token.equals("as")) {
-                        if (++i == tokens.length) {
-                            tcc.getErrorHandler().addWarning("In playerOrder: After `" + placeholderId + "` encountered `as` needs to be followed by `text` or `number`.", getStartMark());
+                        if (++i == args.size()) {
+                            tcc.getErrorHandler().addWarning("In playerOrder: In `" + element + "` the `as` needs to be followed by `text` or `number`.", getStartMark());
                             continue;
                         }
-                        token = tokens[i];
+                        arg = args.get(i);
+                        token = arg.getText();
                         if (!TYPE_ID_MAP.containsKey(token)) {
-                            tcc.getErrorHandler().addWarning("In playerOrder: After `" + placeholderId + "` encountered unknown type: `as " + token + "`. Try using `as text` or `as number` instead.", getStartMark());
+                            tcc.getErrorHandler().addWarning("In playerOrder: After `" + element + "` encountered unknown type: `as " + token + "`. Try using `as text` or `as number` instead.", getStartMark());
                             continue;
                         }
                         if (type != null) {
-                            tcc.getErrorHandler().addWarning("In playerOrder: Ignoring option `as " + token + "` for `" + placeholderId + "` because type has already been set.", getStartMark());
+                            tcc.getErrorHandler().addWarning("In playerOrder: Ignoring option `as " + token + "` for `" + element + "` because type has already been set.", getStartMark());
                             continue;
                         }
                         type = TYPE_ID_MAP.get(token);
                     } else {
-                        tcc.getErrorHandler().addWarning("In playerOrder: Ignoring option `" + token + "` for `" + placeholderId + "`. Unknown option.", getStartMark());
+                        tcc.getErrorHandler().addWarning("In playerOrder: Ignoring option `" + token + "` for `" + element + "`. Unknown option.", getStartMark());
                         continue;
                     }
                 }
@@ -130,7 +152,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                 }
 
                 if (type == null) {
-                    tcc.getErrorHandler().addWarning("In playerOrder: Missing type for `" + placeholderId + "`. Try `" + placeholderId + " as text` or `" + placeholderId + " as number` instead.", getStartMark());
+                    tcc.getErrorHandler().addWarning("In playerOrder: Missing type for `" + element + "`. Try `" + element + " as text` or `" + element + " as number` instead.", getStartMark());
                     continue;
                 }
 
@@ -142,7 +164,7 @@ public class PlayerOrderConfiguration extends MarkedPropertyBase {
                 }
 
                 if (direction == null) {
-                    tcc.getErrorHandler().addWarning("In playerOrder: Missing direction for `" + placeholderId + "`. Try `" + placeholderId + " asc` or `" + placeholderId + " desc` instead.", getStartMark());
+                    tcc.getErrorHandler().addWarning("In playerOrder: Missing direction for `" + element + "`. Try `" + element + " asc` or `" + element + " desc` instead.", getStartMark());
                     continue;
                 }
 

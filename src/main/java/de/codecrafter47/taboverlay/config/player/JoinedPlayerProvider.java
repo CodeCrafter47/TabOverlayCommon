@@ -1,14 +1,15 @@
 package de.codecrafter47.taboverlay.config.player;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 public class JoinedPlayerProvider implements PlayerProvider {
 
-    private final Set<Listener> listeners = new HashSet<>();
-    private final Set<Player> players = new HashSet<>();
+    private final Set<Listener> listeners = new ObjectOpenHashSet<>();
+    private final Set<Player> players = new ObjectOpenHashSet<>();
 
     public JoinedPlayerProvider(Collection<? extends PlayerProvider> providers) {
 

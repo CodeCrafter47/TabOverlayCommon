@@ -65,7 +65,7 @@ public class TableComponentConfiguration extends MarkedPropertyBase implements C
                     } else if (width < 1) {
                         tcc.getErrorHandler().addError("Failed to configure table component. Column has illegal width", entry.getKey().getStartMark());
                     } else if (columnIndex + width > columnsCount.getAsInt()) {
-                        tcc.getErrorHandler().addError("Failed to configure table component. Column outside the tab overlay (available columns here: 0-" + columnsCount.getAsInt() + ").", entry.getKey().getStartMark());
+                        tcc.getErrorHandler().addError("Failed to configure table component. Column outside the tab overlay (available columns here: 0-" + (columnsCount.getAsInt()-1) + ").", entry.getKey().getStartMark());
                     } else {
                         val component = entry.getValue();
                         TemplateCreationContext childContext = tcc.clone();
@@ -77,7 +77,7 @@ public class TableComponentConfiguration extends MarkedPropertyBase implements C
                                 .build());
                     }
                 } catch (NumberFormatException e) {
-                    tcc.getErrorHandler().addError("Failed to configure table component. Failed to parse column key: " + e.getMessage(), entry.getKey().getStartMark());
+                    tcc.getErrorHandler().addError("Failed to configure table component. Failed to parse column key: " + e.getMessage(), key.getStartMark());
                 }
             }
         }

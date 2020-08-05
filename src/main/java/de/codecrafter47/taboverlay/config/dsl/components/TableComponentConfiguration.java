@@ -77,7 +77,7 @@ public class TableComponentConfiguration extends MarkedPropertyBase implements C
                                 .build());
                     }
                 } catch (NumberFormatException e) {
-                    tcc.getErrorHandler().addError("Failed to configure table component. Failed to parse column key: " + e.getMessage(), key.getStartMark());
+                    tcc.getErrorHandler().addError("Failed to configure table component. Failed to parse column key: " + e.getMessage(), entry.getKey().getStartMark());
                 }
             }
         }

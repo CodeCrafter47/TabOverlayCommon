@@ -2,12 +2,12 @@ package de.codecrafter47.taboverlay.config.placeholder;
 
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
+import de.codecrafter47.taboverlay.config.misc.TextColor;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.text.TextView;
 import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 
-import java.awt.*;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.Future;
@@ -17,7 +17,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
 
     private Future<?> task;
     private TextView textView;
-    private final List<Color> colors;
+    private final List<TextColor> colors;
     private final OptionalInt distance;
     private final float speed;
     private String text;
@@ -26,7 +26,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     private float period;
     private String replacement;
 
-    public CustomPlaceholderColorAnimation(TextTemplate textTemplate, List<Color> colors, OptionalInt distance, float speed) {
+    public CustomPlaceholderColorAnimation(TextTemplate textTemplate, List<TextColor> colors, OptionalInt distance, float speed) {
         this.textView = textTemplate.instantiate();
         this.colors = colors;
         this.distance = distance;
@@ -66,16 +66,10 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             double sd = d / effectiveDistance;
             int ia = (int) sd;
-            Color ca = colors.get(ia % colors.size());
-            Color cb = colors.get((ia + 1) % colors.size());
-            double a = Math.sin(((ia + 1) - sd) * Math.PI / 2f);
-            a = a*a;
-            double b = 1 - a;
-            Color c = new Color((int) (a * ca.getRed() + b * cb.getRed()),
-                    (int) (a * ca.getGreen() + b * cb.getGreen()),
-                    (int) (a * ca.getBlue() + b * cb.getBlue()));
-            sb.append("&#");
-            sb.append(Integer.toHexString(c.getRGB()).substring(2));
+            TextColor a = colors.get(ia % colors.size());
+            TextColor b = colors.get((ia + 1) % colors.size());
+            TextColor c = TextColor.interpolateSine(a, b, sd - ia);
+            sb.append(c.getFormatCode());
             sb.appendCodePoint(text.codePointAt(i));
             d += ChatFormat.getCharWidth(text.codePointAt(i));
         }

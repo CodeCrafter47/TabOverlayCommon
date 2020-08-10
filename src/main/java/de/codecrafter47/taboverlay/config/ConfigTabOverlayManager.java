@@ -127,6 +127,7 @@ public class ConfigTabOverlayManager {
                 .put("!compute", CustomPlaceholderConfiguration.Compute.class)
                 .put("!animated", CustomPlaceholderConfiguration.Animated.class)
                 .put("!color_animation", CustomPlaceholderConfiguration.ColorAnimation.class)
+                .put("!progress_bar", CustomPlaceholderConfiguration.ProgressBar.class)
                 .build();
         inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, CustomPlaceholderConfiguration.Alias.class));
         representer.addClassTag(CustomPlaceholderConfiguration.Conditional.class, new Tag("!conditional"));
@@ -134,6 +135,7 @@ public class ConfigTabOverlayManager {
         representer.addClassTag(CustomPlaceholderConfiguration.Compute.class, new Tag("!compute"));
         representer.addClassTag(CustomPlaceholderConfiguration.Animated.class, new Tag("!animated"));
         representer.addClassTag(CustomPlaceholderConfiguration.ColorAnimation.class, new Tag("!color_animation"));
+        representer.addClassTag(CustomPlaceholderConfiguration.ProgressBar.class, new Tag("!progress_bar"));
 
         val constructor = new CustomYamlConstructor(inheritanceHandlerMap.build());
         constructor.setPropertyUtils(new CustomPropertyUtils());

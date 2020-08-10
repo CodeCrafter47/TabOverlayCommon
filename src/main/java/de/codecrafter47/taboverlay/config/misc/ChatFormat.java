@@ -376,6 +376,8 @@ public class ChatFormat {
             Style style = readFormatCode(text, i);
             if (style == null) {
                 sb.appendCodePoint(text.codePointAt(i));
+            } else {
+                i += style.formatCodeLength - 1;
             }
         }
         return sb.toString();

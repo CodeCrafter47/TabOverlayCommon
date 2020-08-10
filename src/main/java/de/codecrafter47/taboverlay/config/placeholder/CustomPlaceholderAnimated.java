@@ -1,6 +1,8 @@
 package de.codecrafter47.taboverlay.config.placeholder;
 
 import de.codecrafter47.taboverlay.config.context.Context;
+import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.misc.TextColor;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.text.TextView;

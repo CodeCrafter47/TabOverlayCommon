@@ -9,12 +9,15 @@ import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.text.TextView;
 import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 
+import java.util.concurrent.Future;
+
 public class CustomPlaceholderConditional extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, String>, ExpressionUpdateListener, TextViewUpdateListener {
 
     private final ToBooleanExpression condition;
     private final TextTemplate trueReplacement;
     private final TextTemplate falseReplacement;
     private TextView activeReplacement;
+    private Future<?> updateFuture = null;
 
     public CustomPlaceholderConditional(ExpressionTemplate condition, TextTemplate trueReplacement, TextTemplate falseReplacement) {
         this.condition = condition.instantiateWithBooleanResult();
@@ -55,7 +58,9 @@ public class CustomPlaceholderConditional extends AbstractActiveElement<Runnable
 
     @Override
     public void onExpressionUpdate() {
-        update(true);
+        if (updateFuture == null || updateFuture.isDone()) {
+            updateFuture = getContext().getTabEventQueue().submit(() -> update(true));
+        }
     }
 
     @Override

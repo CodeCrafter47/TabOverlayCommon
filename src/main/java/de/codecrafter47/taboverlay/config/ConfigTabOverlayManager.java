@@ -20,6 +20,7 @@ import de.codecrafter47.taboverlay.config.player.GlobalPlayerSetFactory;
 import de.codecrafter47.taboverlay.config.player.Player;
 import de.codecrafter47.taboverlay.config.player.PlayerProvider;
 import de.codecrafter47.taboverlay.config.template.AbstractTabOverlayTemplate;
+import de.codecrafter47.taboverlay.config.template.HeaderFooterOnlyTabOverlayTemplate;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.icon.IconTemplate;
 import de.codecrafter47.taboverlay.config.template.ping.PingTemplate;
@@ -305,6 +306,7 @@ public class ConfigTabOverlayManager {
                     .tabOverlayType(new TabOverlayTypeSpec("DYNAMIC_SIZE_FIXED_COLUMNS", RectangularTabOverlayTemplateConfiguration.class))
                     .tabOverlayType(new TabOverlayTypeSpec("RECTANGULAR", RectangularTabOverlayTemplateConfiguration.class))
                     .tabOverlayType(new TabOverlayTypeSpec("DYNAMIC_SIZE", DynamicSizeTabOverlayTemplateConfiguration.class))
+                    .tabOverlayType(new TabOverlayTypeSpec("HEADER_FOOTER", HeaderFooterOnlyTabOverlayTemplateConfiguration.class))
                     .component(new ComponentSpec("!animated", AnimatedComponentConfiguration.class))
                     .component(new ComponentSpec("!conditional", ConditionalComponentConfiguration.class))
                     .component(new ComponentSpec("!container", ContainerComponentConfiguration.class))

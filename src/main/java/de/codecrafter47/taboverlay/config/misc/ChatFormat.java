@@ -257,6 +257,19 @@ public class ChatFormat {
                 }
             }
         }
+        if (c == '{') {
+            if (index + 8 < text.length()
+                    && text.charAt(index + 1) == '#'
+                    && HEX_CHARS.contains(text.charAt(index + 2))
+                    && HEX_CHARS.contains(text.charAt(index + 3))
+                    && HEX_CHARS.contains(text.charAt(index + 4))
+                    && HEX_CHARS.contains(text.charAt(index + 5))
+                    && HEX_CHARS.contains(text.charAt(index + 6))
+                    && HEX_CHARS.contains(text.charAt(index + 7))
+                    && text.charAt(index + 8) == '}') {
+                return new Style(Style.Type.COLOR, text.substring(index + 1, index + 8), 9);
+            }
+        }
         return null;
     }
 

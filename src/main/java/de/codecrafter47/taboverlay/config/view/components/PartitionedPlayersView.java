@@ -67,6 +67,8 @@ public class PartitionedPlayersView extends ListComponentView implements PlayerS
         for (Map.Entry<String, ? extends PlayerSet> entry : playerSetPartition.getPartitions()) {
             addPartition(entry.getKey(), entry.getValue(), false);
         }
+
+        updateLayoutRequirements(false);
     }
 
     @Override

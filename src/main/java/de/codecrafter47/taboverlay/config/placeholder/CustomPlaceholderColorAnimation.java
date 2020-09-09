@@ -85,12 +85,16 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     protected void onActivation() {
         textView.activate(getContext(), this);
         updateText();
-        task = getContext().getTabEventQueue().scheduleAtFixedRate(this::updateAnimation, 100, 100, TimeUnit.MILLISECONDS);
+        if (speed != 0) {
+            task = getContext().getTabEventQueue().scheduleAtFixedRate(this::updateAnimation, 100, 100, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override
     protected void onDeactivation() {
-        task.cancel(false);
+        if (task != null) {
+            task.cancel(false);
+        }
         textView.deactivate();
     }
 

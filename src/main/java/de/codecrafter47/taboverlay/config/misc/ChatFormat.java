@@ -170,6 +170,23 @@ public class ChatFormat {
         return jsonBuilder.toString();
     }
 
+    public static String formattedTextToLegacy(String text) {
+        StringBuilder sb = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
+            Style style = readFormatCode(text, i);
+            if (style == null) {
+                sb.appendCodePoint(text.codePointAt(i));
+            } else {
+                if (style.formatCodeLength == 2) {
+                    sb.append(COLOR_CHAR);
+                    sb.appendCodePoint(text.codePointAt(i + 1));
+                }
+                i += style.formatCodeLength - 1;
+            }
+        }
+        return sb.toString();
+    }
+
     private static Style readFormatCode(String text, int index) {
         char c = text.charAt(index);
         if (index + 1 < text.length() && isFormatChar(c)) {

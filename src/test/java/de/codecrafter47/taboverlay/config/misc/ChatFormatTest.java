@@ -19,7 +19,7 @@ package de.codecrafter47.taboverlay.config.misc;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ChatFormatTest {
 
@@ -39,5 +39,11 @@ public class ChatFormatTest {
     public void textHexColorCMI() {
         String json = ChatFormat.formattedTextToJson("{#012345}Test");
         assertEquals("{\"text\":\"\",\"extra\":[{\"text\":\"Test\",\"color\":\"#012345\"}]}", json);
+    }
+
+    @Test
+    public void textLegacy() {
+        String legacy = ChatFormat.formattedTextToLegacy("[font=minecraft:default]&aTest");
+        assertEquals("§aTest", legacy);
     }
 }

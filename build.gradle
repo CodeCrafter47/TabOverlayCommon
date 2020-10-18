@@ -1,7 +1,18 @@
+buildscript {
+    repositories {
+        jcenter()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'ru.vyarus:gradle-quality-plugin:4.4.0'
+    }
+}
+
 group 'de.codecrafter47.taboverlay'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java-library'
+apply plugin: 'ru.vyarus.quality'
 
 sourceCompatibility = 1.8
 

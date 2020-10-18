@@ -24,15 +24,9 @@ import java.util.UUID;
 
 public interface Area {
 
-    default void setSlot(int index, Icon icon, String text, char alternateColorChar, int ping) {
-        setSlot(index, null, icon, text, alternateColorChar, ping);
-    }
-
     default void setSlot(int index, Icon icon, String text, int ping) {
         setSlot(index, null, icon, text, ping);
     }
-
-    void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping);
 
     void setSlot(int index, UUID uuid, Icon icon, String text, int ping);
 
@@ -41,8 +35,6 @@ public interface Area {
     void setIcon(int index, Icon icon);
 
     void setText(int index, String text);
-
-    void setText(int index, String text, char alternateColorChar);
 
     void setPing(int index, int ping);
 

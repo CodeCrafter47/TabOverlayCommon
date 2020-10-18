@@ -32,18 +32,8 @@ public interface RectangularArea extends Area {
     }
 
     @Override
-    default void setSlot(int index, Icon icon, String text, char alternateColorChar, int ping) {
-        setSlot(index % getColumns(), index / getColumns(), icon, text, alternateColorChar, ping);
-    }
-
-    @Override
     default void setSlot(int index, Icon icon, String text, int ping) {
         setSlot(index % getColumns(), index / getColumns(), icon, text, ping);
-    }
-
-    @Override
-    default void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-        setSlot(index % getColumns(), index / getColumns(), uuid, icon, text, alternateColorChar, ping);
     }
 
     @Override
@@ -62,11 +52,6 @@ public interface RectangularArea extends Area {
     }
 
     @Override
-    default void setText(int index, String text, char alternateColorChar) {
-        setText(index % getColumns(), index / getColumns(), text, alternateColorChar);
-    }
-
-    @Override
     default void setPing(int index, int ping) {
         setPing(index % getColumns(), index / getColumns(), ping);
     }
@@ -75,21 +60,13 @@ public interface RectangularArea extends Area {
         setSlot(column, row, null, icon, text, ping);
     }
 
-    default void setSlot(int column, int row, Icon icon, String text, char alternateColorChar, int ping) {
-        setSlot(column, row, null, icon, text, alternateColorChar, ping);
-    }
-
     void setSlot(int column, int row, UUID uuid, Icon icon, String text, int ping);
-
-    void setSlot(int column, int row, UUID uuid, Icon icon, String text, char alternateColorChar, int ping);
 
     void setUuid(int column, int row, UUID uuid);
 
     void setIcon(int column, int row, Icon icon);
 
     void setText(int column, int row, String text);
-
-    void setText(int column, int row, String text, char alternateColorChar);
 
     void setPing(int column, int row, int ping);
 
@@ -134,11 +111,6 @@ public interface RectangularArea extends Area {
             }
 
             @Override
-            public void setSlot(int column, int row, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-                tabOverlay.setSlot(column, row, uuid, icon, text, alternateColorChar, ping);
-            }
-
-            @Override
             public void setUuid(int column, int row, UUID uuid) {
                 tabOverlay.setUuid(column, row, uuid);
             }
@@ -151,11 +123,6 @@ public interface RectangularArea extends Area {
             @Override
             public void setText(int column, int row, String text) {
                 tabOverlay.setText(column, row, text);
-            }
-
-            @Override
-            public void setText(int column, int row, String text, char alternateColorChar) {
-                tabOverlay.setText(column, row, text, alternateColorChar);
             }
 
             @Override
@@ -197,19 +164,10 @@ public interface RectangularArea extends Area {
         }
         int finalSlotWidth = slotWidth;
         return new RectangularArea() {
-            @Override
-            public void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-                tabOverlay.setSlot(index, uuid, icon, text, alternateColorChar, ping);
-            }
 
             @Override
             public void setSlot(int index, UUID uuid, Icon icon, String text, int ping) {
                 tabOverlay.setSlot(index, uuid, icon, text, ping);
-            }
-
-            @Override
-            public void setSlot(int index, Icon icon, String text, char alternateColorChar, int ping) {
-                tabOverlay.setSlot(index, icon, text, alternateColorChar, ping);
             }
 
             @Override
@@ -233,11 +191,6 @@ public interface RectangularArea extends Area {
             }
 
             @Override
-            public void setText(int index, String text, char alternateColorChar) {
-                tabOverlay.setText(index, text, alternateColorChar);
-            }
-
-            @Override
             public void setPing(int index, int ping) {
                 tabOverlay.setPing(index, ping);
             }
@@ -255,24 +208,6 @@ public interface RectangularArea extends Area {
             public void setSlot(int column, int row, Icon icon, String text, int ping) {
                 if (column == 0) {
                     tabOverlay.setSlot(row, icon, text, ping);
-                } else {
-                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
-                }
-            }
-
-            @Override
-            public void setSlot(int column, int row, Icon icon, String text, char alternateColorChar, int ping) {
-                if (column == 0) {
-                    tabOverlay.setSlot(row, icon, text, alternateColorChar, ping);
-                } else {
-                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
-                }
-            }
-
-            @Override
-            public void setSlot(int column, int row, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-                if (column == 0) {
-                    tabOverlay.setSlot(row, uuid, icon, text, alternateColorChar, ping);
                 } else {
                     throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
                 }
@@ -300,15 +235,6 @@ public interface RectangularArea extends Area {
             public void setText(int column, int row, String text) {
                 if (column == 0) {
                     tabOverlay.setText(row, text);
-                } else {
-                    throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
-                }
-            }
-
-            @Override
-            public void setText(int column, int row, String text, char alternateColorChar) {
-                if (column == 0) {
-                    tabOverlay.setText(row, text, alternateColorChar);
                 } else {
                     throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
                 }

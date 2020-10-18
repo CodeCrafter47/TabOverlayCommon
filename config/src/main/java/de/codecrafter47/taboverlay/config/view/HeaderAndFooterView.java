@@ -69,7 +69,7 @@ class HeaderAndFooterView extends AbstractActiveElement<Void> implements TextVie
     }
 
     private void updateHeaderAndFooter() {
-        headerAndFooterHandle.setHeaderFooter(header != null ? header.getText() : null, footer != null ? footer.getText() : null, '&');
+        headerAndFooterHandle.setHeaderFooter(header != null ? header.getText() : null, footer != null ? footer.getText() : null);
     }
 
     private static TextView constructTextView(List<TextTemplate> templates, float interval) {

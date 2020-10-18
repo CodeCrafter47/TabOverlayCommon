@@ -154,11 +154,6 @@ public final class ContainerComponentView extends ComponentView {
         }
 
         @Override
-        public void setText(int index, String text, char alternateColorChar) {
-            delegate.setText(index / delegate.getRows(), index % delegate.getRows(), text, alternateColorChar);
-        }
-
-        @Override
         public void setPing(int index, int ping) {
             delegate.setPing(index / delegate.getRows(), index % delegate.getRows(), ping);
         }
@@ -166,11 +161,6 @@ public final class ContainerComponentView extends ComponentView {
         @Override
         public void setSlot(int index, Icon icon, String text, int ping) {
             delegate.setSlot(index / delegate.getRows(), index % delegate.getRows(), icon, text, ping);
-        }
-
-        @Override
-        public void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-            delegate.setSlot(index / delegate.getRows(), index % delegate.getRows(), uuid, icon, text, alternateColorChar, ping);
         }
 
         @Override
@@ -203,14 +193,6 @@ public final class ContainerComponentView extends ComponentView {
             }
 
             @Override
-            public void setSlot(int column, int row, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-                if (column == 0) {
-                    TransformedArea.this.setSlot(row, uuid, icon, text, alternateColorChar, ping);
-                }
-
-            }
-
-            @Override
             public void setUuid(int column, int row, UUID uuid) {
                 if (column == 0) {
                     TransformedArea.this.setUuid(row, uuid);
@@ -228,13 +210,6 @@ public final class ContainerComponentView extends ComponentView {
             public void setText(int column, int row, String text) {
                 if (column == 0) {
                     TransformedArea.this.setText(row, text);
-                }
-            }
-
-            @Override
-            public void setText(int column, int row, String text, char alternateColorChar) {
-                if (column == 0) {
-                    TransformedArea.this.setText(row, text, alternateColorChar);
                 }
             }
 

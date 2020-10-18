@@ -148,7 +148,7 @@ public final class TableComponentView extends ComponentView implements DefaultSl
     }
 
     private void updateDefaultSlots() {
-        updateDefaultSlots((area, column, row, defaultSlot) -> area.setSlot(column, row, defaultSlot.getIcon(), defaultSlot.getText(), '&', defaultSlot.getPing()));
+        updateDefaultSlots((area, column, row, defaultSlot) -> area.setSlot(column, row, defaultSlot.getIcon(), defaultSlot.getText(), defaultSlot.getPing()));
     }
 
     private void updateDefaultSlots(DefaultSlotUpdateFunction updateFunction) {
@@ -173,7 +173,7 @@ public final class TableComponentView extends ComponentView implements DefaultSl
 
     @Override
     public void onDefaultSlotTextUpdated() {
-        updateDefaultSlots((area, column, row, defaultSlot) -> area.setText(column, row, defaultSlot.getText(), '&'));
+        updateDefaultSlots((area, column, row, defaultSlot) -> area.setText(column, row, defaultSlot.getText()));
     }
 
     @Override
@@ -188,9 +188,9 @@ public final class TableComponentView extends ComponentView implements DefaultSl
 
     @Value
     public static class Column {
-        private int columnIndex;
-        private int width;
-        private ComponentView component;
+        int columnIndex;
+        int width;
+        ComponentView component;
     }
 
     interface DefaultSlotUpdateFunction {

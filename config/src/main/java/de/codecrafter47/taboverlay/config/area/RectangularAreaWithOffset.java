@@ -51,15 +51,6 @@ public class RectangularAreaWithOffset implements RectangularArea {
     }
 
     @Override
-    public void setSlot(int column, int row, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-        if (column < sizeColumns && row < sizeRows) {
-            delegate.setSlot(column + offsetColumns, row + offsetRows, uuid, icon, text, alternateColorChar, ping);
-        } else {
-            throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=" + getColumns() + ", rows=" + getRows() + ").");
-        }
-    }
-
-    @Override
     public void setUuid(int column, int row, UUID uuid) {
         if (column < sizeColumns && row < sizeRows) {
             delegate.setUuid(column + offsetColumns, row + offsetRows, uuid);
@@ -81,15 +72,6 @@ public class RectangularAreaWithOffset implements RectangularArea {
     public void setText(int column, int row, String text) {
         if (column < sizeColumns && row < sizeRows) {
             delegate.setText(column + offsetColumns, row + offsetRows, text);
-        } else {
-            throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=" + getColumns() + ", rows=" + getRows() + ").");
-        }
-    }
-
-    @Override
-    public void setText(int column, int row, String text, char alternateColorChar) {
-        if (column < sizeColumns && row < sizeRows) {
-            delegate.setText(column + offsetColumns, row + offsetRows, text, alternateColorChar);
         } else {
             throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=" + getColumns() + ", rows=" + getRows() + ").");
         }

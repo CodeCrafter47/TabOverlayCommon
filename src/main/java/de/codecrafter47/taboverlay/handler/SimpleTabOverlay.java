@@ -79,40 +79,6 @@ public interface SimpleTabOverlay extends TabOverlayHandle.BatchModifiable, TabO
     }
 
     /**
-     * Set the content of a slot.
-     * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
-     *
-     * @param index              index of the slot
-     * @param uuid               the uuid to use for the slot. For player slots use the players uuid, otherwise use {@code null}
-     * @param icon               the icon to display
-     * @param text               the text to display
-     * @param alternateColorChar alternate color char used for text formatting
-     * @param ping               the ping to display
-     * @throws IndexOutOfBoundsException if the give position is invalid
-     * @throws NullPointerException      if {@code icon} or {@code text} are {@code null}
-     */
-    void setSlot(int index, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping);
-
-    /**
-     * Set the content of a slot.
-     * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
-     *
-     * @param index              index of the slot
-     * @param icon               the icon to display
-     * @param text               the text to display
-     * @param alternateColorChar alternate color char used for text formatting
-     * @param ping               the ping to display
-     * @throws IndexOutOfBoundsException if the give position is invalid
-     * @throws NullPointerException      if {@code icon} or {@code text} are {@code null}
-     */
-    default void setSlot(int index, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-        setSlot(index, null, icon, text, alternateColorChar, ping);
-    }
-
-
-    /**
      * Set the uuid to use for a slot. For player slots use the players uuid, otherwise use {@code null}.
      *
      * @param index index of the slot
@@ -142,19 +108,6 @@ public interface SimpleTabOverlay extends TabOverlayHandle.BatchModifiable, TabO
      * @throws NullPointerException      if {@code text} is {@code null}
      */
     void setText(int index, @Nonnull String text);
-
-    /**
-     * Set the text to display on a slot.
-     * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
-     *
-     * @param index              index of the slot
-     * @param text               the text
-     * @param alternateColorChar alternate color char used for text formatting
-     * @throws IndexOutOfBoundsException if the give position is invalid
-     * @throws NullPointerException      if {@code text} is {@code null}
-     */
-    void setText(int index, @Nonnull String text, char alternateColorChar);
 
     /**
      * Set the ping for a slot.

@@ -55,7 +55,7 @@ public final class SpacerComponentView extends ComponentView implements DefaultS
             Icon icon = defaultSlotHandler.getIcon();
             // reverse direction improves efficiency as getSize is constant
             for (int i = area.getSize() - 1; i >= 0; i--) {
-                area.setSlot(i, icon, text, '&', ping);
+                area.setSlot(i, icon, text, ping);
             }
         }
     }
@@ -96,7 +96,7 @@ public final class SpacerComponentView extends ComponentView implements DefaultS
             String text = defaultSlotHandler.getText();
             // reverse direction improves efficiency as getSize is constant
             for (int i = area.getSize() - 1; i >= 0; i--) {
-                area.setText(i, text, '&');
+                area.setText(i, text);
             }
         }
 

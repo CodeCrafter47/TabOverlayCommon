@@ -137,7 +137,7 @@ public final class PlayersComponentView extends ComponentView implements Ordered
             int upper = area.getSize();
             firstDefaultSlot = pos;
             while (pos < upper) {
-                area.setSlot(pos, defaultSlotHandler.getIcon(), defaultSlotHandler.getText(), '&', defaultSlotHandler.getPing());
+                area.setSlot(pos, defaultSlotHandler.getIcon(), defaultSlotHandler.getText(), defaultSlotHandler.getPing());
                 pos++;
             }
         }
@@ -197,7 +197,7 @@ public final class PlayersComponentView extends ComponentView implements Ordered
             int upper = Integer.min(area.getSize(), firstDefaultSlot);
             firstDefaultSlot = pos;
             while (pos < upper) {
-                area.setSlot(pos, defaultSlotHandler.getIcon(), defaultSlotHandler.getText(), '&', defaultSlotHandler.getPing());
+                area.setSlot(pos, defaultSlotHandler.getIcon(), defaultSlotHandler.getText(), defaultSlotHandler.getPing());
                 pos++;
             }
         }
@@ -277,7 +277,7 @@ public final class PlayersComponentView extends ComponentView implements Ordered
             int pos = firstDefaultSlot;
             int upper = area.getSize();
             while (pos < upper) {
-                area.setText(pos, defaultSlotHandler.getText(), '&');
+                area.setText(pos, defaultSlotHandler.getText());
                 pos++;
             }
         }

@@ -72,7 +72,7 @@ public final class BasicComponentView extends ComponentView implements TextViewU
     private void updateSlot() {
         Area area = getArea();
         if (area != null) {
-            area.setSlot(0, uuid, iconView.getIcon(), textAfterAlignment, '&', pingView.getPing());
+            area.setSlot(0, uuid, iconView.getIcon(), textAfterAlignment, pingView.getPing());
         }
     }
 
@@ -140,7 +140,7 @@ public final class BasicComponentView extends ComponentView implements TextViewU
         Area area = getArea();
         if (area != null) {
             updateText();
-            area.setText(0, textAfterAlignment, '&');
+            area.setText(0, textAfterAlignment);
         }
     }
 

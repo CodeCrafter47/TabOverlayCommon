@@ -37,15 +37,6 @@ public class AreaWithOffset implements Area {
     }
 
     @Override
-    public void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-        if (index < size) {
-            delegate.setSlot(index + offset, uuid, icon, text, alternateColorChar, ping);
-        } else {
-            throw new IndexOutOfBoundsException("Index " + index + " out of bounds(size=" + size + ").");
-        }
-    }
-
-    @Override
     public void setSlot(int index, UUID uuid, Icon icon, String text, int ping) {
         if (index < size) {
             delegate.setSlot(index + offset, uuid, icon, text, ping);
@@ -76,15 +67,6 @@ public class AreaWithOffset implements Area {
     public void setText(int index, String text) {
         if (index < size) {
             delegate.setText(index + offset, text);
-        } else {
-            throw new IndexOutOfBoundsException("Index " + index + " out of bounds(size=" + size + ").");
-        }
-    }
-
-    @Override
-    public void setText(int index, String text, char alternateColorChar) {
-        if (index < size) {
-            delegate.setText(index + offset, text, alternateColorChar);
         } else {
             throw new IndexOutOfBoundsException("Index " + index + " out of bounds(size=" + size + ").");
         }
@@ -132,18 +114,8 @@ public class AreaWithOffset implements Area {
         }
 
         @Override
-        public void setSlot(int index, Icon icon, String text, char alternateColorChar, int ping) {
-            AreaWithOffset.this.setSlot(index, icon, text, alternateColorChar, ping);
-        }
-
-        @Override
         public void setSlot(int index, Icon icon, String text, int ping) {
             AreaWithOffset.this.setSlot(index, icon, text, ping);
-        }
-
-        @Override
-        public void setSlot(int index, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-            AreaWithOffset.this.setSlot(index, uuid, icon, text, alternateColorChar, ping);
         }
 
         @Override
@@ -162,11 +134,6 @@ public class AreaWithOffset implements Area {
         }
 
         @Override
-        public void setText(int index, String text, char alternateColorChar) {
-            AreaWithOffset.this.setText(index, text, alternateColorChar);
-        }
-
-        @Override
         public void setPing(int index, int ping) {
             AreaWithOffset.this.setPing(index, ping);
         }
@@ -175,15 +142,6 @@ public class AreaWithOffset implements Area {
         public void setSlot(int column, int row, UUID uuid, Icon icon, String text, int ping) {
             if (column == 0) {
                 AreaWithOffset.this.setSlot(row, uuid, icon, text, ping);
-            } else {
-                throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
-            }
-        }
-
-        @Override
-        public void setSlot(int column, int row, UUID uuid, Icon icon, String text, char alternateColorChar, int ping) {
-            if (column == 0) {
-                AreaWithOffset.this.setSlot(row, uuid, icon, text, alternateColorChar, ping);
             } else {
                 throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
             }
@@ -211,15 +169,6 @@ public class AreaWithOffset implements Area {
         public void setText(int column, int row, String text) {
             if (column == 0) {
                 AreaWithOffset.this.setText(row, text);
-            } else {
-                throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
-            }
-        }
-
-        @Override
-        public void setText(int column, int row, String text, char alternateColorChar) {
-            if (column == 0) {
-                AreaWithOffset.this.setText(row, text, alternateColorChar);
             } else {
                 throw new IndexOutOfBoundsException("Index c=" + column + "r=" + row + " out of bounds(columns=1, rows=" + getRows() + ").");
             }

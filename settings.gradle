@@ -1,2 +1,4 @@
-rootProject.name = 'TabOverlayCommon'
+rootProject.name = 'taboverlaycommon-api'
 
+include 'config'
+project(":config").name = 'taboverlaycommon-config'

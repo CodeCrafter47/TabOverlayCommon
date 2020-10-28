@@ -43,7 +43,7 @@ public interface Area {
     int getSlotWidth();
 
     default Area createChild(int firstIndex, int size) {
-        Preconditions.checkArgument(firstIndex < getSize(), "firstIndex < getSize()");
+        Preconditions.checkArgument(firstIndex <= getSize(), "firstIndex <= getSize()");
         Preconditions.checkArgument(firstIndex + size <= getSize(), "firstIndex + size <= getSize()");
         return new AreaWithOffset(this, firstIndex, size);
     }

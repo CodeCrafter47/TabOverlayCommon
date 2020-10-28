@@ -75,8 +75,8 @@ public interface RectangularArea extends Area {
     int getColumns();
 
     default RectangularArea createRectangularChild(int column, int row, int columns, int rows) {
-        Preconditions.checkArgument(column < getColumns(), "column < getColumns()");
-        Preconditions.checkArgument(row < getRows(), "row < getRows()");
+        Preconditions.checkArgument(column < getColumns(), "column <= getColumns()");
+        Preconditions.checkArgument(row < getRows(), "row <= getRows()");
         Preconditions.checkArgument(column + columns <= getColumns(), "column + columns <= getColumns()");
         Preconditions.checkArgument(row + rows <= getRows(), "row + rows <= getRows()");
         return new RectangularAreaWithOffset(this, column, row, columns, rows);

@@ -93,7 +93,7 @@ public class AreaWithOffset implements Area {
 
     @Override
     public Area createChild(int firstIndex, int size) {
-        Preconditions.checkArgument(firstIndex < this.size, "firstIndex < this.size");
+        Preconditions.checkArgument(firstIndex <= this.size, "firstIndex <= this.size");
         Preconditions.checkArgument(firstIndex + size <= this.size, "firstIndex + size <= this.size");
         return new AreaWithOffset(delegate, offset + firstIndex, size);
     }

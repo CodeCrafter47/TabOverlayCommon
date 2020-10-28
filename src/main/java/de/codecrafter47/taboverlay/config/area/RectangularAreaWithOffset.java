@@ -116,8 +116,8 @@ public class RectangularAreaWithOffset implements RectangularArea {
 
     @Override
     public RectangularArea createRectangularChild(int column, int row, int columns, int rows) {
-        Preconditions.checkArgument(column < sizeColumns, "column < sizeColumns");
-        Preconditions.checkArgument(row < sizeRows, "row < sizeRows");
+        Preconditions.checkArgument(column <= sizeColumns, "column <= sizeColumns");
+        Preconditions.checkArgument(row <= sizeRows, "row <= sizeRows");
         Preconditions.checkArgument(column + columns <= sizeColumns, "column + columns <= sizeColumns");
         Preconditions.checkArgument(row + rows <= sizeRows, "row + rows <= sizeRows");
         return new RectangularAreaWithOffset(delegate, this.offsetColumns + column, this.offsetRows + row, columns, rows);

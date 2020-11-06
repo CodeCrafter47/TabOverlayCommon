@@ -27,7 +27,7 @@ public interface HeaderAndFooterHandle extends TabOverlayHandle, TabOverlayHandl
     /**
      * Set the header and footer of the tab list.
      * <p>
-     * The header and footer are provided as text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The header and footer are provided as text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      * <p>
      * A value of null removes the header or footer.
      *
@@ -39,7 +39,7 @@ public interface HeaderAndFooterHandle extends TabOverlayHandle, TabOverlayHandl
     /**
      * Set the header of the tab list.
      * <p>
-     * The header is provided as text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The header is provided as text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      * <p>
      * A value of null removes the header.
      *
@@ -50,7 +50,7 @@ public interface HeaderAndFooterHandle extends TabOverlayHandle, TabOverlayHandl
     /**
      * Set the footer of the tab list.
      * <p>
-     * The footer is provided as text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The footer is provided as text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      * <p>
      * A value of null removes the footer.
      *

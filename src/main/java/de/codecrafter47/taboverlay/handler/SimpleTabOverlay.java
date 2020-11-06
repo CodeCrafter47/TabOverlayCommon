@@ -50,7 +50,7 @@ public interface SimpleTabOverlay extends TabOverlayHandle.BatchModifiable, TabO
     /**
      * Set the content of a slot.
      * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The text is provided as plain text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      *
      * @param index index of the slot
      * @param uuid  the uuid to use for the slot. For player slots use the players uuid, otherwise use {@code null}
@@ -65,7 +65,7 @@ public interface SimpleTabOverlay extends TabOverlayHandle.BatchModifiable, TabO
     /**
      * Set the content of a slot.
      * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The text is provided as plain text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      *
      * @param index index of the slot
      * @param icon  the icon to display
@@ -100,7 +100,7 @@ public interface SimpleTabOverlay extends TabOverlayHandle.BatchModifiable, TabO
     /**
      * Set the text to display on a slot.
      * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The text is provided as plain text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      *
      * @param index index of the slot
      * @param text  the text

@@ -57,7 +57,7 @@ public interface RectangularTabOverlay extends TabOverlayHandle.BatchModifiable,
     /**
      * Set the content of a slot.
      * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The text is provided as plain text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      *
      * @param column the column identifying the slot
      * @param row    the row identifying the slot
@@ -74,7 +74,7 @@ public interface RectangularTabOverlay extends TabOverlayHandle.BatchModifiable,
     /**
      * Set the content of a slot.
      * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The text is provided as plain text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      *
      * @param column the column identifying the slot
      * @param row    the row identifying the slot
@@ -115,7 +115,7 @@ public interface RectangularTabOverlay extends TabOverlayHandle.BatchModifiable,
     /**
      * Set the text to display on a slot.
      * <p>
-     * The text is provided as plain text and may contain legacy <a url=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
+     * The text is provided as plain text and may contain legacy <a href=http://minecraft.gamepedia.com/Formatting_codes>formatting codes</a>.
      *
      * @param column the column identifying the slot
      * @param row    the row identifying the slot

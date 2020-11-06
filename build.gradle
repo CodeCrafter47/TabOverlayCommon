@@ -12,6 +12,7 @@ group 'de.codecrafter47.taboverlay'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java-library'
+apply plugin: 'maven-publish'
 apply plugin: 'ru.vyarus.quality'
 
 sourceCompatibility = 1.8
@@ -42,6 +43,32 @@ dependencies {
     //implementation "it.unimi.dsi:fastutil:8.3.1"
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
+}
+
+publishing {
+    repositories {
+        maven {
+            if (project.version.endsWith("-SNAPSHOT")) {
+                url "https://nexus.codecrafter47.de/content/repositories/snapshots/"
+            } else {
+                url "https://nexus.codecrafter47.de/content/repositories/releases/"
+            }
+            credentials {
+                username "$mavenUser"
+                password "$mavenPassword"
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
 }

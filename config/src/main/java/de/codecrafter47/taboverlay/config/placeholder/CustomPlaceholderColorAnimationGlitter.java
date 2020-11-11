@@ -25,52 +25,31 @@ import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.text.TextView;
 import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 
-import java.util.List;
-import java.util.OptionalInt;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, String>, TextViewUpdateListener {
+public class CustomPlaceholderColorAnimationGlitter extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, String>, TextViewUpdateListener {
 
     private Future<?> task;
-    private TextView textView;
-    private final List<TextColor> colors;
-    private final OptionalInt distance;
-    private final float speed;
+    private final TextView textView;
+    private final TextColor baseColor;
+    private final TextColor effectColor;
     private String text;
-    private float effectiveDistance;
-    private float pos = 0.0f;
-    private float period;
     private String replacement;
 
-    public CustomPlaceholderColorAnimation(TextTemplate textTemplate, List<TextColor> colors, OptionalInt distance, float speed) {
+    public CustomPlaceholderColorAnimationGlitter(TextTemplate textTemplate, TextColor baseColor, TextColor effectColor) {
         this.textView = textTemplate.instantiate();
-        this.colors = colors;
-        this.distance = distance;
-        this.speed = speed;
+        this.baseColor = baseColor;
+        this.effectColor = effectColor;
     }
 
     void updateText() {
         text = ChatFormat.stripFormat(textView.getText());
-        if (distance.isPresent()) {
-            effectiveDistance = distance.getAsInt();
-        } else {
-            effectiveDistance = ChatFormat.formattedTextLength(text) / (colors.size() - 1);
-        }
-        period = effectiveDistance * colors.size();
         updateReplacement();
     }
 
     void updateAnimation() {
         updateReplacement();
-
-        pos += speed;
-        if (this.pos < 0.0) {
-            this.pos += period;
-        }
-        if (this.pos > period) {
-            this.pos -= period;
-        }
 
         if (hasListener()) {
             getListener().run();
@@ -78,17 +57,18 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() * 9);
-        double d = pos;
+        StringBuilder sb = new StringBuilder(text.length() * 4);
+        sb.append(baseColor.getFormatCode());
+        boolean hasBaseColor = true;
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
-            double sd = d / effectiveDistance;
-            int ia = (int) sd;
-            TextColor a = colors.get(ia % colors.size());
-            TextColor b = colors.get((ia + 1) % colors.size());
-            TextColor c = TextColor.interpolateSine(a, b, sd - ia);
-            sb.append(c.getFormatCode());
+            if (!hasBaseColor) {
+                sb.append(baseColor.getFormatCode());
+                hasBaseColor = true;
+            } else if (Math.random() < 0.05) {
+                sb.append(effectColor.getFormatCode());
+                hasBaseColor = false;
+            }
             sb.appendCodePoint(text.codePointAt(i));
-            d += ChatFormat.getCharWidth(text.codePointAt(i));
         }
         replacement = sb.toString();
     }
@@ -102,9 +82,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     protected void onActivation() {
         textView.activate(getContext(), this);
         updateText();
-        if (speed != 0) {
-            task = getContext().getTabEventQueue().scheduleAtFixedRate(this::updateAnimation, 100, 100, TimeUnit.MILLISECONDS);
-        }
+        task = getContext().getTabEventQueue().scheduleAtFixedRate(this::updateAnimation, 150, 150, TimeUnit.MILLISECONDS);
     }
 
     @Override

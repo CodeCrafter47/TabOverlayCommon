@@ -25,9 +25,7 @@ import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedListProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedStringProperty;
 import de.codecrafter47.taboverlay.config.misc.TextColor;
-import de.codecrafter47.taboverlay.config.placeholder.CustomPlaceholderColorAnimation;
-import de.codecrafter47.taboverlay.config.placeholder.PlaceholderArg;
-import de.codecrafter47.taboverlay.config.placeholder.PlaceholderBuilder;
+import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import de.codecrafter47.taboverlay.config.template.text.TextTemplate;
 import lombok.Getter;
@@ -41,7 +39,19 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
 
     @Getter
     @Setter
+    private MarkedStringProperty effect;
+
+    @Getter
+    @Setter
     private MarkedListProperty<MarkedStringProperty> colors;
+
+    @Getter
+    @Setter
+    private MarkedStringProperty baseColor;
+
+    @Getter
+    @Setter
+    private MarkedStringProperty effectColor;
 
     @Getter
     @Setter
@@ -57,9 +67,34 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
 
     @Override
     public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
-        List<TextColor> colors = new ArrayList<>();
 
-        if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
+        String effect = this.effect != null ? this.effect.getValue() : null;
+        if (effect == null) {
+            effect = "rainbow";
+        }
+
+        boolean requireColors = false;
+        boolean requireBaseColor = false;
+        boolean requireEffectColor = false;
+
+        switch (effect) {
+            case "rainbow":
+            case "random":
+                requireColors = true;
+                break;
+            case "wave":
+            case "waveCenter":
+            case "glitter":
+                requireBaseColor = true;
+                requireEffectColor = true;
+                break;
+            default:
+                tcc.getErrorHandler().addWarning("Unknown effect in !color_animation custom placeholder", this.effect.getStartMark());
+        }
+
+        List<TextColor> colors = new ArrayList<>();
+        if (requireColors
+                && ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
                 && ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
 
             for (MarkedStringProperty color : this.colors) {
@@ -67,6 +102,20 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
                     colors.add(TextColor.parse(color.getValue(), tcc, color.getStartMark()));
                 }
             }
+        }
+
+        TextColor baseColor = TextColor.COLOR_BLACK;
+        if (requireBaseColor
+                && ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "baseColor", this.baseColor, getStartMark())
+                && ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "baseColor", this.baseColor.getValue(), this.baseColor.getStartMark())) {
+            baseColor = TextColor.parse(this.baseColor.getValue(), tcc, this.baseColor.getStartMark());
+        }
+
+        TextColor effectColor = TextColor.COLOR_BLACK;
+        if (requireEffectColor
+                && ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "effectColor", this.effectColor, getStartMark())
+                && ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "effectColor", this.effectColor.getValue(), this.effectColor.getStartMark())) {
+            effectColor = TextColor.parse(this.effectColor.getValue(), tcc, this.effectColor.getStartMark());
         }
 
         OptionalInt distance = OptionalInt.empty();
@@ -80,9 +129,35 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
         }
 
         TextTemplate textTemplate = TextTemplate.parse(replaceParameters("%0", args), getStartMark(), tcc);
-
         OptionalInt finalDistance = distance;
         float finalSpeed = speed;
-        return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+        TextColor finalBaseColor = baseColor;
+        TextColor finalEffectColor = effectColor;
+
+
+        switch (effect) {
+            case "rainbow":
+                return builder.acquireData(() -> {
+                    return new CustomPlaceholderColorAnimationRainbow(textTemplate, colors, finalDistance, finalSpeed);
+                }, TypeToken.STRING, textTemplate.requiresViewerContext());
+            case "random":
+                return builder.acquireData(() -> {
+                    return new CustomPlaceholderColorAnimationRandom(textTemplate, colors);
+                }, TypeToken.STRING, textTemplate.requiresViewerContext());
+            case "wave":
+                return builder.acquireData(() -> {
+                    return new CustomPlaceholderColorAnimationWave(textTemplate, finalBaseColor, finalEffectColor, finalSpeed);
+                }, TypeToken.STRING, textTemplate.requiresViewerContext());
+            case "waveCenter":
+                return builder.acquireData(() -> {
+                    return new CustomPlaceholderColorAnimationWaveCenter(textTemplate, finalBaseColor, finalEffectColor, finalSpeed);
+                }, TypeToken.STRING, textTemplate.requiresViewerContext());
+            case "glitter":
+                return builder.acquireData(() -> {
+                    return new CustomPlaceholderColorAnimationGlitter(textTemplate, finalBaseColor, finalEffectColor);
+                }, TypeToken.STRING, textTemplate.requiresViewerContext());
+            default:
+                return builder;
+        }
     }
 }

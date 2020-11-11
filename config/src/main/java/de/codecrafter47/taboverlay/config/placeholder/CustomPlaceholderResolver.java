@@ -18,7 +18,7 @@
 package de.codecrafter47.taboverlay.config.placeholder;
 
 import de.codecrafter47.taboverlay.config.context.Context;
-import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
+import de.codecrafter47.taboverlay.config.dsl.customplaceholder.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 
 import javax.annotation.Nonnull;

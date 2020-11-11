@@ -26,6 +26,7 @@ import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.dsl.*;
 import de.codecrafter47.taboverlay.config.dsl.components.*;
+import de.codecrafter47.taboverlay.config.dsl.customplaceholder.*;
 import de.codecrafter47.taboverlay.config.dsl.yaml.*;
 import de.codecrafter47.taboverlay.config.expression.DefaultExpressionEngine;
 import de.codecrafter47.taboverlay.config.expression.ExpressionEngine;
@@ -139,20 +140,20 @@ public class ConfigTabOverlayManager {
 
         // custom placeholders
         val customPlaceholderMap = ImmutableMap.<String, Class<?>>builder()
-                .put("!conditional", CustomPlaceholderConfiguration.Conditional.class)
-                .put("!switch", CustomPlaceholderConfiguration.Switch.class)
-                .put("!compute", CustomPlaceholderConfiguration.Compute.class)
-                .put("!animated", CustomPlaceholderConfiguration.Animated.class)
-                .put("!color_animation", CustomPlaceholderConfiguration.ColorAnimation.class)
-                .put("!progress_bar", CustomPlaceholderConfiguration.ProgressBar.class)
+                .put("!conditional", CustomPlaceholderConditionalConfiguration.class)
+                .put("!switch", CustomPlaceholderSwitchConfiguration.class)
+                .put("!compute", CustomPlaceholderComputeConfiguration.class)
+                .put("!animated", CustomPlaceholderAnimatedConfiguration.class)
+                .put("!color_animation", CustomPlaceholderColorAnimationConfiguration.class)
+                .put("!progress_bar", CustomPlaceholderProgressBarConfiguration.class)
                 .build();
-        inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, CustomPlaceholderConfiguration.Alias.class));
-        representer.addClassTag(CustomPlaceholderConfiguration.Conditional.class, new Tag("!conditional"));
-        representer.addClassTag(CustomPlaceholderConfiguration.Switch.class, new Tag("!switch"));
-        representer.addClassTag(CustomPlaceholderConfiguration.Compute.class, new Tag("!compute"));
-        representer.addClassTag(CustomPlaceholderConfiguration.Animated.class, new Tag("!animated"));
-        representer.addClassTag(CustomPlaceholderConfiguration.ColorAnimation.class, new Tag("!color_animation"));
-        representer.addClassTag(CustomPlaceholderConfiguration.ProgressBar.class, new Tag("!progress_bar"));
+        inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, CustomPlaceholderAliasConfiguration.class));
+        representer.addClassTag(CustomPlaceholderConditionalConfiguration.class, new Tag("!conditional"));
+        representer.addClassTag(CustomPlaceholderSwitchConfiguration.class, new Tag("!switch"));
+        representer.addClassTag(CustomPlaceholderComputeConfiguration.class, new Tag("!compute"));
+        representer.addClassTag(CustomPlaceholderAnimatedConfiguration.class, new Tag("!animated"));
+        representer.addClassTag(CustomPlaceholderColorAnimationConfiguration.class, new Tag("!color_animation"));
+        representer.addClassTag(CustomPlaceholderProgressBarConfiguration.class, new Tag("!progress_bar"));
 
         val constructor = new CustomYamlConstructor(inheritanceHandlerMap.build());
         constructor.setPropertyUtils(new CustomPropertyUtils());

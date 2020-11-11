@@ -20,6 +20,7 @@ package de.codecrafter47.taboverlay.config.dsl;
 import com.google.common.collect.ImmutableList;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
 import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
+import de.codecrafter47.taboverlay.config.dsl.customplaceholder.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedFloatProperty;
 import de.codecrafter47.taboverlay.config.dsl.yaml.MarkedIntegerProperty;

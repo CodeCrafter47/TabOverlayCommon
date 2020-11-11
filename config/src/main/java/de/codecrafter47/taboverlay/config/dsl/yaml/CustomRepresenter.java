@@ -17,7 +17,8 @@
 
 package de.codecrafter47.taboverlay.config.dsl.yaml;
 
-import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
+import de.codecrafter47.taboverlay.config.dsl.customplaceholder.CustomPlaceholderAliasConfiguration;
+import de.codecrafter47.taboverlay.config.dsl.customplaceholder.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
@@ -38,7 +39,7 @@ public class CustomRepresenter extends Representer {
         representers.put(MarkedStringProperty.class, data -> representData(((MarkedStringProperty) data).getValue()));
         representers.put(MarkedListProperty.class, data -> representData(new ArrayList<>(Unchecked.cast(data))));
         representers.put(MarkedMapProperty.class, data -> representData(new LinkedHashMap<>(Unchecked.cast(data))));
-        representers.put(CustomPlaceholderConfiguration.Alias.class, data -> representData(((CustomPlaceholderConfiguration.Alias) data).getReplacement()));
+        representers.put(CustomPlaceholderAliasConfiguration.class, data -> representData(((CustomPlaceholderAliasConfiguration) data).getReplacement()));
     }
 
     @Override

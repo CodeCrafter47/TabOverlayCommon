@@ -217,6 +217,7 @@ public final class TabOverlayProviderSet {
                         provider.detach(tabView);
                     }
                 }
+                providers.clear();
                 update();
                 active = false;
             }

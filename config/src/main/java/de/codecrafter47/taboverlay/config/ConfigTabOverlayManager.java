@@ -142,6 +142,7 @@ public class ConfigTabOverlayManager {
         val customPlaceholderMap = ImmutableMap.<String, Class<?>>builder()
                 .put("!conditional", CustomPlaceholderConditionalConfiguration.class)
                 .put("!switch", CustomPlaceholderSwitchConfiguration.class)
+                .put("!select", CustomPlaceholderSelectConfiguration.class)
                 .put("!compute", CustomPlaceholderComputeConfiguration.class)
                 .put("!animated", CustomPlaceholderAnimatedConfiguration.class)
                 .put("!color_animation", CustomPlaceholderColorAnimationConfiguration.class)
@@ -150,6 +151,7 @@ public class ConfigTabOverlayManager {
         inheritanceHandlerMap.put(CustomPlaceholderConfiguration.class, new TagInheritanceHandler(customPlaceholderMap, CustomPlaceholderAliasConfiguration.class));
         representer.addClassTag(CustomPlaceholderConditionalConfiguration.class, new Tag("!conditional"));
         representer.addClassTag(CustomPlaceholderSwitchConfiguration.class, new Tag("!switch"));
+        representer.addClassTag(CustomPlaceholderSelectConfiguration.class, new Tag("!select"));
         representer.addClassTag(CustomPlaceholderComputeConfiguration.class, new Tag("!compute"));
         representer.addClassTag(CustomPlaceholderAnimatedConfiguration.class, new Tag("!animated"));
         representer.addClassTag(CustomPlaceholderColorAnimationConfiguration.class, new Tag("!color_animation"));

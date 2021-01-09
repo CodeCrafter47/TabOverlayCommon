@@ -206,6 +206,15 @@ public class DefaultIconManager implements IconManager {
         return future;
     }
 
+    /**
+     * Remove all entries from the in memory cache.
+     *
+     * This is especially useful to remove cached entries for image files that might have changed on the disk.
+     */
+    public void clearCache() {
+        cache.invalidateAll();
+    }
+
     private void fetchIconFromImage(BufferedImage image, CompletableFuture<Icon> future) {
 
         int[] rgb = image.getRGB(0, 0, 8, 8, null, 0, 8);

@@ -79,8 +79,12 @@ public class CustomPlaceholderColorAnimationWaveCenter extends AbstractActiveEle
         float pos = halfTextLength - this.pos;
         float min = pos - PULSE_RADIUS;
         float max = pos + PULSE_RADIUS;
+
+        // loop variable for pixel position
         double d = 0;
         boolean hasBaseColor = false;
+
+        // loop variable for character index
         int i = 0;
         for (; i < text.length() && d <= halfTextLength; i += Character.charCount(text.codePointAt(i))) {
             if (d > min && d < max) {
@@ -101,7 +105,7 @@ public class CustomPlaceholderColorAnimationWaveCenter extends AbstractActiveEle
         max = pos + PULSE_RADIUS;
         for (; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             if (d > min && d < max) {
-                double factor = Math.abs(d - this.pos) / PULSE_RADIUS;
+                double factor = Math.abs(d - pos) / PULSE_RADIUS;
                 TextColor color = TextColor.interpolateSine(this.effectColor, this.baseColor, factor);
                 sb.append(color.getFormatCode());
                 hasBaseColor = false;

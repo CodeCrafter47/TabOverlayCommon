@@ -78,6 +78,7 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
         boolean requireEffectColor = false;
 
         switch (effect) {
+            case "uniformRainbow":
             case "rainbow":
             case "random":
                 requireColors = true;
@@ -155,6 +156,10 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
             case "glitter":
                 return builder.acquireData(() -> {
                     return new CustomPlaceholderColorAnimationGlitter(textTemplate, finalBaseColor, finalEffectColor);
+                }, TypeToken.STRING, textTemplate.requiresViewerContext());
+            case "uniformRainbow":
+                return builder.acquireData(() -> {
+                    return new CustomPlaceholderColorAnimationUniformRainbow(textTemplate, colors, finalDistance, finalSpeed);
                 }, TypeToken.STRING, textTemplate.requiresViewerContext());
             default:
                 return builder;

@@ -67,7 +67,7 @@ public class CustomPlaceholderSelectConfiguration extends CustomPlaceholderConfi
                     tcc.getErrorHandler().addWarning("Replacement with missing or null key in !select custom placeholder", entry.getKey().getStartMark());
                 } else {
                     // Parse expression
-                    ExpressionTemplate expression = tcc.getExpressionEngine().compile(tcc, entry.getKey().getValue(), entry.getKey().getStartMark());
+                    ExpressionTemplate expression = tcc.getExpressionEngine().compile(tcc, replaceParameters(entry.getKey().getValue(), args), entry.getKey().getStartMark());
 
                     // Parse Replacement
                     TextTemplate replacement = TextTemplate.EMPTY;

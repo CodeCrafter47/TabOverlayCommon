@@ -49,6 +49,9 @@ public class CustomPlaceholderConditional extends AbstractActiveElement<Runnable
     }
 
     private void update(boolean fireEvent) {
+        if (!isActive()) {
+            return;
+        }
         if (activeReplacement != null) {
             activeReplacement.deactivate();
         }

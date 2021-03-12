@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 public class CustomPlaceholderSelect extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, String>, ExpressionUpdateListener, TextViewUpdateListener {
 
@@ -39,6 +40,7 @@ public class CustomPlaceholderSelect extends AbstractActiveElement<Runnable> imp
     private final TextTemplate defaultReplacement;
     private TextView activeView;
     private int activeEntry = -1;
+    private Future<?> updateFuture = null;
 
     public CustomPlaceholderSelect(Map<ExpressionTemplate, TextTemplate> replacements, TextTemplate defaultReplacement) {
         this.entryList = new ArrayList<>(replacements.size());
@@ -50,6 +52,9 @@ public class CustomPlaceholderSelect extends AbstractActiveElement<Runnable> imp
     }
 
     private void update(boolean fireEvent) {
+        if (!isActive()) {
+            return;
+        }
         if (this.activeView != null) {
             this.activeView.deactivate();
         }
@@ -115,7 +120,9 @@ public class CustomPlaceholderSelect extends AbstractActiveElement<Runnable> imp
 
     @Override
     public void onExpressionUpdate() {
-        update(true);
+        if (updateFuture == null || updateFuture.isDone()) {
+            updateFuture = getContext().getTabEventQueue().submit(() -> update(true));
+        }
     }
 
     @Override

@@ -27,6 +27,7 @@ import de.codecrafter47.taboverlay.config.view.text.TextView;
 import de.codecrafter47.taboverlay.config.view.text.TextViewUpdateListener;
 
 import java.util.Map;
+import java.util.concurrent.Future;
 
 public class CustomPlaceholderSwitch extends AbstractActiveElement<Runnable> implements PlaceholderDataProvider<Context, String>, ExpressionUpdateListener, TextViewUpdateListener {
 
@@ -34,6 +35,7 @@ public class CustomPlaceholderSwitch extends AbstractActiveElement<Runnable> imp
     private final Map<String, TextTemplate> replacements;
     private final TextTemplate defaultReplacement;
     private TextView activeView;
+    private Future<?> updateFuture = null;
 
     public CustomPlaceholderSwitch(ExpressionTemplate expression, Map<String, TextTemplate> replacements, TextTemplate defaultReplacement) {
         this.expression = expression.instantiateWithStringResult();
@@ -43,6 +45,9 @@ public class CustomPlaceholderSwitch extends AbstractActiveElement<Runnable> imp
 
 
     private void update(boolean fireEvent) {
+        if (!isActive()) {
+            return;
+        }
         if (this.activeView != null) {
             this.activeView.deactivate();
         }
@@ -72,7 +77,9 @@ public class CustomPlaceholderSwitch extends AbstractActiveElement<Runnable> imp
 
     @Override
     public void onExpressionUpdate() {
-        update(true);
+        if (updateFuture == null || updateFuture.isDone()) {
+            updateFuture = getContext().getTabEventQueue().submit(() -> update(true));
+        }
     }
 
     @Override

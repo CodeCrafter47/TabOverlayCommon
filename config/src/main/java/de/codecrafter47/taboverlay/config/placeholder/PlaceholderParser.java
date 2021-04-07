@@ -17,7 +17,6 @@
 
 package de.codecrafter47.taboverlay.config.placeholder;
 
-import com.google.common.base.Strings;
 import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import org.yaml.snakeyaml.error.Mark;
@@ -39,13 +38,14 @@ public class PlaceholderParser {
     static {
         dataRepresentations = new HashMap<>();
         dataRepresentations.put(TypeToken.INTEGER, arg -> {
-            final int length = Integer.parseInt(arg);
+            final String format = "%0" + arg + "d";
+            //noinspection ResultOfMethodCallIgnored
+            String.format(format, 1); // just test whether format string is correct
             return (Integer v) -> {
                 if (v == null) {
                     return "";
                 }
-                String s = Integer.toString(v);
-                return Strings.padStart(s, length, ' ');
+                return String.format(format, v);
             };
         });
         dataRepresentations.put(TypeToken.FLOAT, arg -> {

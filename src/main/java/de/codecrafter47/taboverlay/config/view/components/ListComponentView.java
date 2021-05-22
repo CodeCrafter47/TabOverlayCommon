@@ -257,7 +257,11 @@ public class ListComponentView extends ComponentView implements TextViewUpdateLi
     }
 
     protected int getInitialSizeEstimate(ComponentView componentView) {
-        return componentView.getMinSize();
+        int size = componentView.getMinSize();
+        if (componentView.isBlockAligned()) {
+            size = ((size + columns - 1) / columns) * columns;
+        }
+        return size;
     }
 
     private void updateDefaultSlots() {

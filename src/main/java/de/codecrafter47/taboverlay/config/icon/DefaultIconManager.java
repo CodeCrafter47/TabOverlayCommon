@@ -41,6 +41,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
@@ -197,6 +198,9 @@ public class DefaultIconManager implements IconManager {
                     return;
                 }
                 fetchIconFromImage(image, future);
+            } catch (NoSuchFileException ex) {
+                logger.log(Level.WARNING, "File does not exist: " + path.toString());
+                future.completeExceptionally(ex);
             } catch (Throwable ex) {
                 logger.log(Level.WARNING, "Failed to load file " + path.toString() + ": " + ex.getMessage(), ex);
                 future.completeExceptionally(ex);

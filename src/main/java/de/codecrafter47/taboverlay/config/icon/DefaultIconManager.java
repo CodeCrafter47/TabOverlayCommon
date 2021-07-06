@@ -61,6 +61,7 @@ public class DefaultIconManager implements IconManager {
     private final Cache<UUID, CompletableFuture<Icon>> cacheUUID = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build();
     private final Cache<String, IconTemplate> cache = CacheBuilder.newBuilder().weakValues().build();
     private final Map<IconImageData, Icon> iconCache = new ConcurrentHashMap<>();
+    private final Map<BufferedImage, Integer> connectionAttempts = new HashMap<>();
 
     private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
     private final static Pattern PATTERN_VALID_UUID = Pattern.compile("(?i)[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}");
@@ -167,11 +168,7 @@ public class DefaultIconManager implements IconManager {
                                 if (head.getWidth() != 8 || head.getHeight() != 8) {
                                     return new Icon(new ProfileProperty("error", "wrong image dimensions", null));
                                 }
-
-                                int[] rgb = head.getRGB(0, 0, 8, 8, null, 0, 8);
-                                ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
-                                byteBuffer.asIntBuffer().put(rgb);
-                                byte[] headArray = byteBuffer.array();
+                                byte[] headArray = getHeadArray(head);
 
                                 IconImageData imageData = IconImageData.of(headArray);
                                 Icon icon = iconCache.get(imageData);
@@ -199,7 +196,7 @@ public class DefaultIconManager implements IconManager {
                 }
                 fetchIconFromImage(image, future);
             } catch (NoSuchFileException ex) {
-                logger.log(Level.WARNING, "File does not exist: " + path.toString());
+                logger.log(Level.WARNING, "File does not exist: " + path);
                 future.completeExceptionally(ex);
             } catch (Throwable ex) {
                 logger.log(Level.WARNING, "Failed to load file " + path.toString() + ": " + ex.getMessage(), ex);
@@ -211,11 +208,7 @@ public class DefaultIconManager implements IconManager {
     }
 
     private void fetchIconFromImage(BufferedImage image, CompletableFuture<Icon> future) {
-
-        int[] rgb = image.getRGB(0, 0, 8, 8, null, 0, 8);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
-        byteBuffer.asIntBuffer().put(rgb);
-        byte[] headArray = byteBuffer.array();
+        byte[] headArray = getHeadArray(image);
 
         IconImageData imageData = IconImageData.of(headArray);
         if (iconCache.containsKey(imageData)) {
@@ -235,7 +228,7 @@ public class DefaultIconManager implements IconManager {
                     out.flush();
                 }
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
-                LinkedHashTreeMap map = gson.fromJson(reader, LinkedHashTreeMap.class);
+                LinkedHashTreeMap<?, ?> map = gson.fromJson(reader, LinkedHashTreeMap.class);
                 if (map.get("state").equals("ERROR")) {
                     future.completeExceptionally(new Exception("Server side error occurred. Try again later"));
                     // todo retry or fall back to a different service in this case
@@ -246,6 +239,7 @@ public class DefaultIconManager implements IconManager {
                     iconCache.put(imageData, icon);
 
                     future.complete(icon);
+                    connectionAttempts.remove(image);
 
                     synchronized (DefaultIconManager.this) {
                         // save to cache
@@ -267,6 +261,19 @@ public class DefaultIconManager implements IconManager {
                 // retry after 5 minutes
                 // todo limit retries/ switch to a different service
                 // todo exception handling during retries
+                if (connectionAttempts.containsKey(image)) {
+                    int attempts = connectionAttempts.getOrDefault(image, 1);
+                    if (attempts > 3) {
+                        logger.log(Level.WARNING, "Had 3 failed attempts to contact skinservice.codecrafter47.dyndns.eu. Cancelling further connections...");
+                        return;
+                    }
+                    
+                    connectionAttempts.put(image, attempts + 1);
+                } else {
+                    connectionAttempts.put(image, 1);
+                }
+                
+                
                 asyncExecutor.schedule(() -> {
                     try {
                         fetchIconFromImage(image, future);
@@ -380,6 +387,14 @@ public class DefaultIconManager implements IconManager {
                 connection.disconnect();
             }
         }
+    }
+    
+    private byte[] getHeadArray(BufferedImage image){
+        int[] rgb = image.getRGB(0, 0, 8, 8, null, 0, 8);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
+        byteBuffer.asIntBuffer().put(rgb);
+        
+        return byteBuffer.array();
     }
 
     private class IconEntry implements IconTemplate {

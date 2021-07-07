@@ -61,7 +61,6 @@ public class DefaultIconManager implements IconManager {
     private final Cache<UUID, CompletableFuture<Icon>> cacheUUID = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build();
     private final Cache<String, IconTemplate> cache = CacheBuilder.newBuilder().weakValues().build();
     private final Map<IconImageData, Icon> iconCache = new ConcurrentHashMap<>();
-    private final Map<BufferedImage, Integer> connectionAttempts = new HashMap<>();
 
     private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
     private final static Pattern PATTERN_VALID_UUID = Pattern.compile("(?i)[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}");
@@ -239,7 +238,6 @@ public class DefaultIconManager implements IconManager {
                     iconCache.put(imageData, icon);
 
                     future.complete(icon);
-                    connectionAttempts.remove(image);
 
                     synchronized (DefaultIconManager.this) {
                         // save to cache
@@ -261,19 +259,6 @@ public class DefaultIconManager implements IconManager {
                 // retry after 5 minutes
                 // todo limit retries/ switch to a different service
                 // todo exception handling during retries
-                if (connectionAttempts.containsKey(image)) {
-                    int attempts = connectionAttempts.getOrDefault(image, 1);
-                    if (attempts > 3) {
-                        logger.log(Level.WARNING, "Had 3 failed attempts to contact skinservice.codecrafter47.dyndns.eu. Cancelling further connections...");
-                        return;
-                    }
-                    
-                    connectionAttempts.put(image, attempts + 1);
-                } else {
-                    connectionAttempts.put(image, 1);
-                }
-                
-                
                 asyncExecutor.schedule(() -> {
                     try {
                         fetchIconFromImage(image, future);

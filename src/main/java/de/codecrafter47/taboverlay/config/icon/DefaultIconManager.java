@@ -167,11 +167,7 @@ public class DefaultIconManager implements IconManager {
                                 if (head.getWidth() != 8 || head.getHeight() != 8) {
                                     return new Icon(new ProfileProperty("error", "wrong image dimensions", null));
                                 }
-
-                                int[] rgb = head.getRGB(0, 0, 8, 8, null, 0, 8);
-                                ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
-                                byteBuffer.asIntBuffer().put(rgb);
-                                byte[] headArray = byteBuffer.array();
+                                byte[] headArray = getHeadArray(head);
 
                                 IconImageData imageData = IconImageData.of(headArray);
                                 Icon icon = iconCache.get(imageData);
@@ -199,7 +195,7 @@ public class DefaultIconManager implements IconManager {
                 }
                 fetchIconFromImage(image, future);
             } catch (NoSuchFileException ex) {
-                logger.log(Level.WARNING, "File does not exist: " + path.toString());
+                logger.log(Level.WARNING, "File does not exist: " + path);
                 future.completeExceptionally(ex);
             } catch (Throwable ex) {
                 logger.log(Level.WARNING, "Failed to load file " + path.toString() + ": " + ex.getMessage(), ex);
@@ -211,11 +207,7 @@ public class DefaultIconManager implements IconManager {
     }
 
     private void fetchIconFromImage(BufferedImage image, CompletableFuture<Icon> future) {
-
-        int[] rgb = image.getRGB(0, 0, 8, 8, null, 0, 8);
-        ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
-        byteBuffer.asIntBuffer().put(rgb);
-        byte[] headArray = byteBuffer.array();
+        byte[] headArray = getHeadArray(image);
 
         IconImageData imageData = IconImageData.of(headArray);
         if (iconCache.containsKey(imageData)) {
@@ -235,7 +227,7 @@ public class DefaultIconManager implements IconManager {
                     out.flush();
                 }
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
-                LinkedHashTreeMap map = gson.fromJson(reader, LinkedHashTreeMap.class);
+                LinkedHashTreeMap<?, ?> map = gson.fromJson(reader, LinkedHashTreeMap.class);
                 if (map.get("state").equals("ERROR")) {
                     future.completeExceptionally(new Exception("Server side error occurred. Try again later"));
                     // todo retry or fall back to a different service in this case
@@ -380,6 +372,14 @@ public class DefaultIconManager implements IconManager {
                 connection.disconnect();
             }
         }
+    }
+    
+    private byte[] getHeadArray(BufferedImage image){
+        int[] rgb = image.getRGB(0, 0, 8, 8, null, 0, 8);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
+        byteBuffer.asIntBuffer().put(rgb);
+        
+        return byteBuffer.array();
     }
 
     private class IconEntry implements IconTemplate {

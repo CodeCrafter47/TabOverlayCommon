@@ -63,7 +63,7 @@ public class CustomPlaceholderSwitchConfiguration extends CustomPlaceholderConfi
             }
         }
 
-        Map<String, TextTemplate> replacementMap = new HashMap<>(replacements.size());
+        Map<String, TextTemplate> replacementMap = new HashMap<>();
         if (ConfigValidationUtil.checkNotNull(tcc, "custom placeholder !switch", "replacements", replacements, getStartMark())) {
             for (val entry : replacements.entrySet()) {
                 if (entry.getKey() == null) {

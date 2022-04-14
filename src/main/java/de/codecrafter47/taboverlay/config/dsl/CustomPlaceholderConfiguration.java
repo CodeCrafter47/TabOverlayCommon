@@ -321,7 +321,31 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
             OptionalInt finalDistance = distance;
             float finalSpeed = speed;
-            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, formats.getValue(), finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, sanitizeFormats(formats.getValue()), finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+        }
+        
+        // Make sure only valid formatting codes are provided.
+        private String sanitizeFormats(String formats) {
+            if (formats == null) {
+                return "";
+            }
+            
+            char[] chars = formats.toCharArray();
+            StringBuilder sb = new StringBuilder(formats.length());
+            
+            for (int i = 0; i < chars.length; i++) {
+                char c = chars[i];
+                
+                if (c == '&' && i++ < chars.length) {
+                    char code = Character.toLowerCase(chars[i]);
+                    
+                    if (code == 'l' || code == 'm' || code == 'n' || code == 'o' || code == 'k') {
+                        sb.append(c).append(code);
+                    }
+                }
+            }
+            
+            return sb.toString();
         }
     }
 

@@ -298,8 +298,8 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             List<TextColor> colors = new ArrayList<>();
             List<TextColor> formats = new ArrayList<>();
 
-            if (ConfigValidationUtil.checkNotNull(tcc,  "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark()) 
-                && ConfigValidationUtil.checkNotEmpty(tcc,  "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
+            if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
+                && ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())) {
 
                 for (MarkedStringProperty color : this.colors) {
                     if (color != null) {
@@ -308,11 +308,11 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                 }
             }
             
-            if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "formats", this.formats, this.formats.getStartMark()) 
-                && ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "formats", this.formats, this.formats.getStartMark())) {
+            if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "formats", this.formats, getStartMark())
+                && ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "formats", this.formats, getStartMark())) {
                 
                 for (MarkedStringProperty format : this.formats) {
-                    TextColor tc = TextColor.parseFormat(format.getValue(), tcc, format.getStartMark());
+                    TextColor tc = TextColor.parseFormat(format.getValue(), tcc, getStartMark());
                     if (tc != null) {
                         formats.add(tc);
                     }

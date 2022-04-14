@@ -287,23 +287,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
     
         @Getter
         @Setter
-        private MarkedBooleanProperty bold;
-    
-        @Getter
-        @Setter
-        private MarkedBooleanProperty italic;
-    
-        @Getter
-        @Setter
-        private MarkedBooleanProperty underline;
-    
-        @Getter
-        @Setter
-        private MarkedBooleanProperty strikethrough;
-    
-        @Getter
-        @Setter
-        private MarkedBooleanProperty magic;
+        private MarkedListProperty<MarkedStringProperty> formats;
 
         public ColorAnimation() {
             setParameters(new MarkedIntegerProperty(1));
@@ -314,8 +298,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             List<TextColor> colors = new ArrayList<>();
             List<TextColor> formats = new ArrayList<>();
 
-            if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
-                    && ConfigValidationUtil.checkNotEmpty(tcc,  "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
+            if (ConfigValidationUtil.checkNotEmpty(tcc,  "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
 
                 for (MarkedStringProperty color : this.colors) {
                     if (color != null) {
@@ -324,24 +307,14 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                 }
             }
             
-            if (this.bold != null && this.bold.isValue()) {
-                formats.add(TextColor.FORMAT_BOLD);
-            }
-            
-            if (this.italic != null && this.italic.isValue()) {
-                formats.add(TextColor.FORMAT_ITALIC);
-            }
-            
-            if (this.underline != null && this.underline.isValue()) {
-                formats.add(TextColor.FORMAT_UNDERLINE);
-            }
-            
-            if (this.strikethrough != null && this.strikethrough.isValue()) {
-                formats.add(TextColor.FORMAT_STRIKETHROUGH);
-            }
-            
-            if (this.magic != null && this.magic.isValue()) {
-                formats.add(TextColor.FORMAT_MAGIC);
+            if (ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "formats", this.formats, this.formats.getStartMark())) {
+                
+                for (MarkedStringProperty format : this.formats) {
+                    TextColor tc = TextColor.parseFormat(format.getValue(), tcc, format.getStartMark());
+                    if (tc != null) {
+                        formats.add(tc);
+                    }
+                }
             }
 
             OptionalInt distance = OptionalInt.empty();

@@ -22,6 +22,7 @@ import lombok.Getter;
 import org.yaml.snakeyaml.error.Mark;
 
 import java.awt.*;
+import java.util.Locale;
 
 @Getter
 public class TextColor {
@@ -109,6 +110,28 @@ public class TextColor {
         tcc.getErrorHandler().addWarning("Specified color " + color + " does not match expected format.\n" +
                 "Expected a formatting code (e.g. &7) or a hex color (e.g. #012345).", mark);
         return COLOR_WHITE;
+    }
+    
+    public static TextColor parseFormat(String format, TemplateCreationContext tcc, Mark mark) {
+        if (format == null) {
+            return null;
+        }
+        
+        switch (format.toUpperCase(Locale.ROOT)) {
+            case "BOLD":
+                return FORMAT_BOLD;
+            case "ITALIC":
+                return FORMAT_ITALIC;
+            case "UNDERLINE":
+                return FORMAT_UNDERLINE;
+            case "STRIKETHROUGH":
+                return FORMAT_STRIKETHROUGH;
+            case "MAGIC":
+                return FORMAT_MAGIC;
+        }
+        tcc.getErrorHandler().addWarning("Specified format " + format + " does not match expected format.\n" +
+                "Expected a format name (e.g. BOLD).", mark);
+        return null;
     }
 
     public static TextColor interpolateLinear(TextColor a, TextColor b, double x) {

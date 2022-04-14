@@ -57,7 +57,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
         if (distance.isPresent()) {
             effectiveDistance = distance.getAsInt();
         } else {
-            effectiveDistance = ChatFormat.formattedTextLength(text) / ((colors.size() - 1) + (formats.size() - 1));
+            effectiveDistance = ChatFormat.formattedTextLength(text) / (colors.size() - 1);
         }
         period = effectiveDistance * colors.size();
         updateReplacement();

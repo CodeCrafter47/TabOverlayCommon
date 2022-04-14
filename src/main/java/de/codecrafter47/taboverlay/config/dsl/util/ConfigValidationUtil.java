@@ -39,10 +39,6 @@ public class ConfigValidationUtil {
     }
 
     public static boolean checkNotEmpty(TemplateCreationContext tcc, String context, String attributeName, Collection<?> value, Mark mark) {
-        if (!checkNotNull(tcc, context, attributeName, value, mark)) {
-            return false;
-        }
-        
         if (value.isEmpty()) {
             tcc.getErrorHandler().addError("Failed to configure " + context + ", " + attributeName + " is empty.", mark);
             return false;

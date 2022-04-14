@@ -284,6 +284,26 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         @Getter
         @Setter
         private MarkedFloatProperty speed;
+    
+        @Getter
+        @Setter
+        private MarkedBooleanProperty bold;
+    
+        @Getter
+        @Setter
+        private MarkedBooleanProperty italic;
+    
+        @Getter
+        @Setter
+        private MarkedBooleanProperty underline;
+    
+        @Getter
+        @Setter
+        private MarkedBooleanProperty strikethrough;
+    
+        @Getter
+        @Setter
+        private MarkedBooleanProperty magic;
 
         public ColorAnimation() {
             setParameters(new MarkedIntegerProperty(1));
@@ -292,6 +312,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         @Override
         public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             List<TextColor> colors = new ArrayList<>();
+            List<TextColor> formats = new ArrayList<>();
 
             if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
                     && ConfigValidationUtil.checkNotEmpty(tcc,  "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
@@ -301,6 +322,26 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                         colors.add(TextColor.parse(color.getValue(), tcc, color.getStartMark()));
                     }
                 }
+            }
+            
+            if (this.bold != null && this.bold.isValue()) {
+                formats.add(TextColor.FORMAT_BOLD);
+            }
+            
+            if (this.italic != null && this.italic.isValue()) {
+                formats.add(TextColor.FORMAT_ITALIC);
+            }
+            
+            if (this.underline != null && this.underline.isValue()) {
+                formats.add(TextColor.FORMAT_UNDERLINE);
+            }
+            
+            if (this.strikethrough != null && this.strikethrough.isValue()) {
+                formats.add(TextColor.FORMAT_STRIKETHROUGH);
+            }
+            
+            if (this.magic != null && this.magic.isValue()) {
+                formats.add(TextColor.FORMAT_MAGIC);
             }
 
             OptionalInt distance = OptionalInt.empty();
@@ -317,7 +358,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
             OptionalInt finalDistance = distance;
             float finalSpeed = speed;
-            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, formats, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
         }
     }
 

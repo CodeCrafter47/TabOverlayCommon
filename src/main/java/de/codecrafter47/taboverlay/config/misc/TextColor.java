@@ -42,6 +42,12 @@ public class TextColor {
     public static final TextColor COLOR_DARK_GREEN = new TextColor(0, 170, 0, "&2");
     public static final TextColor COLOR_DARK_BLUE = new TextColor(0, 0, 170, "&1");
     public static final TextColor COLOR_BLACK = new TextColor(0, 0, 0, "&0");
+    
+    public static final TextColor FORMAT_BOLD = new TextColor("&l");
+    public static final TextColor FORMAT_ITALIC = new TextColor("&o");
+    public static final TextColor FORMAT_UNDERLINE = new TextColor("&n");
+    public static final TextColor FORMAT_STRIKETHROUGH = new TextColor("&m");
+    public static final TextColor FORMAT_MAGIC = new TextColor("&k");
 
     public static TextColor parse(String color, TemplateCreationContext tcc, Mark mark) {
         char c;
@@ -135,6 +141,13 @@ public class TextColor {
         this.r = r;
         this.g = g;
         this.b = b;
+        this.formatCode = formatCode;
+    }
+    
+    public TextColor(String formatCode){
+        this.r = -1;
+        this.g = -1;
+        this.b = -1;
         this.formatCode = formatCode;
     }
 }

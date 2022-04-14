@@ -21,9 +21,6 @@ import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import lombok.Getter;
 import org.yaml.snakeyaml.error.Mark;
 
-import java.awt.*;
-import java.util.Locale;
-
 @Getter
 public class TextColor {
 
@@ -43,12 +40,6 @@ public class TextColor {
     public static final TextColor COLOR_DARK_GREEN = new TextColor(0, 170, 0, "&2");
     public static final TextColor COLOR_DARK_BLUE = new TextColor(0, 0, 170, "&1");
     public static final TextColor COLOR_BLACK = new TextColor(0, 0, 0, "&0");
-    
-    public static final TextColor FORMAT_BOLD = new TextColor("&l");
-    public static final TextColor FORMAT_ITALIC = new TextColor("&o");
-    public static final TextColor FORMAT_UNDERLINE = new TextColor("&n");
-    public static final TextColor FORMAT_STRIKETHROUGH = new TextColor("&m");
-    public static final TextColor FORMAT_MAGIC = new TextColor("&k");
 
     public static TextColor parse(String color, TemplateCreationContext tcc, Mark mark) {
         char c;
@@ -111,28 +102,6 @@ public class TextColor {
                 "Expected a formatting code (e.g. &7) or a hex color (e.g. #012345).", mark);
         return COLOR_WHITE;
     }
-    
-    public static TextColor parseFormat(String format, TemplateCreationContext tcc, Mark mark) {
-        if (format == null) {
-            return null;
-        }
-        
-        switch (format.toUpperCase(Locale.ROOT)) {
-            case "BOLD":
-                return FORMAT_BOLD;
-            case "ITALIC":
-                return FORMAT_ITALIC;
-            case "UNDERLINE":
-                return FORMAT_UNDERLINE;
-            case "STRIKETHROUGH":
-                return FORMAT_STRIKETHROUGH;
-            case "MAGIC":
-                return FORMAT_MAGIC;
-        }
-        tcc.getErrorHandler().addWarning("Specified format " + format + " does not match expected format.\n" +
-                "Expected a format name (e.g. BOLD).", mark);
-        return null;
-    }
 
     public static TextColor interpolateLinear(TextColor a, TextColor b, double x) {
         double rb = x;
@@ -164,13 +133,6 @@ public class TextColor {
         this.r = r;
         this.g = g;
         this.b = b;
-        this.formatCode = formatCode;
-    }
-    
-    public TextColor(String formatCode){
-        this.r = -1;
-        this.g = -1;
-        this.b = -1;
         this.formatCode = formatCode;
     }
 }

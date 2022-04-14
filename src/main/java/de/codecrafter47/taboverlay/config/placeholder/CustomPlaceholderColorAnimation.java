@@ -35,7 +35,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     private Future<?> task;
     private TextView textView;
     private final List<TextColor> colors;
-    private final List<TextColor> formats;
+    private final String formats;
     private final OptionalInt distance;
     private final float speed;
     private String text;
@@ -44,7 +44,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     private float period;
     private String replacement;
 
-    public CustomPlaceholderColorAnimation(TextTemplate textTemplate, List<TextColor> colors, List<TextColor> formats, OptionalInt distance, float speed) {
+    public CustomPlaceholderColorAnimation(TextTemplate textTemplate, List<TextColor> colors, String formats, OptionalInt distance, float speed) {
         this.textView = textTemplate.instantiate();
         this.colors = colors;
         this.formats = formats;
@@ -89,9 +89,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
             TextColor b = colors.get((ia + 1) % colors.size());
             TextColor c = TextColor.interpolateSine(a, b, sd - ia);
             sb.append(c.getFormatCode());
-            for (TextColor format : formats) {
-                sb.append(format.getFormatCode());
-            }
+            sb.append(sanitizeFormats(formats));
             sb.appendCodePoint(text.codePointAt(i));
             d += ChatFormat.getCharWidth(text.codePointAt(i));
         }
@@ -126,5 +124,28 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
         if (hasListener()) {
             getListener().run();
         }
+    }
+    
+    // Makes sure the provided Format String is valid formatting codes.
+    private String sanitizeFormats(String formats) {
+        if (formats == null || formats.isEmpty()) {
+            return "";
+        }
+        
+        char[] chars = formats.toCharArray();
+        StringBuilder sb = new StringBuilder(formats.length());
+        for (int i = 0; i < chars.length; i++) {
+            char chr = Character.toLowerCase(chars[i]);
+            
+            if (chr == '&' && i++ < chars.length) {
+                char code = chars[i];
+                
+                if(code == 'l' || code == 'm' || code == 'n' || code == 'o' || code == 'k') {
+                    sb.append(chr).append(code);
+                }
+            }
+        }
+        
+        return sb.toString();
     }
 }

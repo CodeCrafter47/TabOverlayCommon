@@ -287,7 +287,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
     
         @Getter
         @Setter
-        private MarkedListProperty<MarkedStringProperty> formats;
+        private MarkedStringProperty formats;
 
         public ColorAnimation() {
             setParameters(new MarkedIntegerProperty(1));
@@ -296,7 +296,6 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         @Override
         public PlaceholderBuilder<?, ?> bindArgs(PlaceholderBuilder<Context, ?> builder, List<PlaceholderArg> args, TemplateCreationContext tcc) {
             List<TextColor> colors = new ArrayList<>();
-            List<TextColor> formats = new ArrayList<>();
 
             if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
                 && ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
@@ -308,17 +307,6 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                 }
             }
             
-            if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "formats", this.formats, getStartMark())
-                && ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "formats", this.formats, this.formats.getStartMark())) {
-                
-                for (MarkedStringProperty format : this.formats) {
-                    TextColor tc = TextColor.parseFormat(format.getValue(), tcc, getStartMark());
-                    if (tc != null) {
-                        formats.add(tc);
-                    }
-                }
-            }
-
             OptionalInt distance = OptionalInt.empty();
             if (this.distance != null) {
                 distance = OptionalInt.of(this.distance.getValue());
@@ -333,7 +321,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
             OptionalInt finalDistance = distance;
             float finalSpeed = speed;
-            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, formats, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, formats.getValue(), finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
         }
     }
 

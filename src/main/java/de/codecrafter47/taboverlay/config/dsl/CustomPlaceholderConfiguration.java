@@ -321,7 +321,8 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
             OptionalInt finalDistance = distance;
             float finalSpeed = speed;
-            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, sanitizeFormats(formats.getValue()), finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+            String finalFormats = formats == null ? "" : sanitizeFormats(formats.getValue());
+            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, finalFormats, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
         }
         
         // Make sure only valid formatting codes are provided.

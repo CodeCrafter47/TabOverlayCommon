@@ -80,7 +80,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() * 9);
+        StringBuilder sb = new StringBuilder(text.length() * (9 + formats.length()));
         double d = pos;
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             double sd = d / effectiveDistance;

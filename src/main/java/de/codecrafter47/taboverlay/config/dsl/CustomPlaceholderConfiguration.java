@@ -284,6 +284,10 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
         @Getter
         @Setter
         private MarkedFloatProperty speed;
+    
+        @Getter
+        @Setter
+        private MarkedStringProperty formats;
 
         public ColorAnimation() {
             setParameters(new MarkedIntegerProperty(1));
@@ -294,7 +298,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
             List<TextColor> colors = new ArrayList<>();
 
             if (ConfigValidationUtil.checkNotNull(tcc, "!color_animation custom placeholder", "colors", this.colors, getStartMark())
-                    && ConfigValidationUtil.checkNotEmpty(tcc,  "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
+                && ConfigValidationUtil.checkNotEmpty(tcc, "!color_animation custom placeholder", "colors", this.colors, this.colors.getStartMark())) {
 
                 for (MarkedStringProperty color : this.colors) {
                     if (color != null) {
@@ -302,7 +306,7 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
                     }
                 }
             }
-
+            
             OptionalInt distance = OptionalInt.empty();
             if (this.distance != null) {
                 distance = OptionalInt.of(this.distance.getValue());
@@ -317,7 +321,32 @@ public abstract class CustomPlaceholderConfiguration extends MarkedPropertyBase 
 
             OptionalInt finalDistance = distance;
             float finalSpeed = speed;
-            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+            String finalFormats = formats == null ? "" : sanitizeFormats(formats.getValue());
+            return builder.acquireData(() -> new CustomPlaceholderColorAnimation(textTemplate, colors, finalFormats, finalDistance, finalSpeed), TypeToken.STRING, textTemplate.requiresViewerContext());
+        }
+        
+        // Make sure only valid formatting codes are provided.
+        private String sanitizeFormats(String formats) {
+            if (formats == null) {
+                return "";
+            }
+            
+            char[] chars = formats.toCharArray();
+            StringBuilder sb = new StringBuilder(formats.length());
+            
+            for (int i = 0; i < chars.length; i++) {
+                char c = chars[i];
+                
+                if (c == '&' && i++ < chars.length) {
+                    char code = Character.toLowerCase(chars[i]);
+                    
+                    if (code == 'l' || code == 'm' || code == 'n' || code == 'o' || code == 'k') {
+                        sb.append(c).append(code);
+                    }
+                }
+            }
+            
+            return sb.toString();
         }
     }
 

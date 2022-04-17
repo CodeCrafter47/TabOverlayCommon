@@ -21,8 +21,6 @@ import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
 import lombok.Getter;
 import org.yaml.snakeyaml.error.Mark;
 
-import java.awt.*;
-
 @Getter
 public class TextColor {
 

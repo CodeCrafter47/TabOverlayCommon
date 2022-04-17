@@ -35,6 +35,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     private Future<?> task;
     private TextView textView;
     private final List<TextColor> colors;
+    private final String formats;
     private final OptionalInt distance;
     private final float speed;
     private String text;
@@ -43,9 +44,10 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     private float period;
     private String replacement;
 
-    public CustomPlaceholderColorAnimation(TextTemplate textTemplate, List<TextColor> colors, OptionalInt distance, float speed) {
+    public CustomPlaceholderColorAnimation(TextTemplate textTemplate, List<TextColor> colors, String formats, OptionalInt distance, float speed) {
         this.textView = textTemplate.instantiate();
         this.colors = colors;
+        this.formats = formats;
         this.distance = distance;
         this.speed = speed;
     }
@@ -78,7 +80,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() * 9);
+        StringBuilder sb = new StringBuilder(text.length() * (9 + formats.length()));
         double d = pos;
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             double sd = d / effectiveDistance;
@@ -87,6 +89,7 @@ public class CustomPlaceholderColorAnimation extends AbstractActiveElement<Runna
             TextColor b = colors.get((ia + 1) % colors.size());
             TextColor c = TextColor.interpolateSine(a, b, sd - ia);
             sb.append(c.getFormatCode());
+            sb.append(formats);
             sb.appendCodePoint(text.codePointAt(i));
             d += ChatFormat.getCharWidth(text.codePointAt(i));
         }

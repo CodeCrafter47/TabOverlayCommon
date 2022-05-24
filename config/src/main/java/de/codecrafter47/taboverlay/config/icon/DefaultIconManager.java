@@ -21,7 +21,6 @@ import com.google.common.base.Charsets;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedHashTreeMap;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
@@ -31,6 +30,9 @@ import de.codecrafter47.taboverlay.config.view.AbstractActiveElement;
 import de.codecrafter47.taboverlay.config.view.icon.IconView;
 import de.codecrafter47.taboverlay.config.view.icon.IconViewConstant;
 import de.codecrafter47.taboverlay.config.view.icon.IconViewUpdateListener;
+import org.mineskin.MineskinClient;
+import org.mineskin.data.Skin;
+import org.mineskin.data.SkinCallback;
 import org.yaml.snakeyaml.error.Mark;
 
 import javax.annotation.Nullable;
@@ -61,6 +63,7 @@ public class DefaultIconManager implements IconManager {
     private final Cache<UUID, CompletableFuture<Icon>> cacheUUID = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).build();
     private final Cache<String, IconTemplate> cache = CacheBuilder.newBuilder().weakValues().build();
     private final Map<IconImageData, Icon> iconCache = new ConcurrentHashMap<>();
+    private final MineskinClient mineSkinClient;
 
     private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
     private final static Pattern PATTERN_VALID_UUID = Pattern.compile("(?i)[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}");
@@ -75,6 +78,7 @@ public class DefaultIconManager implements IconManager {
         this.tabEventQueue = tabEventQueue;
         this.iconFolder = iconFolder;
         this.logger = logger;
+        mineSkinClient = new MineskinClient(Executors.newSingleThreadExecutor(), "BungeeTabListPlus");
         loadIconCache();
     }
 
@@ -230,63 +234,48 @@ public class DefaultIconManager implements IconManager {
         if (iconCache.containsKey(imageData)) {
             future.complete(iconCache.get(imageData));
         } else {
-            HttpURLConnection connection = null;
+            // create transparent 64x64 image
+            BufferedImage skinImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+            for (int x = 0; x < 64; x++) {
+                for (int y = 0; y < 64; y++) {
+                    skinImage.setRGB(x, y, 0x00000000);
+                }
+            }
+            
+            // draw image at 8, 8 in skinImage
+            skinImage.setRGB(8, 8, 8, 8, rgb, 0, 8);
+            
+            // save skinImage to temp file
             try {
-                connection = (HttpURLConnection) new URL("http://skinservice.codecrafter47.dyndns.eu/api/customhead").openConnection();
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setUseCaches(false);
-                connection.setDoInput(true);
-                connection.setDoOutput(true);
-                try (DataOutputStream out = new DataOutputStream(connection.
-                        getOutputStream())) {
-                    out.write((Base64.getEncoder().encodeToString(headArray)).getBytes(Charsets.UTF_8));
-                    out.flush();
-                }
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
-                LinkedHashTreeMap map = gson.fromJson(reader, LinkedHashTreeMap.class);
-                if (map.get("state").equals("ERROR")) {
-                    future.completeExceptionally(new Exception("Server side error occurred. Try again later"));
-                    // todo retry or fall back to a different service in this case
-                } else if (map.get("state").equals("QUEUED")) {
-                    asyncExecutor.schedule(() -> fetchIconFromImage(image, future), 5, TimeUnit.SECONDS);
-                } else if (map.get("state").equals("SUCCESS")) {
-                    Icon icon = new Icon(new ProfileProperty("textures", (String) map.get("skin"), (String) map.get("signature")));
-                    iconCache.put(imageData, icon);
-
-                    future.complete(icon);
-
-                    synchronized (DefaultIconManager.this) {
-                        // save to cache
-                        Path cacheFile = iconFolder.resolve("cache.txt");
-                        BufferedWriter writer = new BufferedWriter(Files.newBufferedWriter(cacheFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND));
-                        writer.write(Base64.getEncoder().encodeToString(headArray));
-                        writer.write(' ');
-                        writer.write(icon.getTextureProperty().getValue());
-                        writer.write(' ');
-                        writer.write(icon.getTextureProperty().getSignature());
-                        writer.newLine();
-                        writer.close();
+                File tempFile = File.createTempFile("skin", ".png");
+                ImageIO.write(skinImage, "png", tempFile);
+                
+                mineSkinClient.generateUpload(tempFile, new SkinCallback() {
+                    @Override
+                    public void done(Skin skin) {
+                        Icon icon = new Icon(new ProfileProperty("textures", skin.data.texture.value, skin.data.texture.signature));
+                        iconCache.put(imageData, icon);
+                        future.complete(icon);
+                        synchronized (DefaultIconManager.this) {
+                            // save to cache
+                            try {
+                                Path cacheFile = iconFolder.resolve("cache.txt");
+                                BufferedWriter writer = new BufferedWriter(Files.newBufferedWriter(cacheFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND));
+                                writer.write(Base64.getEncoder().encodeToString(headArray));
+                                writer.write(' ');
+                                writer.write(icon.getTextureProperty().getValue());
+                                writer.write(' ');
+                                writer.write(icon.getTextureProperty().getSignature());
+                                writer.newLine();
+                                writer.close();
+                            } catch (IOException ex) {
+                                logger.log(Level.WARNING, "Failed to save icon cache", ex);
+                            }
+                        }
                     }
-                } else {
-                    future.completeExceptionally(new Exception("Server side error occurred. Unexpected response. Try again later"));
-                }
+                });
             } catch (IOException ex) {
-                logger.log(Level.WARNING, "An error occurred while trying to contact skinservice.codecrafter47.dyndns.eu", ex);
-                // retry after 5 minutes
-                // todo limit retries/ switch to a different service
-                // todo exception handling during retries
-                asyncExecutor.schedule(() -> {
-                    try {
-                        fetchIconFromImage(image, future);
-                    } catch (Exception e) {
-                        future.completeExceptionally(ex);
-                    }
-                }, 5, TimeUnit.MINUTES);
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
+                future.completeExceptionally(ex);
             }
         }
     }

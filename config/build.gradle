@@ -48,6 +48,7 @@ dependencies {
     testImplementation "com.google.code.gson:gson:2.3.1"
     testImplementation group: 'junit', name: 'junit', version: '4.11'
     implementation "it.unimi.dsi:fastutil:8.3.1"
+    implementation project(path: ':mineskin-java-client', configuration: 'shadow')
 }
 
 task sourceJar(type: Jar) {

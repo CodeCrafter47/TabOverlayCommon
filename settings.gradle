@@ -1,4 +1,5 @@
 rootProject.name = 'taboverlaycommon-api'
 
 include 'config'
+include 'mineskin-java-client'
 project(":config").name = 'taboverlaycommon-config'

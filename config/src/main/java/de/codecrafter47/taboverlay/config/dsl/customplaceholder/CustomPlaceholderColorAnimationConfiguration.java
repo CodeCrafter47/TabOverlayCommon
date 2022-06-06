@@ -61,6 +61,10 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
     @Setter
     private MarkedFloatProperty speed;
 
+    @Getter
+    @Setter
+    private MarkedStringProperty formats;
+
     public CustomPlaceholderColorAnimationConfiguration() {
         setParameters(new MarkedIntegerProperty(1));
     }
@@ -134,35 +138,60 @@ public class CustomPlaceholderColorAnimationConfiguration extends CustomPlacehol
         float finalSpeed = speed;
         TextColor finalBaseColor = baseColor;
         TextColor finalEffectColor = effectColor;
+        String finalFormats = formats == null ? "" : sanitizeFormats(formats.getValue());
 
 
         switch (effect) {
             case "rainbow":
                 return builder.acquireData(() -> {
-                    return new CustomPlaceholderColorAnimationRainbow(textTemplate, colors, finalDistance, finalSpeed);
+                    return new CustomPlaceholderColorAnimationRainbow(textTemplate, colors, finalFormats, finalDistance, finalSpeed);
                 }, TypeToken.STRING, textTemplate.requiresViewerContext());
             case "random":
                 return builder.acquireData(() -> {
-                    return new CustomPlaceholderColorAnimationRandom(textTemplate, colors);
+                    return new CustomPlaceholderColorAnimationRandom(textTemplate, colors, finalFormats);
                 }, TypeToken.STRING, textTemplate.requiresViewerContext());
             case "wave":
                 return builder.acquireData(() -> {
-                    return new CustomPlaceholderColorAnimationWave(textTemplate, finalBaseColor, finalEffectColor, finalSpeed);
+                    return new CustomPlaceholderColorAnimationWave(textTemplate, finalBaseColor, finalEffectColor, finalSpeed, finalFormats);
                 }, TypeToken.STRING, textTemplate.requiresViewerContext());
             case "waveCenter":
                 return builder.acquireData(() -> {
-                    return new CustomPlaceholderColorAnimationWaveCenter(textTemplate, finalBaseColor, finalEffectColor, finalSpeed);
+                    return new CustomPlaceholderColorAnimationWaveCenter(textTemplate, finalBaseColor, finalEffectColor, finalSpeed, finalFormats);
                 }, TypeToken.STRING, textTemplate.requiresViewerContext());
             case "glitter":
                 return builder.acquireData(() -> {
-                    return new CustomPlaceholderColorAnimationGlitter(textTemplate, finalBaseColor, finalEffectColor);
+                    return new CustomPlaceholderColorAnimationGlitter(textTemplate, finalBaseColor, finalEffectColor, finalFormats);
                 }, TypeToken.STRING, textTemplate.requiresViewerContext());
             case "uniformRainbow":
                 return builder.acquireData(() -> {
-                    return new CustomPlaceholderColorAnimationUniformRainbow(textTemplate, colors, finalDistance, finalSpeed);
+                    return new CustomPlaceholderColorAnimationUniformRainbow(textTemplate, colors, finalDistance, finalSpeed, finalFormats);
                 }, TypeToken.STRING, textTemplate.requiresViewerContext());
             default:
                 return builder;
         }
+    }
+    
+    // Make sure only valid formatting codes are provided.
+    private static String sanitizeFormats(String formats) {
+        if (formats == null) {
+            return "";
+        }
+
+        char[] chars = formats.toCharArray();
+        StringBuilder sb = new StringBuilder(formats.length());
+
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+
+            if (c == '&' && i++ < chars.length) {
+                char code = Character.toLowerCase(chars[i]);
+
+                if (code == 'l' || code == 'm' || code == 'n' || code == 'o' || code == 'k') {
+                    sb.append(c).append(code);
+                }
+            }
+        }
+
+        return sb.toString();
     }
 }

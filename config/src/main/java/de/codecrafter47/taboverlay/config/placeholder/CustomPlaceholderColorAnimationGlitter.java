@@ -34,13 +34,15 @@ public class CustomPlaceholderColorAnimationGlitter extends AbstractActiveElemen
     private final TextView textView;
     private final TextColor baseColor;
     private final TextColor effectColor;
+    private final String formats;
     private String text;
     private String replacement;
 
-    public CustomPlaceholderColorAnimationGlitter(TextTemplate textTemplate, TextColor baseColor, TextColor effectColor) {
+    public CustomPlaceholderColorAnimationGlitter(TextTemplate textTemplate, TextColor baseColor, TextColor effectColor, String formats) {
         this.textView = textTemplate.instantiate();
         this.baseColor = baseColor;
         this.effectColor = effectColor;
+        this.formats = formats;
     }
 
     void updateText() {
@@ -57,15 +59,18 @@ public class CustomPlaceholderColorAnimationGlitter extends AbstractActiveElemen
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() * 4);
+        StringBuilder sb = new StringBuilder(text.length() * (9 + formats.length()) / 2);
         sb.append(baseColor.getFormatCode());
+        sb.append(formats);
         boolean hasBaseColor = true;
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             if (!hasBaseColor) {
                 sb.append(baseColor.getFormatCode());
+                sb.append(formats);
                 hasBaseColor = true;
             } else if (Math.random() < 0.05) {
                 sb.append(effectColor.getFormatCode());
+                sb.append(formats);
                 hasBaseColor = false;
             }
             sb.appendCodePoint(text.codePointAt(i));

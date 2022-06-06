@@ -37,17 +37,19 @@ public class CustomPlaceholderColorAnimationUniformRainbow extends AbstractActiv
     private final List<TextColor> colors;
     private final OptionalInt distance;
     private final float speed;
+    private final String formats;
     private String text;
     private float effectiveDistance;
     private float pos = 0.0f;
     private float period;
     private String replacement;
 
-    public CustomPlaceholderColorAnimationUniformRainbow(TextTemplate textTemplate, List<TextColor> colors, OptionalInt distance, float speed) {
+    public CustomPlaceholderColorAnimationUniformRainbow(TextTemplate textTemplate, List<TextColor> colors, OptionalInt distance, float speed, String formats) {
         this.textView = textTemplate.instantiate();
         this.colors = colors;
         this.distance = distance;
         this.speed = speed;
+        this.formats = formats;
     }
 
     void updateText() {
@@ -78,7 +80,7 @@ public class CustomPlaceholderColorAnimationUniformRainbow extends AbstractActiv
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() + 9);
+        StringBuilder sb = new StringBuilder(text.length() + 9 + formats.length());
         double d = pos;
         double sd = d / effectiveDistance;
         int ia = (int) sd;
@@ -86,6 +88,7 @@ public class CustomPlaceholderColorAnimationUniformRainbow extends AbstractActiv
         TextColor b = colors.get((ia + 1) % colors.size());
         TextColor c = TextColor.interpolateSine(a, b, sd - ia);
         sb.append(c.getFormatCode());
+        sb.append(formats);
         sb.append(text);
         replacement = sb.toString();
     }

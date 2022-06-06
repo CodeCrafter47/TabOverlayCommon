@@ -37,16 +37,18 @@ public class CustomPlaceholderColorAnimationWave extends AbstractActiveElement<R
     private final TextColor baseColor;
     private final TextColor effectColor;
     private final float speed;
+    private final String formats;
     private String text;
     private float pos = 0.0f;
     private float period;
     private String replacement;
 
-    public CustomPlaceholderColorAnimationWave(TextTemplate textTemplate, TextColor baseColor, TextColor effectColor, float speed) {
+    public CustomPlaceholderColorAnimationWave(TextTemplate textTemplate, TextColor baseColor, TextColor effectColor, float speed, String formats) {
         this.textView = textTemplate.instantiate();
         this.baseColor = baseColor;
         this.effectColor = effectColor;
         this.speed = speed;
+        this.formats = formats;
     }
 
     void updateText() {
@@ -73,7 +75,7 @@ public class CustomPlaceholderColorAnimationWave extends AbstractActiveElement<R
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() * 9);
+        StringBuilder sb = new StringBuilder(text.length() * (9 + formats.length()));
         float min = this.pos - PULSE_RADIUS;
         float max = this.pos + PULSE_RADIUS;
         double d = 0;
@@ -83,9 +85,11 @@ public class CustomPlaceholderColorAnimationWave extends AbstractActiveElement<R
                 double factor = Math.abs(d - this.pos) / PULSE_RADIUS;
                 TextColor color = TextColor.interpolateSine(this.effectColor, this.baseColor, factor);
                 sb.append(color.getFormatCode());
+                sb.append(formats);
                 hasBaseColor = false;
             } else if (!hasBaseColor) {
                 sb.append(baseColor.getFormatCode());
+                sb.append(formats);
                 hasBaseColor = true;
             }
             sb.appendCodePoint(text.codePointAt(i));

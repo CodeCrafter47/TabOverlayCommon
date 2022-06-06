@@ -37,17 +37,19 @@ public class CustomPlaceholderColorAnimationWaveCenter extends AbstractActiveEle
     private final TextColor baseColor;
     private final TextColor effectColor;
     private final float speed;
+    private final String formats;
     private String text;
     private float pos = 0.0f;
     private float period;
     private String replacement;
     private float textLength;
 
-    public CustomPlaceholderColorAnimationWaveCenter(TextTemplate textTemplate, TextColor baseColor, TextColor effectColor, float speed) {
+    public CustomPlaceholderColorAnimationWaveCenter(TextTemplate textTemplate, TextColor baseColor, TextColor effectColor, float speed, String formats) {
         this.textView = textTemplate.instantiate();
         this.baseColor = baseColor;
         this.effectColor = effectColor;
         this.speed = speed;
+        this.formats = formats;
     }
 
     void updateText() {
@@ -74,7 +76,7 @@ public class CustomPlaceholderColorAnimationWaveCenter extends AbstractActiveEle
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() * 9);
+        StringBuilder sb = new StringBuilder(text.length() * (9 + formats.length()));
         float halfTextLength = textLength / 2f;
         float pos = halfTextLength - this.pos;
         float min = pos - PULSE_RADIUS;
@@ -96,6 +98,7 @@ public class CustomPlaceholderColorAnimationWaveCenter extends AbstractActiveEle
                 sb.append(baseColor.getFormatCode());
                 hasBaseColor = true;
             }
+            sb.append(formats);
             sb.appendCodePoint(text.codePointAt(i));
             d += ChatFormat.getCharWidth(text.codePointAt(i));
         }
@@ -113,6 +116,7 @@ public class CustomPlaceholderColorAnimationWaveCenter extends AbstractActiveEle
                 sb.append(baseColor.getFormatCode());
                 hasBaseColor = true;
             }
+            sb.append(formats);
             sb.appendCodePoint(text.codePointAt(i));
             d += ChatFormat.getCharWidth(text.codePointAt(i));
         }

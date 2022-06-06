@@ -34,12 +34,14 @@ public class CustomPlaceholderColorAnimationRandom extends AbstractActiveElement
     private Future<?> task;
     private final TextView textView;
     private final List<TextColor> colors;
+    private final String formats;
     private String text;
     private String replacement;
 
-    public CustomPlaceholderColorAnimationRandom(TextTemplate textTemplate, List<TextColor> colors) {
+    public CustomPlaceholderColorAnimationRandom(TextTemplate textTemplate, List<TextColor> colors, String formats) {
         this.textView = textTemplate.instantiate();
         this.colors = colors;
+        this.formats = formats;
     }
 
     void updateText() {
@@ -56,11 +58,13 @@ public class CustomPlaceholderColorAnimationRandom extends AbstractActiveElement
     }
 
     private void updateReplacement() {
-        StringBuilder sb = new StringBuilder(text.length() * 4);
+        StringBuilder sb = new StringBuilder(text.length() * (9 + formats.length()) / 2);
         sb.append(randomColor().getFormatCode());
+        sb.append(formats);
         for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
             if (Math.random() < 0.25) {
                 sb.append(randomColor().getFormatCode());
+                sb.append(formats);
             }
             sb.appendCodePoint(text.codePointAt(i));
         }

@@ -43,6 +43,20 @@ public class ChatFormat {
         DEFAULT_FONT = CHAR_WIDTH.get("minecraft:default");
     }
 
+    public static String lastFormatCode(String text) {
+        if (text == null) { 
+            return null;
+        }
+        String output = null;
+        for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
+            Style style = readFormatCode(text, i);
+            if (style != null) {
+                output = text.substring(i, i + style.formatCodeLength);
+            }
+        }
+        return output;
+    }
+
     public static String formattedTextToJson(String text) {
         if (text == null || text.isEmpty()) {
             return EMPTY_JSON_TEXT;

@@ -273,6 +273,24 @@ public class DefaultIconManager implements IconManager {
                             }
                         }
                     }
+
+                    @Override
+                    public void exception(Exception ex) {
+                        logger.log(Level.WARNING, "Unexpected exception while uploading skin to mineskin.org", ex);
+                        future.completeExceptionally(ex);
+                    }
+
+                    @Override
+                    public void error(String errorMessage) {
+                        logger.log(Level.WARNING, "Received error from mineskin.org: " + errorMessage);
+                        future.completeExceptionally(new Exception());
+                    }
+
+                    @Override
+                    public void parseException(Exception exception, String body) {
+                        logger.log(Level.WARNING, "Failed to parse responce from mineskin.org", exception);
+                        future.completeExceptionally(exception);
+                    }
                 });
             } catch (IOException ex) {
                 future.completeExceptionally(ex);

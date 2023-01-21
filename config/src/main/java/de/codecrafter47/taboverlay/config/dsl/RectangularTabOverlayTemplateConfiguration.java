@@ -35,6 +35,8 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
     private IconTemplateConfiguration defaultIcon;
 
     private PingTemplateConfiguration defaultPing = PingTemplateConfiguration.ZERO;
+    
+    private TextTemplateConfiguration defaultText = TextTemplateConfiguration.DEFAULT;
 
     private ComponentConfiguration components;
 
@@ -78,6 +80,9 @@ public class RectangularTabOverlayTemplateConfiguration extends AbstractTabOverl
         }
         if (ConfigValidationUtil.checkNotNull(tcc, "RECTANGULAR tab overlay", "defaultPing", defaultPing, null)) {
             child.setDefaultPing(defaultPing.toTemplate(tcc));
+        }
+        if (ConfigValidationUtil.checkNotNull(tcc, "RECTANGULAR tab overlay", "defaultText", defaultText, null)) {
+            child.setDefaultText(defaultText.toTemplate(tcc));
         }
         if (ConfigValidationUtil.checkNotNull(tcc, "RECTANGULAR tab overlay", "components", components, null)) {
             ComponentTemplate contentRoot = components.toTemplate(child);

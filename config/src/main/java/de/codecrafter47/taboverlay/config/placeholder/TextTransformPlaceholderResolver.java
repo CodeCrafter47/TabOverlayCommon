@@ -43,6 +43,7 @@ public class TextTransformPlaceholderResolver extends AbstractPlaceholderResolve
         addPlaceholder("superscript", create(CharacterMapping.from("\u207b\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u1d2c\u1d2e\u1d9c\u1d30\u1d31\u1da0\u1d33\u1d34\u1d35\u1d36\u1d37\u1d38\u1d39\u1d3a\u1d3c\u1d3e\u1d60\u1d3f\u02e2\u1d40\u1d41\u2c7d\u1d42\u02e3\u02b8\u1dbb\u1d43\u1d47\u1d9c\u1d48\u1d49\u1da0\u1d4d\u02b0\u1da6\u02b2\u1d4f\u02e1\u1d50\u207f\u1d52\u1d56\u1d60\u02b3\u02e2\u1d57\u1d58\u1d5b\u02b7\u02e3\u02b8\u1dbb")));
         addPlaceholder("bubbles", create(CharacterMapping.from("-\u24ea\u2460\u2461\u2462\u2463\u2464\u2465\u2466\u2467\u2468\u24b6\u24b7\u24b8\u24b9\u24ba\u24bb\u24bc\u24bd\u24be\u24bf\u24c0\u24c1\u24c2\u24c3\u24c4\u24c5\u24c6\u24c7\u24c8\u24c9\u24ca\u24cb\u24cc\u24cd\u24ce\u24cf\u24d0\u24d1\u24d2\u24d3\u24d4\u24d5\u24d6\u24d7\u24d8\u24d9\u24da\u24db\u24dc\u24dd\u24de\u24df\u24e0\u24e1\u24e2\u24e3\u24e4\u24e5\u24e6\u24e7\u24e8\u24e9")));
         addPlaceholder("rainbow", create(TextTransformPlaceholderResolver::rainbowString));
+        addPlaceholder("capitalize", create(TextTransformPlaceholderResolver::capitalize));
     }
 
     private PlaceholderResolver<Context> create(Function<String, String> transform) {
@@ -143,5 +144,15 @@ public class TextTransformPlaceholderResolver extends AbstractPlaceholderResolve
         }
 
         return sb.toString();
+    }
+
+    private static String capitalize(String str) {
+        String[] words = str.split(" ");
+        StringBuilder sb = new StringBuilder();
+
+        for (String word : words) {
+            sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(" ");
+        }
+        return sb.toString().trim();
     }
 }

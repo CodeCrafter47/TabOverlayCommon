@@ -89,19 +89,19 @@ public class ChatFormat {
                         jsonBuilder.append(",\"font\":\"").append(font).append("\"");
                     }
                     if (bold) {
-                        jsonBuilder.append(",\"bold\":\"true\"");
+                        jsonBuilder.append(",\"bold\":true");
                     }
                     if (italic) {
-                        jsonBuilder.append(",\"italic\":\"true\"");
+                        jsonBuilder.append(",\"italic\":true");
                     }
                     if (underlined) {
-                        jsonBuilder.append(",\"underlined\":\"true\"");
+                        jsonBuilder.append(",\"underlined\":true");
                     }
                     if (strikeout) {
-                        jsonBuilder.append(",\"strikethrough\":\"true\"");
+                        jsonBuilder.append(",\"strikethrough\":true");
                     }
                     if (obfuscated) {
-                        jsonBuilder.append(",\"obfuscated\":\"true\"");
+                        jsonBuilder.append(",\"obfuscated\":true");
                     }
                     jsonBuilder.append("}");
                     builder.setLength(0);
@@ -158,19 +158,19 @@ public class ChatFormat {
                 jsonBuilder.append(",\"font\":\"").append(font).append("\"");
             }
             if (bold) {
-                jsonBuilder.append(",\"bold\":\"true\"");
+                jsonBuilder.append(",\"bold\":true");
             }
             if (italic) {
-                jsonBuilder.append(",\"italic\":\"true\"");
+                jsonBuilder.append(",\"italic\":true");
             }
             if (underlined) {
-                jsonBuilder.append(",\"underlined\":\"true\"");
+                jsonBuilder.append(",\"underlined\":true");
             }
             if (strikeout) {
-                jsonBuilder.append(",\"strikethrough\":\"true\"");
+                jsonBuilder.append(",\"strikethrough\":true");
             }
             if (obfuscated) {
-                jsonBuilder.append(",\"obfuscated\":\"true\"");
+                jsonBuilder.append(",\"obfuscated\":true");
             }
             jsonBuilder.append("}");
             builder.setLength(0);

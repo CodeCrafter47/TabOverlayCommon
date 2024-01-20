@@ -42,7 +42,7 @@ public class PatternTokenReader extends TokenReader {
     public Token read(String text, ParsePosition position, Mark mark, TemplateCreationContext tcc) {
         if (text.regionMatches(ignoreCase, position.getIndex(), pattern, 0, pattern.length())) {
             int newIndex = position.getIndex() + pattern.length();
-            if (((newIndex + 1) < text.length() && text.charAt(newIndex + 1) == ' ') || (newIndex == (text.length() - 1))) {
+            if (((newIndex + 1) < text.length() && Character.isWhitespace(text.charAt(newIndex + 1))) || (newIndex == (text.length() - 1))) {
                 position.setIndex(position.getIndex() + pattern.length());
                 return token;
             }

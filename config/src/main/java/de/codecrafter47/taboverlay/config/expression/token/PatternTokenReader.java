@@ -41,8 +41,11 @@ public class PatternTokenReader extends TokenReader {
     @Override
     public Token read(String text, ParsePosition position, Mark mark, TemplateCreationContext tcc) {
         if (text.regionMatches(ignoreCase, position.getIndex(), pattern, 0, pattern.length())) {
-            position.setIndex(position.getIndex() + pattern.length());
-            return token;
+            int newIndex = position.getIndex() + pattern.length();
+            if (((newIndex + 1) < text.length() && text.charAt(newIndex + 1) == ' ') || (newIndex == (text.length() - 1))) {
+                position.setIndex(position.getIndex() + pattern.length());
+                return token;
+            }
         }
         return null;
     }

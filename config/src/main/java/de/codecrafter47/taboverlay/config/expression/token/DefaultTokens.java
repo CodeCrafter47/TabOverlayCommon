@@ -24,6 +24,9 @@ public class DefaultTokens {
     public static final Token CLOSING_PARENTHESIS = new Token("CLOSING_PARENTHESIS");
     public static final Token EQUAL = new Token("EQUAL");
     public static final Token NOT_EQUAL = new Token("NOT_EQUAL");
+    public static final Token STARTS_WITH = new Token("STARTS_WITH");
+    public static final Token ENDS_WITH = new Token("ENDS_WITH");
+    public static final Token CONTAINS = new Token("CONTAINS");
     public static final Token NEGATION = new Token("NEGATION");
     public static final Token GREATER_THAN = new Token("GREATER_THAN");
     public static final Token LESSER_THAN = new Token("LESSER_THAN");

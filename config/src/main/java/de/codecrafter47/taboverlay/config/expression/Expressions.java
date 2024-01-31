@@ -95,6 +95,33 @@ public class Expressions {
             }
         };
     }
+    
+    public static ToBooleanExpression startsWith(ToStringExpression a, ToStringExpression b) {
+        return new AbstractBinaryToBooleanExpression<ToStringExpression>(a, b) {
+            @Override
+            public boolean evaluate(){
+                return a.evaluate().startsWith(b.evaluate());
+            }
+        };
+    }
+    
+    public static ToBooleanExpression endsWith(ToStringExpression a, ToStringExpression b) {
+        return new AbstractBinaryToBooleanExpression<ToStringExpression>(a, b) {
+            @Override
+            public boolean evaluate(){
+                return a.evaluate().endsWith(b.evaluate());
+            }
+        };
+    }
+    
+    public static ToBooleanExpression contains(ToStringExpression a, ToStringExpression b) {
+        return new AbstractBinaryToBooleanExpression<ToStringExpression>(a, b) {
+            @Override
+            public boolean evaluate(){
+                return a.evaluate().contains(b.evaluate());
+            }
+        };
+    }
 
     public static ToBooleanExpression greaterThan(ToDoubleExpression a, ToDoubleExpression b) {
         return new AbstractBinaryToBooleanExpression<ToDoubleExpression>(a, b) {

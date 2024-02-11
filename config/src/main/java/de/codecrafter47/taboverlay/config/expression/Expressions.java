@@ -86,12 +86,30 @@ public class Expressions {
             }
         };
     }
+    
+    public static ToBooleanExpression equalIgnoreCase(ToStringExpression a, ToStringExpression b) {
+        return new AbstractBinaryToBooleanExpression<ToStringExpression>(a, b) {
+            @Override
+            public boolean evaluate() {
+                return a.evaluate().equalsIgnoreCase(b.evaluate());
+            }
+        };
+    }
 
     public static ToBooleanExpression notEqual(ToStringExpression a, ToStringExpression b) {
         return new AbstractBinaryToBooleanExpression<ToStringExpression>(a, b) {
             @Override
             public boolean evaluate() {
                 return !Objects.equals(a.evaluate(), b.evaluate());
+            }
+        };
+    }
+    
+    public static ToBooleanExpression notEqualIgnoreCase(ToStringExpression a, ToStringExpression b) {
+        return new AbstractBinaryToBooleanExpression<ToStringExpression>(a, b) {
+            @Override
+            public boolean evaluate() {
+                return !a.evaluate().equalsIgnoreCase(b.evaluate());
             }
         };
     }

@@ -23,7 +23,9 @@ public class DefaultTokens {
     public static final Token OPENING_PARENTHESIS = new Token("OPENING_PARENTHESIS");
     public static final Token CLOSING_PARENTHESIS = new Token("CLOSING_PARENTHESIS");
     public static final Token EQUAL = new Token("EQUAL");
+    public static final Token EQUAL_IGNORE_CASE = new Token("EQUAL_IGNORE_CASE");
     public static final Token NOT_EQUAL = new Token("NOT_EQUAL");
+    public static final Token NOT_EQUAL_IGNORE_CASE = new Token("NOT_EQUAL_IGNORE_CASE");
     public static final Token STARTS_WITH = new Token("STARTS_WITH");
     public static final Token ENDS_WITH = new Token("ENDS_WITH");
     public static final Token CONTAINS = new Token("CONTAINS");

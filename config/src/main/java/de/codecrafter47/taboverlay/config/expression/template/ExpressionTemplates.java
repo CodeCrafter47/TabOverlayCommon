@@ -50,9 +50,17 @@ public class ExpressionTemplates {
     public  ExpressionTemplate equal(ExpressionTemplate a, ExpressionTemplate b) {
         return new Equal(a, b);
     }
+    
+    public  ExpressionTemplate equalIgnoreCase(ExpressionTemplate a, ExpressionTemplate b) {
+        return new EqualIgnoreCase(a, b);
+    }
 
     public  ExpressionTemplate notEqual(ExpressionTemplate a, ExpressionTemplate b) {
         return new NotEqual(a, b);
+    }
+    
+    public  ExpressionTemplate notEqualIgnoreCase(ExpressionTemplate a, ExpressionTemplate b) {
+        return new NotEqualIgnoreCase(a, b);
     }
     
     public  ExpressionTemplate startsWith(ExpressionTemplate a, ExpressionTemplate b) {
@@ -204,6 +212,27 @@ public class ExpressionTemplates {
             return a.requiresViewerContext() || b.requiresViewerContext();
         }
     }
+    
+    @EqualsAndHashCode(callSuper = false)
+    private static class EqualIgnoreCase extends AbstractBooleanExpressionTemplate {
+        private final ExpressionTemplate a;
+        private final ExpressionTemplate b;
+        
+        private EqualIgnoreCase(ExpressionTemplate a, ExpressionTemplate b){
+            this.a = a;
+            this.b = b;
+        }
+        
+        @Override
+        public ToBooleanExpression instantiateWithBooleanResult(){
+            return Expressions.equalIgnoreCase(a.instantiateWithStringResult(), b.instantiateWithStringResult());
+        }
+        
+        @Override
+        public boolean requiresViewerContext(){
+            return a.requiresViewerContext() || b.requiresViewerContext();
+        }
+    }
 
     @EqualsAndHashCode(callSuper = false)
     private static class NotEqual extends AbstractBooleanExpressionTemplate {
@@ -222,6 +251,27 @@ public class ExpressionTemplates {
 
         @Override
         public boolean requiresViewerContext() {
+            return a.requiresViewerContext() || b.requiresViewerContext();
+        }
+    }
+    
+    @EqualsAndHashCode(callSuper = false)
+    private static class NotEqualIgnoreCase extends AbstractBooleanExpressionTemplate {
+        private final ExpressionTemplate a;
+        private final ExpressionTemplate b;
+        
+        private NotEqualIgnoreCase(ExpressionTemplate a, ExpressionTemplate b){
+            this.a = a;
+            this.b = b;
+        }
+        
+        @Override
+        public ToBooleanExpression instantiateWithBooleanResult(){
+            return Expressions.notEqualIgnoreCase(a.instantiateWithStringResult(), b.instantiateWithStringResult());
+        }
+        
+        @Override
+        public boolean requiresViewerContext(){
             return a.requiresViewerContext() || b.requiresViewerContext();
         }
     }

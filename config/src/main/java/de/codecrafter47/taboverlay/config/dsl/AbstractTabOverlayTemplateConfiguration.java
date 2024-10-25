@@ -69,6 +69,8 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
     private Map<MarkedStringProperty, PlayerSetConfiguration> playerSets = new HashMap<>();
 
     private BasicComponentConfiguration.LongTextBehaviour longText = BasicComponentConfiguration.LongTextBehaviour.DISPLAY_ALL;
+    
+    private String customLongText = "";
 
     public T toTemplate(TemplateCreationContext tcc) {
         T template = createTemplate();
@@ -196,6 +198,7 @@ public abstract class AbstractTabOverlayTemplateConfiguration<T extends Abstract
         }
 
         tcc.setDefaultLongTextBehaviour(longText);
+        tcc.setCustomLongText(customLongText);
 
     }
 }

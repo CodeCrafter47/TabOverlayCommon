@@ -76,6 +76,8 @@ public class TemplateCreationContext implements Cloneable {
     private PlayerSetConfiguration.Visibility defaultHiddenPlayerVisibility = PlayerSetConfiguration.Visibility.VISIBLE_TO_ADMINS;
 
     private BasicComponentConfiguration.LongTextBehaviour defaultLongTextBehaviour = null;
+    
+    private String customLongText = null;
 
     private boolean viewerAvailable = false;
 
@@ -92,6 +94,10 @@ public class TemplateCreationContext implements Cloneable {
 
     public Optional<BasicComponentConfiguration.LongTextBehaviour> getDefaultLongTextBehaviour() {
         return Optional.ofNullable(defaultLongTextBehaviour);
+    }
+    
+    public Optional<String> getDefaultCustomLongText(){
+        return Optional.ofNullable(customLongText);
     }
 
     public ComponentTemplate emptySlot() {

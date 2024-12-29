@@ -35,6 +35,7 @@ public class BasicComponentTemplate implements ComponentTemplate {
     PingTemplate ping;
     IconTemplate icon;
     BasicComponentConfiguration.LongTextBehaviour longText;
+    String customLongText;
 
     @Override
     public LayoutInfo getLayoutInfo() {
@@ -50,6 +51,6 @@ public class BasicComponentTemplate implements ComponentTemplate {
         return new BasicComponentView(leftText != null ? leftText.instantiate() : null,
                 centerText != null ? centerText.instantiate() : null,
                 rightText != null ? rightText.instantiate() : null,
-                ping.instantiate(), icon.instantiate(), longText);
+                ping.instantiate(), icon.instantiate(), longText, customLongText);
     }
 }

@@ -46,6 +46,7 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
     private PingTemplateConfiguration ping = PingTemplateConfiguration.DEFAULT;
     private Alignment alignment = Alignment.LEFT;
     private LongTextBehaviour longText = null;
+    private String customLongText = null;
 
     private transient boolean needToFixMark = false;
 
@@ -88,6 +89,7 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
                 .rightText(rightTemplate)
                 .ping(ping != null ? ping.toTemplate(tcc) : tcc.getDefaultPing())
                 .longText(Optional.ofNullable(longText).orElse(tcc.getDefaultLongTextBehaviour().orElse(LongTextBehaviour.DISPLAY_ALL)))
+                .customLongText(Optional.ofNullable(customLongText).orElse(tcc.getDefaultCustomLongText().orElse("")))
                 .build();
     }
 
@@ -96,6 +98,6 @@ public class BasicComponentConfiguration extends MarkedPropertyBase implements C
     }
 
     public enum LongTextBehaviour {
-        DISPLAY_ALL, CROP, CROP_2DOTS, CROP_3DOTS;
+        DISPLAY_ALL, CROP, CROP_2DOTS, CROP_3DOTS, CUSTOM;
     }
 }

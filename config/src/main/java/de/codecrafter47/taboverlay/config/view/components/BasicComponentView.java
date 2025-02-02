@@ -39,19 +39,21 @@ public final class BasicComponentView extends ComponentView implements TextViewU
     private final PingView pingView;
     private final IconView iconView;
     private final BasicComponentConfiguration.LongTextBehaviour longText;
+    private final String customLongText;
     private int slotWidth;
     @Nullable
     private UUID uuid;
     @Nullable
     private String textAfterAlignment;
 
-    public BasicComponentView(TextView leftTextView, TextView centerTextView, TextView rightTextView, PingView pingView, IconView iconView, BasicComponentConfiguration.LongTextBehaviour longText) {
+    public BasicComponentView(TextView leftTextView, TextView centerTextView, TextView rightTextView, PingView pingView, IconView iconView, BasicComponentConfiguration.LongTextBehaviour longText, String customLongText) {
         this.leftTextView = leftTextView;
         this.centerTextView = centerTextView;
         this.rightTextView = rightTextView;
         this.pingView = pingView;
         this.iconView = iconView;
         this.longText = longText;
+        this.customLongText = customLongText;
     }
 
     @Override
@@ -104,6 +106,8 @@ public final class BasicComponentView extends ComponentView implements TextViewU
                     suffix = "..";
                 } else if (longText == BasicComponentConfiguration.LongTextBehaviour.CROP_3DOTS) {
                     suffix = "...";
+                } else if (longText == BasicComponentConfiguration.LongTextBehaviour.CUSTOM) {
+                    suffix = customLongText;
                 }
                 float suffixLength = ChatFormat.formattedTextLength(suffix);
                 leftText = ChatFormat.cropFormattedText(leftText, slotWidth - ((rightTextView != null ? 4f : 0f) + rightTextLength) - suffixLength) + suffix;

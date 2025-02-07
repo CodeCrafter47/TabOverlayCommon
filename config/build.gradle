@@ -21,7 +21,10 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java-library'
 apply plugin: 'ru.vyarus.quality'
 
-sourceCompatibility = 1.8
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()

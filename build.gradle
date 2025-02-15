@@ -15,8 +15,6 @@ apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 apply plugin: 'ru.vyarus.quality'
 
-sourceCompatibility = 1.8
-
 repositories {
     mavenCentral()
     maven {
@@ -46,6 +44,9 @@ dependencies {
 java {
     withJavadocJar()
     withSourcesJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 task sourceJar(type: Jar) {
